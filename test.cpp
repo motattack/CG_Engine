@@ -7,6 +7,9 @@
 #include <vec3.h>
 #include <vec3.hpp>
 
+#include <vec4.h>
+#include <vec4.hpp>
+
 #include <geometric.hpp>
 
 /* \\\\\\\\\\\\\\\ TEST FOR VEC 2 ////////////// */
@@ -353,6 +356,186 @@ TEST_CASE("!= Vec3", "[Vec3]") {
 
     glm::vec3 resA2(7, 7, 2);
     glm::vec3 resB2(7, 2, 2);
+    bool res2 = resA2 != resB2;
+
+    REQUIRE(res1 == res2);
+}
+
+/* \\\\\\\\\\\\\\\ TEST FOR VEC 4 ////////////// */
+
+TEST_CASE("Constructor Vec4", "[Vec4]") {
+    Vec4 res1(5, 7, 2, 3);
+    glm::vec4 res2(5, 7, 2, 3);
+
+    REQUIRE(res1.x == res2.x);
+    REQUIRE(res1.y == res2.y);
+    REQUIRE(res1.z == res2.z);
+    REQUIRE(res1.w == res2.w);
+}
+
+TEST_CASE("Length Vec4", "[Vec4]") {
+    Vec4 res1(5, 7, 2, 3);
+    glm::vec4 res2(5, 7, 2, 3);
+
+    REQUIRE(res1.len() == glm::length(res2));
+}
+
+TEST_CASE("+ Vec4", "[Vec4]") {
+    Vec4 resA1(5, 7, 2, 3);
+    Vec4 resB1(7, 5, 2, 3);
+    Vec4 res1 = resA1 + resB1;
+
+    glm::vec4 resA2(5, 7, 2, 3);
+    glm::vec4 resB2(7, 5, 2, 3);
+    glm::vec4 res2 = resA2 + resB2;
+
+    REQUIRE(res1.x == res2.x);
+    REQUIRE(res1.y == res2.y);
+    REQUIRE(res1.z == res2.z);
+    REQUIRE(res1.w == res2.w);
+}
+
+TEST_CASE("+= Vec4", "[Vec4]") {
+    Vec4 resA1(5, 7, 2, 3);
+    Vec4 resB1(7, 5, 2, 3);
+    resA1 += resB1;
+
+    glm::vec4 resA2(5, 7, 2, 3);
+    glm::vec4 resB2(7, 5, 2, 3);
+    resA2 += resB2;
+
+    REQUIRE(resA1.x == resA2.x);
+    REQUIRE(resA1.y == resA2.y);
+    REQUIRE(resA1.z == resA2.z);
+    REQUIRE(resA1.w == resA2.w);
+}
+
+TEST_CASE("- Vec4", "[Vec4]") {
+    Vec4 resA1(5, 7, 2, 3);
+    Vec4 resB1(7, 5, 2, 3);
+    Vec4 res1 = resA1 - resB1;
+
+    glm::vec4 resA2(5, 7, 2, 3);
+    glm::vec4 resB2(7, 5, 2, 3);
+    glm::vec4 res2 = resA2 - resB2;
+
+    REQUIRE(res1.x == res2.x);
+    REQUIRE(res1.y == res2.y);
+    REQUIRE(res1.z == res2.z);
+    REQUIRE(res1.w == res2.w);
+}
+
+TEST_CASE("-= Vec4", "[Vec4]") {
+    Vec4 resA1(5, 7, 2, 3);
+    Vec4 resB1(7, 5, 2, 3);
+    resA1 -= resB1;
+
+    glm::vec4 resA2(5, 7, 2, 3);
+    glm::vec4 resB2(7, 5, 2, 3);
+    resA2 -= resB2;
+
+    REQUIRE(resA1.x == resA2.x);
+    REQUIRE(resA1.y == resA2.y);
+    REQUIRE(resA1.z == resA2.z);
+    REQUIRE(resA1.w == resA2.w);
+}
+
+
+TEST_CASE("dot product Vec4", "[Vec4]") {
+    Vec4 vecA1(12, 1, 2, 3);
+    Vec4 vecB1(8, 5, 2, 3);
+    float res1 = vecA1.dotProduct(vecB1);
+
+    glm::vec4 vecA2 = glm::vec4(12, 1, 2, 3);
+    glm::vec4 vecB2 = glm::vec4(8, 5, 2, 3);
+    float res2 = glm::dot(vecA2, vecB2);
+
+    REQUIRE(res1 == res2);
+}
+
+TEST_CASE("* Vec4", "[Vec4]") {
+    Vec4 vec1(12, 7, 2, 3);
+    Vec4 res1(vec1 * 2.0f);
+
+    glm::vec4 vec2 = glm::vec4(12, 7, 2, 3);
+    glm::vec4 res2 = vec2 * 2.0f;
+
+    REQUIRE(res1.x == res2.x);
+    REQUIRE(res1.y == res2.y);
+    REQUIRE(res1.z == res2.z);
+    REQUIRE(res1.w == res2.w);
+}
+
+TEST_CASE("*= Vec4", "[Vec4]") {
+    Vec4 vec1(12, 7, 2, 3);
+    vec1 *= 6.0f;
+
+    glm::vec4 vec2 = glm::vec4(12, 7, 2, 3);
+    vec2 *= 6.0f;
+
+    REQUIRE(vec1.x == vec2.x);
+    REQUIRE(vec1.y == vec2.y);
+}
+
+TEST_CASE("/ Vec4", "[Vec4]") {
+    Vec4 vec1(12, 7, 2, 3);
+    Vec4 res1(vec1 / 2.0f);
+
+    glm::vec4 vec2 = glm::vec4(12, 7, 2, 3);
+    glm::vec4 res2 = vec2 / 2.0f;
+
+    REQUIRE(res1.x == res2.x);
+    REQUIRE(res1.y == res2.y);
+    REQUIRE(res1.z == res2.z);
+    REQUIRE(res1.w == res2.w);
+}
+
+TEST_CASE("/= Vec4", "[Vec4]") {
+    Vec4 vec1(12, 7, 2, 3);
+    vec1 /= 6.0f;
+
+    glm::vec4 vec2 = glm::vec4(12, 7, 2, 3);
+    vec2 /= 6.0f;
+
+    REQUIRE(vec1.x == vec2.x);
+    REQUIRE(vec1.y == vec2.y);
+    REQUIRE(vec1.z == vec2.z);
+    REQUIRE(vec1.w == vec2.w);
+}
+
+//// WAIT WHAT?
+//TEST_CASE("Normalize Vec4", "[Vec4]") {
+//    Vec4 vec1(12, 7, 2, 3);
+//    Vec4 res1 = vec1.normalize();
+//
+//    glm::vec4 vec2 = glm::vec4(12, 7, 2, 3);
+//    glm::vec4 res2 = glm::normalize(vec2);
+//
+//    REQUIRE(res1.x == res2.x);
+//    REQUIRE(res1.y == res2.y);
+//    REQUIRE(res1.z == res2.z);
+//    REQUIRE(res1.w == res2.w);
+//}
+
+TEST_CASE("== Vec4", "[Vec4]") {
+    Vec4 resA1(7, 7, 2, 3);
+    Vec4 resB1(7, 7, 2, 3);
+    bool res1 = resA1 == resB1;
+
+    glm::vec4 resA2(7, 7, 2, 3);
+    glm::vec4 resB2(7, 7, 2, 3);
+    bool res2 = resA2 == resB2;
+
+    REQUIRE(res1 == res2);
+}
+
+TEST_CASE("!= Vec4", "[Vec4]") {
+    Vec4 resA1(7, 7, 2, 3);
+    Vec4 resB1(7, 2, 2, 3);
+    bool res1 = resA1 != resB1;
+
+    glm::vec4 resA2(7, 7, 2, 3);
+    glm::vec4 resB2(7, 2, 2, 3);
     bool res2 = resA2 != resB2;
 
     REQUIRE(res1 == res2);
