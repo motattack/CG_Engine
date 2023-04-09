@@ -6,7 +6,6 @@ include_directories(${CMAKE_SOURCE_DIR}/libs/glew-2.1.0/include)
 include_directories(${CMAKE_SOURCE_DIR}/libs/SFML-2.5.1/include)
 
 # Link directories for GLEW and SFML
-
 link_directories(${CMAKE_SOURCE_DIR}/libs/glew-2.1.0/lib/Release/x64)
 link_directories(${CMAKE_SOURCE_DIR}/libs/SFML-2.5.1/lib)
 
