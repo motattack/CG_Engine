@@ -10,11 +10,15 @@
 #include <vec4.h>
 #include <vec4.hpp>
 
+#include <mat2x2.h>
+#include <mat2x2.hpp>
+
 #include <geometric.hpp>
+#include <gtc/matrix_access.hpp>
 
 /* \\\\\\\\\\\\\\\ TEST FOR VEC 2 ////////////// */
 
-TEST_CASE("Constructor", "[Vec2]") {
+TEST_CASE("Constructor", "[Vector]") {
     Vec2 res1(5, 7);
     glm::vec2 res2(5, 7);
 
@@ -22,14 +26,14 @@ TEST_CASE("Constructor", "[Vec2]") {
     REQUIRE(res1.y == res2.y);
 }
 
-TEST_CASE("Length", "[Vec2]") {
+TEST_CASE("Length", "[Vector]") {
     Vec2 res1(5, 7);
     glm::vec2 res2(5, 7);
 
     REQUIRE(res1.len() == glm::length(res2));
 }
 
-TEST_CASE("+", "[Vec2]") {
+TEST_CASE("+", "[Vector]") {
     Vec2 resA1(5, 7);
     Vec2 resB1(7, 5);
     Vec2 res1 = resA1 + resB1;
@@ -42,7 +46,7 @@ TEST_CASE("+", "[Vec2]") {
     REQUIRE(res1.y == res2.y);
 }
 
-TEST_CASE("+=", "[Vec2]") {
+TEST_CASE("+=", "[Vector]") {
     Vec2 resA1(5, 7);
     Vec2 resB1(7, 5);
     resA1 += resB1;
@@ -55,7 +59,7 @@ TEST_CASE("+=", "[Vec2]") {
     REQUIRE(resA1.y == resA2.y);
 }
 
-TEST_CASE("-", "[Vec2]") {
+TEST_CASE("-", "[Vector]") {
     Vec2 resA1(5, 7);
     Vec2 resB1(7, 5);
     Vec2 res1 = resA1 - resB1;
@@ -68,7 +72,7 @@ TEST_CASE("-", "[Vec2]") {
     REQUIRE(res1.y == res2.y);
 }
 
-TEST_CASE("-=", "[Vec2]") {
+TEST_CASE("-=", "[Vector]") {
     Vec2 resA1(5, 7);
     Vec2 resB1(7, 5);
     resA1 -= resB1;
@@ -82,7 +86,7 @@ TEST_CASE("-=", "[Vec2]") {
 }
 
 
-TEST_CASE("dot product", "[Vec2]") {
+TEST_CASE("dot product", "[Vector]") {
     Vec2 vecA1(12, 1);
     Vec2 vecB1(8, 5);
     float res1 = vecA1.dotProduct(vecB1);
@@ -94,7 +98,7 @@ TEST_CASE("dot product", "[Vec2]") {
     REQUIRE(res1 == res2);
 }
 
-TEST_CASE("*", "[Vec2]") {
+TEST_CASE("*", "[Vector]") {
     Vec2 vec1(12, 7);
     Vec2 res1(vec1 * 2.0f);
 
@@ -105,7 +109,7 @@ TEST_CASE("*", "[Vec2]") {
     REQUIRE(res1.y == res2.y);
 }
 
-TEST_CASE("*=", "[Vec2]") {
+TEST_CASE("*=", "[Vector]") {
     Vec2 vec1(12, 7);
     vec1 *= 6.0f;
 
@@ -116,7 +120,7 @@ TEST_CASE("*=", "[Vec2]") {
     REQUIRE(vec1.y == vec2.y);
 }
 
-TEST_CASE("/", "[Vec2]") {
+TEST_CASE("/", "[Vector]") {
     Vec2 vec1(12, 7);
     Vec2 res1(vec1 / 2.0f);
 
@@ -127,7 +131,7 @@ TEST_CASE("/", "[Vec2]") {
     REQUIRE(res1.y == res2.y);
 }
 
-TEST_CASE("/=", "[Vec2]") {
+TEST_CASE("/=", "[Vector]") {
     Vec2 vec1(12, 7);
     vec1 /= 6.0f;
 
@@ -139,7 +143,7 @@ TEST_CASE("/=", "[Vec2]") {
 }
 
 //// WAIT WHAT?
-//TEST_CASE("Normalize", "[Vec2]") {
+//TEST_CASE("Normalize", "[Vector]") {
 //    Vec2 vec1(12, 7);
 //    Vec2 res1 = vec1.normalize();
 //
@@ -150,7 +154,7 @@ TEST_CASE("/=", "[Vec2]") {
 //    REQUIRE(res1.y == res2.y);
 //}
 
-TEST_CASE("==", "[Vec2]") {
+TEST_CASE("==", "[Vector]") {
     Vec2 resA1(7, 7);
     Vec2 resB1(7, 7);
     bool res1 = resA1 == resB1;
@@ -162,7 +166,7 @@ TEST_CASE("==", "[Vec2]") {
     REQUIRE(res1 == res2);
 }
 
-TEST_CASE("!=", "[Vec2]") {
+TEST_CASE("!=", "[Vector]") {
     Vec2 resA1(7, 7);
     Vec2 resB1(7, 2);
     bool res1 = resA1 != resB1;
@@ -176,7 +180,7 @@ TEST_CASE("!=", "[Vec2]") {
 
 /* \\\\\\\\\\\\\\\ TEST FOR VEC 3 ////////////// */
 
-TEST_CASE("Constructor Vec3", "[Vec3]") {
+TEST_CASE("Constructor Vec3", "[Vector]") {
     Vec3 res1(5, 7, 2);
     glm::vec3 res2(5, 7, 2);
 
@@ -186,14 +190,14 @@ TEST_CASE("Constructor Vec3", "[Vec3]") {
 
 }
 
-TEST_CASE("Length Vec3", "[Vec3]") {
+TEST_CASE("Length Vec3", "[Vector]") {
     Vec3 res1(5, 7, 2);
     glm::vec3 res2(5, 7, 2);
 
     REQUIRE(res1.len() == glm::length(res2));
 }
 
-TEST_CASE("+ Vec3", "[Vec3]") {
+TEST_CASE("+ Vec3", "[Vector]") {
     Vec3 resA1(5, 7, 2);
     Vec3 resB1(7, 5, 1);
     Vec3 res1 = resA1 + resB1;
@@ -207,7 +211,7 @@ TEST_CASE("+ Vec3", "[Vec3]") {
     REQUIRE(res1.z == res2.z);
 }
 
-TEST_CASE("+= Vec3", "[Vec3]") {
+TEST_CASE("+= Vec3", "[Vector]") {
     Vec3 resA1(5, 7, 2);
     Vec3 resB1(7, 5, 2);
     resA1 += resB1;
@@ -221,7 +225,7 @@ TEST_CASE("+= Vec3", "[Vec3]") {
     REQUIRE(resA1.z == resA2.z);
 }
 
-TEST_CASE("- Vec3", "[Vec3]") {
+TEST_CASE("- Vec3", "[Vector]") {
     Vec3 resA1(5, 7, 2);
     Vec3 resB1(7, 5, 2);
     Vec3 res1 = resA1 - resB1;
@@ -235,7 +239,7 @@ TEST_CASE("- Vec3", "[Vec3]") {
     REQUIRE(res1.z == res2.z);
 }
 
-TEST_CASE("-= Vec3", "[Vec3]") {
+TEST_CASE("-= Vec3", "[Vector]") {
     Vec3 resA1(5, 7, 2);
     Vec3 resB1(7, 5, 2);
     resA1 -= resB1;
@@ -250,7 +254,7 @@ TEST_CASE("-= Vec3", "[Vec3]") {
 }
 
 
-TEST_CASE("dot product Vec3", "[Vec3]") {
+TEST_CASE("dot product Vec3", "[Vector]") {
     Vec3 vecA1(12, 1, 2);
     Vec3 vecB1(8, 5, 2);
     float res1 = vecA1.dotProduct(vecB1);
@@ -262,7 +266,7 @@ TEST_CASE("dot product Vec3", "[Vec3]") {
     REQUIRE(res1 == res2);
 }
 
-TEST_CASE("cross product Vec3", "[Vec3]") {
+TEST_CASE("cross product Vec3", "[Vector]") {
     Vec3 vecA1(15, 12, 1337);
     Vec3 vecB1(134, 0, 777);
     Vec3 res1(vecA1.crossProduct(vecB1));
@@ -276,7 +280,7 @@ TEST_CASE("cross product Vec3", "[Vec3]") {
     REQUIRE(res1.z == res2.z);
 }
 
-TEST_CASE("* Vec3", "[Vec3]") {
+TEST_CASE("* Vec3", "[Vector]") {
     Vec3 vec1(12, 7, 2);
     Vec3 res1(vec1 * 2.0f);
 
@@ -288,7 +292,7 @@ TEST_CASE("* Vec3", "[Vec3]") {
     REQUIRE(res1.z == res2.z);
 }
 
-TEST_CASE("*= Vec3", "[Vec3]") {
+TEST_CASE("*= Vec3", "[Vector]") {
     Vec3 vec1(12, 7, 2);
     vec1 *= 6.0f;
 
@@ -300,7 +304,7 @@ TEST_CASE("*= Vec3", "[Vec3]") {
     REQUIRE(vec1.z == vec2.z);
 }
 
-TEST_CASE("/ Vec3", "[Vec3]") {
+TEST_CASE("/ Vec3", "[Vector]") {
     Vec3 vec1(12, 7, 2);
     Vec3 res1(vec1 / 2.0f);
 
@@ -312,7 +316,7 @@ TEST_CASE("/ Vec3", "[Vec3]") {
     REQUIRE(res1.z == res2.z);
 }
 
-TEST_CASE("/= Vec3", "[Vec3]") {
+TEST_CASE("/= Vec3", "[Vector]") {
     Vec3 vec1(12, 7, 2);
     vec1 /= 6.0f;
 
@@ -325,7 +329,7 @@ TEST_CASE("/= Vec3", "[Vec3]") {
 }
 
 //// WAIT WHAT?
-//TEST_CASE("Normalize Vec3", "[Vec3]") {
+//TEST_CASE("Normalize Vec3", "[Vector]") {
 //    Vec3 vec1(12, 7, 2);
 //    Vec3 res1 = vec1.normalize();
 //
@@ -337,7 +341,7 @@ TEST_CASE("/= Vec3", "[Vec3]") {
 //    REQUIRE(res1.z == res2.z);
 //}
 
-TEST_CASE("== Vec3", "[Vec3]") {
+TEST_CASE("== Vec3", "[Vector]") {
     Vec3 resA1(7, 7, 2);
     Vec3 resB1(7, 7, 2);
     bool res1 = resA1 == resB1;
@@ -349,7 +353,7 @@ TEST_CASE("== Vec3", "[Vec3]") {
     REQUIRE(res1 == res2);
 }
 
-TEST_CASE("!= Vec3", "[Vec3]") {
+TEST_CASE("!= Vec3", "[Vector]") {
     Vec3 resA1(7, 7, 2);
     Vec3 resB1(7, 2, 2);
     bool res1 = resA1 != resB1;
@@ -363,7 +367,7 @@ TEST_CASE("!= Vec3", "[Vec3]") {
 
 /* \\\\\\\\\\\\\\\ TEST FOR VEC 4 ////////////// */
 
-TEST_CASE("Constructor Vec4", "[Vec4]") {
+TEST_CASE("Constructor Vec4", "[Vector]") {
     Vec4 res1(5, 7, 2, 3);
     glm::vec4 res2(5, 7, 2, 3);
 
@@ -373,14 +377,14 @@ TEST_CASE("Constructor Vec4", "[Vec4]") {
     REQUIRE(res1.w == res2.w);
 }
 
-TEST_CASE("Length Vec4", "[Vec4]") {
+TEST_CASE("Length Vec4", "[Vector]") {
     Vec4 res1(5, 7, 2, 3);
     glm::vec4 res2(5, 7, 2, 3);
 
     REQUIRE(res1.len() == glm::length(res2));
 }
 
-TEST_CASE("+ Vec4", "[Vec4]") {
+TEST_CASE("+ Vec4", "[Vector]") {
     Vec4 resA1(5, 7, 2, 3);
     Vec4 resB1(7, 5, 2, 3);
     Vec4 res1 = resA1 + resB1;
@@ -395,7 +399,7 @@ TEST_CASE("+ Vec4", "[Vec4]") {
     REQUIRE(res1.w == res2.w);
 }
 
-TEST_CASE("+= Vec4", "[Vec4]") {
+TEST_CASE("+= Vec4", "[Vector]") {
     Vec4 resA1(5, 7, 2, 3);
     Vec4 resB1(7, 5, 2, 3);
     resA1 += resB1;
@@ -410,7 +414,7 @@ TEST_CASE("+= Vec4", "[Vec4]") {
     REQUIRE(resA1.w == resA2.w);
 }
 
-TEST_CASE("- Vec4", "[Vec4]") {
+TEST_CASE("- Vec4", "[Vector]") {
     Vec4 resA1(5, 7, 2, 3);
     Vec4 resB1(7, 5, 2, 3);
     Vec4 res1 = resA1 - resB1;
@@ -425,7 +429,7 @@ TEST_CASE("- Vec4", "[Vec4]") {
     REQUIRE(res1.w == res2.w);
 }
 
-TEST_CASE("-= Vec4", "[Vec4]") {
+TEST_CASE("-= Vec4", "[Vector]") {
     Vec4 resA1(5, 7, 2, 3);
     Vec4 resB1(7, 5, 2, 3);
     resA1 -= resB1;
@@ -441,7 +445,7 @@ TEST_CASE("-= Vec4", "[Vec4]") {
 }
 
 
-TEST_CASE("dot product Vec4", "[Vec4]") {
+TEST_CASE("dot product Vec4", "[Vector]") {
     Vec4 vecA1(12, 1, 2, 3);
     Vec4 vecB1(8, 5, 2, 3);
     float res1 = vecA1.dotProduct(vecB1);
@@ -453,7 +457,7 @@ TEST_CASE("dot product Vec4", "[Vec4]") {
     REQUIRE(res1 == res2);
 }
 
-TEST_CASE("* Vec4", "[Vec4]") {
+TEST_CASE("* Vec4", "[Vector]") {
     Vec4 vec1(12, 7, 2, 3);
     Vec4 res1(vec1 * 2.0f);
 
@@ -466,7 +470,7 @@ TEST_CASE("* Vec4", "[Vec4]") {
     REQUIRE(res1.w == res2.w);
 }
 
-TEST_CASE("*= Vec4", "[Vec4]") {
+TEST_CASE("*= Vec4", "[Vector]") {
     Vec4 vec1(12, 7, 2, 3);
     vec1 *= 6.0f;
 
@@ -477,7 +481,7 @@ TEST_CASE("*= Vec4", "[Vec4]") {
     REQUIRE(vec1.y == vec2.y);
 }
 
-TEST_CASE("/ Vec4", "[Vec4]") {
+TEST_CASE("/ Vec4", "[Vector]") {
     Vec4 vec1(12, 7, 2, 3);
     Vec4 res1(vec1 / 2.0f);
 
@@ -490,7 +494,7 @@ TEST_CASE("/ Vec4", "[Vec4]") {
     REQUIRE(res1.w == res2.w);
 }
 
-TEST_CASE("/= Vec4", "[Vec4]") {
+TEST_CASE("/= Vec4", "[Vector]") {
     Vec4 vec1(12, 7, 2, 3);
     vec1 /= 6.0f;
 
@@ -504,7 +508,7 @@ TEST_CASE("/= Vec4", "[Vec4]") {
 }
 
 //// WAIT WHAT?
-//TEST_CASE("Normalize Vec4", "[Vec4]") {
+//TEST_CASE("Normalize Vec4", "[Vector]") {
 //    Vec4 vec1(12, 7, 2, 3);
 //    Vec4 res1 = vec1.normalize();
 //
@@ -517,7 +521,7 @@ TEST_CASE("/= Vec4", "[Vec4]") {
 //    REQUIRE(res1.w == res2.w);
 //}
 
-TEST_CASE("== Vec4", "[Vec4]") {
+TEST_CASE("== Vec4", "[Vector]") {
     Vec4 resA1(7, 7, 2, 3);
     Vec4 resB1(7, 7, 2, 3);
     bool res1 = resA1 == resB1;
@@ -529,7 +533,7 @@ TEST_CASE("== Vec4", "[Vec4]") {
     REQUIRE(res1 == res2);
 }
 
-TEST_CASE("!= Vec4", "[Vec4]") {
+TEST_CASE("!= Vec4", "[Vector]") {
     Vec4 resA1(7, 7, 2, 3);
     Vec4 resB1(7, 2, 2, 3);
     bool res1 = resA1 != resB1;
@@ -537,6 +541,310 @@ TEST_CASE("!= Vec4", "[Vec4]") {
     glm::vec4 resA2(7, 7, 2, 3);
     glm::vec4 resB2(7, 2, 2, 3);
     bool res2 = resA2 != resB2;
+
+    REQUIRE(res1 == res2);
+}
+
+/* \\\\\\\\\\\\\\\ TEST FOR MATRIX 2 ////////////// */
+
+TEST_CASE("Constructor Mat2x2", "[Mat]") {
+    Mat2x2 res1(2);
+    glm::mat2 res2(2);
+
+    REQUIRE(res1[0][0] == res2[0][0]);
+    REQUIRE(res1[0][1] == res2[0][1]);
+    REQUIRE(res1[1][0] == res2[1][0]);
+    REQUIRE(res1[1][1] == res2[1][1]);
+}
+
+TEST_CASE("+ Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    Mat2x2 matTwo(5, 6, 7, 8);
+    Mat2x2 res1;
+    res1 = matOne + matTwo;
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    glm::mat2 mat2 = glm::mat2(5, 6, 7, 8);
+    glm::mat2 res2 = mat1 + mat2;
+
+    REQUIRE(res1[0][0] == res2[0][0]);
+    REQUIRE(res1[0][1] == res2[0][1]);
+    REQUIRE(res1[1][0] == res2[1][0]);
+    REQUIRE(res1[1][1] == res2[1][1]);
+}
+
+TEST_CASE("+= Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    Mat2x2 matTwo(5, 6, 7, 8);
+    matOne += matTwo;
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    glm::mat2 mat2 = glm::mat2(5, 6, 7, 8);
+    mat1 += mat2;
+
+    REQUIRE(mat1[0][0] == matOne[0][0]);
+    REQUIRE(mat1[0][1] == matOne[0][1]);
+    REQUIRE(mat1[1][0] == matOne[1][0]);
+    REQUIRE(mat1[1][1] == matOne[1][1]);
+}
+
+TEST_CASE("- Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    Mat2x2 matTwo(5, 6, 7, 8);
+    Mat2x2 fuc = matOne - matTwo;
+    Mat2x2 res1 = fuc;
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    glm::mat2 mat2 = glm::mat2(5, 6, 7, 8);
+    glm::mat2 res2 = mat1 - mat2;
+
+    REQUIRE(res1[0][0] == res2[0][0]);
+    REQUIRE(res1[0][1] == res2[0][1]);
+    REQUIRE(res1[1][0] == res2[1][0]);
+    REQUIRE(res1[1][1] == res2[1][1]);
+}
+
+TEST_CASE("-= Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    Mat2x2 matTwo(5, 6, 7, 8);
+    matOne -= matTwo;
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    glm::mat2 mat2 = glm::mat2(5, 6, 7, 8);
+    mat1 -= mat2;
+
+    REQUIRE(mat1[0][0] == matOne[0][0]);
+    REQUIRE(mat1[0][1] == matOne[0][1]);
+    REQUIRE(mat1[1][0] == matOne[1][0]);
+    REQUIRE(mat1[1][1] == matOne[1][1]);
+}
+
+TEST_CASE("* Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    Mat2x2 matTwo(5, 6, 7, 8);
+    Mat2x2 res1(matOne * matTwo);
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    glm::mat2 mat2 = glm::mat2(5, 6, 7, 8);
+    glm::mat2 res2 = mat1 * mat2;
+
+    REQUIRE(res1[0][0] == res2[0][0]);
+    REQUIRE(res1[0][1] == res2[0][1]);
+    REQUIRE(res1[1][0] == res2[1][0]);
+    REQUIRE(res1[1][1] == res2[1][1]);
+}
+
+TEST_CASE("*= Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    Mat2x2 matTwo(5, 6, 7, 8);
+    matOne *= matTwo;
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    glm::mat2 mat2 = glm::mat2(5, 6, 7, 8);
+    mat1 *= mat2;
+
+    REQUIRE(mat1[0][0] == matOne[0][0]);
+    REQUIRE(mat1[0][1] == matOne[0][1]);
+    REQUIRE(mat1[1][0] == matOne[1][0]);
+    REQUIRE(mat1[1][1] == matOne[1][1]);
+}
+
+TEST_CASE("*x Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    Mat2x2 res1(matOne * 15.0f);
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    glm::mat2 res2 = mat1 * 15.0f;
+
+    REQUIRE(res1[0][0] == res2[0][0]);
+    REQUIRE(res1[0][1] == res2[0][1]);
+    REQUIRE(res1[1][0] == res2[1][0]);
+    REQUIRE(res1[1][1] == res2[1][1]);
+}
+
+TEST_CASE("*=x Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    matOne *= 15.0f;
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    mat1 *= 15.0f;
+
+    REQUIRE(mat1[0][0] == matOne[0][0]);
+    REQUIRE(mat1[0][1] == matOne[0][1]);
+    REQUIRE(mat1[1][0] == matOne[1][0]);
+    REQUIRE(mat1[1][1] == matOne[1][1]);
+}
+
+TEST_CASE("|x|=1 Mat2x2", "[Mat]") {
+    Mat2x2 res1 = Mat2x2::identity();
+
+    auto res2 = glm::mat2(1);
+
+    REQUIRE(res1[0][0] == res2[0][0]);
+    REQUIRE(res1[0][1] == res2[0][1]);
+    REQUIRE(res1[1][0] == res2[1][0]);
+    REQUIRE(res1[1][1] == res2[1][1]);
+}
+
+TEST_CASE("/ Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    Mat2x2 res1(matOne / 15.0f);
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    glm::mat2 res2 = mat1 / 15.0f;
+
+    REQUIRE(res1[0][0] == res2[0][0]);
+    REQUIRE(res1[0][1] == res2[0][1]);
+    REQUIRE(res1[1][0] == res2[1][0]);
+    REQUIRE(res1[1][1] == res2[1][1]);
+}
+
+TEST_CASE("/= Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    matOne /= 15.0f;
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    mat1 /= 15.0f;
+
+    REQUIRE(mat1[0][0] == matOne[0][0]);
+    REQUIRE(mat1[0][1] == matOne[0][1]);
+    REQUIRE(mat1[1][0] == matOne[1][0]);
+    REQUIRE(mat1[1][1] == matOne[1][1]);
+}
+
+TEST_CASE("+x Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    Mat2x2 res1(matOne + 15.0f);
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    glm::mat2 res2 = mat1 + 15.0f;
+
+    REQUIRE(res1[0][0] == res2[0][0]);
+    REQUIRE(res1[0][1] == res2[0][1]);
+    REQUIRE(res1[1][0] == res2[1][0]);
+    REQUIRE(res1[1][1] == res2[1][1]);
+}
+
+TEST_CASE("+=x Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    matOne += 15.0f;
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    mat1 += 15.0f;
+
+    REQUIRE(mat1[0][0] == matOne[0][0]);
+    REQUIRE(mat1[0][1] == matOne[0][1]);
+    REQUIRE(mat1[1][0] == matOne[1][0]);
+    REQUIRE(mat1[1][1] == matOne[1][1]);
+}
+
+TEST_CASE("-x Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    Mat2x2 res1(matOne - 15.0f);
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    glm::mat2 res2 = mat1 - 15.0f;
+
+    REQUIRE(res1[0][0] == res2[0][0]);
+    REQUIRE(res1[0][1] == res2[0][1]);
+    REQUIRE(res1[1][0] == res2[1][0]);
+    REQUIRE(res1[1][1] == res2[1][1]);
+}
+
+TEST_CASE("-=x Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    matOne -= 15.0f;
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    mat1 -= 15.0f;
+
+    REQUIRE(mat1[0][0] == matOne[0][0]);
+    REQUIRE(mat1[0][1] == matOne[0][1]);
+    REQUIRE(mat1[1][0] == matOne[1][0]);
+    REQUIRE(mat1[1][1] == matOne[1][1]);
+}
+
+TEST_CASE("M*M Mat2x2", "[Mat]") {
+    Mat2x2 matOne(1, 2, 3, 4);
+    Vec2 vecOne(5, 8);
+    Vec2 res1(matOne * vecOne);
+
+    glm::mat2 mat1 = glm::mat2(1, 2, 3, 4);
+    glm::vec2 mat2 = glm::vec2(5, 8);
+    glm::vec2 res2 = mat1 * mat2;
+
+    REQUIRE(res2.x == res1.x);
+    REQUIRE(res2.y == res1.y);
+}
+
+TEST_CASE("Trans Mat2x2", "[Mat]") {
+    Mat2x2 MatOne(1, 2, 3, 4);
+    Mat2x2 res1 = MatOne.transpose();
+
+    glm::mat2 MathOne = glm::mat2(1, 2, 3, 4);
+    glm::mat2 res2 = glm::transpose(MathOne);
+
+    REQUIRE(res1[0][0] == res2[0][0]);
+    REQUIRE(res1[0][1] == res2[0][1]);
+    REQUIRE(res1[1][0] == res2[1][0]);
+    REQUIRE(res1[1][1] == res2[1][1]);
+}
+
+TEST_CASE("Inv Mat2x2", "[Mat]") {
+    Mat2x2 MathA1(1, 2, 3, 4);
+    Mat2x2 res1 = MathA1.reverse();
+
+    glm::mat2 MathA2 = glm::mat2(1, 2, 3, 4);
+    glm::mat2 res2 = glm::inverse(MathA2);
+
+    REQUIRE(res1[0][0] == res2[0][0]);
+    REQUIRE(res1[0][1] == res2[0][1]);
+    REQUIRE(res1[1][0] == res2[1][0]);
+    REQUIRE(res1[1][1] == res2[1][1]);
+}
+
+TEST_CASE("Row Mat2x2", "[Mat]") {
+    Mat2x2 MathA1(144, 12, 78, -10);
+    Vec2 Row1(MathA1.Row(0));
+
+    glm::mat2 MathA2 = glm::mat2(144, 12, 78, -10);
+    auto Row2 = glm::vec2(glm::row(MathA2, 0));
+
+    REQUIRE(Row1.x == Row2.x);
+    REQUIRE(Row1.y == Row2.y);
+}
+
+TEST_CASE("Column Mat2x2", "[Mat]") {
+    Mat2x2 MathA1(36, 26, 100, -2);
+    Vec2 Col1(MathA1.Column(0));
+
+    glm::mat2 MathA2 = glm::mat2(36, 26, 100, -2);
+    auto Col2 = glm::vec2(glm::column(MathA2, 0));
+
+    REQUIRE(Col1.x == Col2.x);
+    REQUIRE(Col1.y == Col2.y);
+}
+
+TEST_CASE("== Mat2x2", "[Mat]") {
+    Mat2x2 MathA1(144, 12, 78, -10);
+    Mat2x2 MathB1(144, 12, 78, -10);
+    bool res1 = MathA1 == MathB1;
+
+    glm::mat2 MathA2(144, 12, 78, -10);
+    glm::mat2 MathB2(144, 12, 78, -10);
+    bool res2 = MathA2 == MathB2;
+
+    REQUIRE(res1 == res2);
+}
+
+TEST_CASE("!= Mat2x2", "[Mat]") {
+    Mat2x2 MatA1(19, 70, 25, -6);
+    Mat2x2 MatB1(25, 70, 19, -100);
+    bool res1 = MatA1 != MatB1;
+
+    glm::mat2 MathA2 = glm::mat2(19, 70, 25, -6);
+    glm::mat2 MathB2 = glm::mat2(25, 70, 19, -100);
+    bool res2 = MathA2 != MathB2;
 
     REQUIRE(res1 == res2);
 }
