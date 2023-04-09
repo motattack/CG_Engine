@@ -13,6 +13,9 @@
 #include <mat2x2.h>
 #include <mat2x2.hpp>
 
+#include <mat3x3.h>
+#include <mat3x3.hpp>
+
 #include <geometric.hpp>
 #include <gtc/matrix_access.hpp>
 
@@ -845,6 +848,437 @@ TEST_CASE("!= Mat2x2", "[Mat]") {
     glm::mat2 MathA2 = glm::mat2(19, 70, 25, -6);
     glm::mat2 MathB2 = glm::mat2(25, 70, 19, -100);
     bool res2 = MathA2 != MathB2;
+
+    REQUIRE(res1 == res2);
+}
+
+/* \\\\\\\\\\\\\\\ TEST FOR MATRIX 3 ////////////// */
+
+
+TEST_CASE("Constructor Ma3x3", "[Mat]") {
+    auto res2 = glm::mat3(9);
+    Mat3x3 res1(9);
+
+    REQUIRE(res2[0][0] == res1[0][0]);
+    REQUIRE(res2[0][1] == res1[0][1]);
+    REQUIRE(res2[0][2] == res1[0][2]);
+
+    REQUIRE(res2[1][0] == res1[1][0]);
+    REQUIRE(res2[1][1] == res1[1][1]);
+    REQUIRE(res2[1][2] == res1[1][2]);
+
+    REQUIRE(res2[2][0] == res1[2][0]);
+    REQUIRE(res2[2][1] == res1[2][1]);
+    REQUIRE(res2[2][2] == res1[2][2]);
+}
+
+TEST_CASE("+ Mat3x3", "[Mat]") {
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 matTwo(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 res1(matOne + matTwo);
+
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 MAthTwo = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 res2 = MathOne + MAthTwo;
+
+    REQUIRE(res2[0][0] == res1[0][0]);
+    REQUIRE(res2[0][1] == res1[0][1]);
+    REQUIRE(res2[0][2] == res1[0][2]);
+
+    REQUIRE(res2[1][0] == res1[1][0]);
+    REQUIRE(res2[1][1] == res1[1][1]);
+    REQUIRE(res2[1][2] == res1[1][2]);
+
+    REQUIRE(res2[2][0] == res1[2][0]);
+    REQUIRE(res2[2][1] == res1[2][1]);
+    REQUIRE(res2[2][2] == res1[2][2]);
+}
+
+TEST_CASE("+= Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 MAthTwo = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    MathOne += MAthTwo;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 matTwo(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    matOne += matTwo;
+
+    REQUIRE(MathOne[0][0] == matOne[0][0]);
+    REQUIRE(MathOne[0][1] == matOne[0][1]);
+    REQUIRE(MathOne[0][2] == matOne[0][2]);
+
+    REQUIRE(MathOne[1][0] == matOne[1][0]);
+    REQUIRE(MathOne[1][1] == matOne[1][1]);
+    REQUIRE(MathOne[1][2] == matOne[1][2]);
+
+    REQUIRE(MathOne[2][0] == matOne[2][0]);
+    REQUIRE(MathOne[2][1] == matOne[2][1]);
+    REQUIRE(MathOne[2][2] == matOne[2][2]);
+}
+
+TEST_CASE("|x| = 1 Mat3x3", "[Mat]") {
+    auto res2 = glm::mat3(1);
+    Mat3x3 res1 = Mat3x3::identity();
+
+    REQUIRE(res2[0][0] == res1[0][0]);
+    REQUIRE(res2[0][1] == res1[0][1]);
+    REQUIRE(res2[0][2] == res1[0][2]);
+
+    REQUIRE(res2[1][0] == res1[1][0]);
+    REQUIRE(res2[1][1] == res1[1][1]);
+    REQUIRE(res2[1][2] == res1[1][2]);
+
+    REQUIRE(res2[2][0] == res1[2][0]);
+    REQUIRE(res2[2][1] == res1[2][1]);
+    REQUIRE(res2[2][2] == res1[2][2]);
+}
+
+TEST_CASE("- Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 MAthTwo = glm::mat3(9, 8, 7, 6, 5, 4, 3, 2, 1);
+    glm::mat3 res2 = MathOne - MAthTwo;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 matTwo(9, 8, 7, 6, 5, 4, 3, 2, 1);
+    Mat3x3 res1(matOne - matTwo);
+
+    REQUIRE(res2[0][0] == res1[0][0]);
+    REQUIRE(res2[0][1] == res1[0][1]);
+    REQUIRE(res2[0][2] == res1[0][2]);
+
+    REQUIRE(res2[1][0] == res1[1][0]);
+    REQUIRE(res2[1][1] == res1[1][1]);
+    REQUIRE(res2[1][2] == res1[1][2]);
+
+    REQUIRE(res2[2][0] == res1[2][0]);
+    REQUIRE(res2[2][1] == res1[2][1]);
+    REQUIRE(res2[2][2] == res1[2][2]);
+}
+
+TEST_CASE("-= Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 MAthTwo = glm::mat3(9, 8, 7, 6, 5, 4, 3, 2, 1);
+    MathOne -= MAthTwo;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 matTwo(9, 8, 7, 6, 5, 4, 3, 2, 1);
+    matOne -= matTwo;
+
+    REQUIRE(MathOne[0][0] == matOne[0][0]);
+    REQUIRE(MathOne[0][1] == matOne[0][1]);
+    REQUIRE(MathOne[0][2] == matOne[0][2]);
+
+    REQUIRE(MathOne[1][0] == matOne[1][0]);
+    REQUIRE(MathOne[1][1] == matOne[1][1]);
+    REQUIRE(MathOne[1][2] == matOne[1][2]);
+
+    REQUIRE(MathOne[2][0] == matOne[2][0]);
+    REQUIRE(MathOne[2][1] == matOne[2][1]);
+    REQUIRE(MathOne[2][2] == matOne[2][2]);
+}
+
+TEST_CASE("* Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 MAthTwo = glm::mat3(9, 8, 7, 6, 5, 4, 3, 2, 1);
+    glm::mat3 res2 = MathOne * MAthTwo;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 matTwo(9, 8, 7, 6, 5, 4, 3, 2, 1);
+    Mat3x3 res1(matOne * matTwo);
+
+    REQUIRE(res2[0][0] == res1[0][0]);
+    REQUIRE(res2[0][1] == res1[0][1]);
+    REQUIRE(res2[0][2] == res1[0][2]);
+
+    REQUIRE(res2[1][0] == res1[1][0]);
+    REQUIRE(res2[1][1] == res1[1][1]);
+    REQUIRE(res2[1][2] == res1[1][2]);
+
+    REQUIRE(res2[2][0] == res1[2][0]);
+    REQUIRE(res2[2][1] == res1[2][1]);
+    REQUIRE(res2[2][2] == res1[2][2]);
+}
+
+TEST_CASE("*= Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 MAthTwo = glm::mat3(9, 8, 7, 6, 5, 4, 3, 2, 1);
+    MathOne *= MAthTwo;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 matTwo(9, 8, 7, 6, 5, 4, 3, 2, 1);
+    matOne *= matTwo;
+
+    REQUIRE(MathOne[0][0] == matOne[0][0]);
+    REQUIRE(MathOne[0][1] == matOne[0][1]);
+    REQUIRE(MathOne[0][2] == matOne[0][2]);
+
+    REQUIRE(MathOne[1][0] == matOne[1][0]);
+    REQUIRE(MathOne[1][1] == matOne[1][1]);
+    REQUIRE(MathOne[1][2] == matOne[1][2]);
+
+    REQUIRE(MathOne[2][0] == matOne[2][0]);
+    REQUIRE(MathOne[2][1] == matOne[2][1]);
+    REQUIRE(MathOne[2][2] == matOne[2][2]);
+}
+
+TEST_CASE("*x Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 res2 = MathOne * 17.0f;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 res1(matOne * 17.0f);
+
+    REQUIRE(res2[0][0] == res1[0][0]);
+    REQUIRE(res2[0][1] == res1[0][1]);
+    REQUIRE(res2[0][2] == res1[0][2]);
+
+    REQUIRE(res2[1][0] == res1[1][0]);
+    REQUIRE(res2[1][1] == res1[1][1]);
+    REQUIRE(res2[1][2] == res1[1][2]);
+
+    REQUIRE(res2[2][0] == res1[2][0]);
+    REQUIRE(res2[2][1] == res1[2][1]);
+    REQUIRE(res2[2][2] == res1[2][2]);
+}
+
+TEST_CASE("*=x Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    MathOne *= 17.0f;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    matOne *= 17.0f;
+
+    REQUIRE(MathOne[0][0] == matOne[0][0]);
+    REQUIRE(MathOne[0][1] == matOne[0][1]);
+    REQUIRE(MathOne[0][2] == matOne[0][2]);
+
+    REQUIRE(MathOne[1][0] == matOne[1][0]);
+    REQUIRE(MathOne[1][1] == matOne[1][1]);
+    REQUIRE(MathOne[1][2] == matOne[1][2]);
+
+    REQUIRE(MathOne[2][0] == matOne[2][0]);
+    REQUIRE(MathOne[2][1] == matOne[2][1]);
+    REQUIRE(MathOne[2][2] == matOne[2][2]);
+}
+
+TEST_CASE("/x Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 res2 = MathOne / 89.0f;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 res1(matOne / 89.0f);
+
+    REQUIRE(res2[0][0] == res1[0][0]);
+    REQUIRE(res2[0][1] == res1[0][1]);
+    REQUIRE(res2[0][2] == res1[0][2]);
+
+    REQUIRE(res2[1][0] == res1[1][0]);
+    REQUIRE(res2[1][1] == res1[1][1]);
+    REQUIRE(res2[1][2] == res1[1][2]);
+
+    REQUIRE(res2[2][0] == res1[2][0]);
+    REQUIRE(res2[2][1] == res1[2][1]);
+    REQUIRE(res2[2][2] == res1[2][2]);
+}
+
+TEST_CASE("/=x Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    MathOne /= 89.0f;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    matOne /= 89.0f;
+
+    REQUIRE(MathOne[0][0] == matOne[0][0]);
+    REQUIRE(MathOne[0][1] == matOne[0][1]);
+    REQUIRE(MathOne[0][2] == matOne[0][2]);
+
+    REQUIRE(MathOne[1][0] == matOne[1][0]);
+    REQUIRE(MathOne[1][1] == matOne[1][1]);
+    REQUIRE(MathOne[1][2] == matOne[1][2]);
+
+    REQUIRE(MathOne[2][0] == matOne[2][0]);
+    REQUIRE(MathOne[2][1] == matOne[2][1]);
+    REQUIRE(MathOne[2][2] == matOne[2][2]);
+}
+
+TEST_CASE("-x Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 res2 = MathOne - 100.0f;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 res1(matOne - 100.0f);
+
+    REQUIRE(res2[0][0] == res1[0][0]);
+    REQUIRE(res2[0][1] == res1[0][1]);
+    REQUIRE(res2[0][2] == res1[0][2]);
+
+    REQUIRE(res2[1][0] == res1[1][0]);
+    REQUIRE(res2[1][1] == res1[1][1]);
+    REQUIRE(res2[1][2] == res1[1][2]);
+
+    REQUIRE(res2[2][0] == res1[2][0]);
+    REQUIRE(res2[2][1] == res1[2][1]);
+    REQUIRE(res2[2][2] == res1[2][2]);
+}
+
+TEST_CASE("-=x Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    MathOne -= 100.0f;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    matOne -= 100.0f;
+
+    REQUIRE(MathOne[0][0] == matOne[0][0]);
+    REQUIRE(MathOne[0][1] == matOne[0][1]);
+    REQUIRE(MathOne[0][2] == matOne[0][2]);
+
+    REQUIRE(MathOne[1][0] == matOne[1][0]);
+    REQUIRE(MathOne[1][1] == matOne[1][1]);
+    REQUIRE(MathOne[1][2] == matOne[1][2]);
+
+    REQUIRE(MathOne[2][0] == matOne[2][0]);
+    REQUIRE(MathOne[2][1] == matOne[2][1]);
+    REQUIRE(MathOne[2][2] == matOne[2][2]);
+}
+
+TEST_CASE("+x Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 res2 = MathOne + 27.0f;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 res1(matOne + 27.0f);
+
+    REQUIRE(res2[0][0] == res1[0][0]);
+    REQUIRE(res2[0][1] == res1[0][1]);
+    REQUIRE(res2[0][2] == res1[0][2]);
+
+    REQUIRE(res2[1][0] == res1[1][0]);
+    REQUIRE(res2[1][1] == res1[1][1]);
+    REQUIRE(res2[1][2] == res1[1][2]);
+
+    REQUIRE(res2[2][0] == res1[2][0]);
+    REQUIRE(res2[2][1] == res1[2][1]);
+    REQUIRE(res2[2][2] == res1[2][2]);
+}
+
+TEST_CASE("+=x Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    MathOne += 27.0f;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    matOne += 27.0f;
+
+    REQUIRE(MathOne[0][0] == matOne[0][0]);
+    REQUIRE(MathOne[0][1] == matOne[0][1]);
+    REQUIRE(MathOne[0][2] == matOne[0][2]);
+
+    REQUIRE(MathOne[1][0] == matOne[1][0]);
+    REQUIRE(MathOne[1][1] == matOne[1][1]);
+    REQUIRE(MathOne[1][2] == matOne[1][2]);
+
+    REQUIRE(MathOne[2][0] == matOne[2][0]);
+    REQUIRE(MathOne[2][1] == matOne[2][1]);
+    REQUIRE(MathOne[2][2] == matOne[2][2]);
+}
+
+TEST_CASE("*vec Mat3x3", "[Mat]") {
+    glm::mat3 MatOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::vec3 mat2 = glm::vec3(10, 11, 12);
+    glm::vec3 res2 = MatOne * mat2;
+
+    Mat3x3 matOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Vec3 vecOne(10, 11, 12);
+    Vec3 res1(matOne * vecOne);
+
+    REQUIRE(res1.x == res2.x);
+    REQUIRE(res1.y == res2.y);
+    REQUIRE(res1.z == res2.z);
+}
+
+TEST_CASE("Reverse- Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 res2 = glm::inverse(MathOne);
+
+    Mat3x3 MatOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 res1 = MatOne.reverse();
+
+    REQUIRE(res2[0][0] == res1[0][0]);
+    REQUIRE(res2[0][1] == res1[0][1]);
+    REQUIRE(res2[0][2] == res1[0][2]);
+
+    REQUIRE(res2[1][0] == res1[1][0]);
+    REQUIRE(res2[1][1] == res1[1][1]);
+    REQUIRE(res2[1][2] == res1[1][2]);
+
+    REQUIRE(res2[2][0] == res1[2][0]);
+    REQUIRE(res2[2][1] == res1[2][1]);
+    REQUIRE(res2[2][2] == res1[2][2]);
+}
+
+TEST_CASE("Trans Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    glm::mat3 res2 = glm::transpose(MathOne);
+
+    Mat3x3 MatOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Mat3x3 res1 = MatOne.transpose();
+
+    REQUIRE(res2[0][0] == res1[0][0]);
+    REQUIRE(res2[0][1] == res1[0][1]);
+    REQUIRE(res2[0][2] == res1[0][2]);
+
+    REQUIRE(res2[1][0] == res1[1][0]);
+    REQUIRE(res2[1][1] == res1[1][1]);
+    REQUIRE(res2[1][2] == res1[1][2]);
+
+    REQUIRE(res2[2][0] == res1[2][0]);
+    REQUIRE(res2[2][1] == res1[2][1]);
+    REQUIRE(res2[2][2] == res1[2][2]);
+}
+
+TEST_CASE("Row Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(144, 12, 78, -10, 23, 0, 8, 100, 89);
+    glm::vec3 Row1(glm::row(MathOne, 2));
+
+    Mat3x3 Mat2x2One(144, 12, 78, -10, 23, 0, 8, 100, 89);
+    Vec3 Row2(Mat2x2One.Row(2));
+
+    REQUIRE(Row1.x == Row2.x);
+    REQUIRE(Row1.y == Row2.y);
+    REQUIRE(Row1.z == Row2.z);
+}
+
+TEST_CASE("Col Mat3x3", "[Mat]") {
+    glm::mat3 MathOne = glm::mat3(36, 26, 100, -2, 1, 1, 30, 20, 18);
+    glm::vec3 Col1(glm::column(MathOne, 1));
+
+    Mat3x3 Mat2x2One(36, 26, 100, -2, 1, 1, 30, 20, 18);
+    Vec3 Col2(Mat2x2One.Column(1));
+
+    REQUIRE(Col1.x == Col2.x);
+    REQUIRE(Col1.y == Col2.y);
+    REQUIRE(Col1.z == Col2.z);
+}
+
+TEST_CASE("== Mat3x3", "[Mat]") {
+    Mat3x3 Mat2x2One(144, 12, 78, -10, 23, 0, 8, 100, 89);
+    Mat3x3 Mat2x2Two(144, 12, 78, -10, 23, 0, 8, 100, 89);
+    bool res1 = Mat2x2One == Mat2x2Two;
+
+    glm::mat3 MathOne = glm::mat3(144, 12, 78, -10, 23, 0, 8, 100, 89);
+    glm::mat3 MathTwo = glm::mat3(144, 12, 78, -10, 23, 0, 8, 100, 89);
+    bool res2 = MathOne == MathTwo;
+
+    REQUIRE(res1 == res2);
+}
+
+TEST_CASE("!= Mat3x3", "[Mat]") {
+    Mat3x3 Mat2x2One(19, 70, 25, -6, 0, 0, 0, 0, 0);
+    Mat3x3 Mat2x2Two(25, 70, 19, -100, 0, 0, 0, 0, 0);
+    bool res1 = Mat2x2One != Mat2x2Two;
+
+    glm::mat3 MathOne = glm::mat3(19, 70, 25, -6, 0, 0, 0, 0, 0);
+    glm::mat3 MathTwo = glm::mat3(25, 70, 19, -100, 0, 0, 0, 0, 0);
+    bool res2 = MathOne != MathTwo;
 
     REQUIRE(res1 == res2);
 }

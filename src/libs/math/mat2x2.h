@@ -2,7 +2,6 @@
 #define CG_ENGINE_MAT2X2_H
 
 #include <vec2.h>
-#include <iostream>
 
 class Mat2x2 {
 public:
