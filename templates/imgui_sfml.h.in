@@ -1,6 +1,0 @@
-#ifndef IMGUI_SFML_H
-#define IMGUI_SFML_H
-
-${IMGUI_SFML_CONTENT}
-
-#endif // IMGUI_SFML_H
