@@ -20,9 +20,9 @@ file(GLOB IMGUI_SFML_SRCS ${CMAKE_SOURCE_DIR}/src/libs/imgui-sfml-2.5/*.cpp)
 add_library(imgui_sfml ${IMGUI_SFML_SRCS})
 
 # Add executable
-#add_executable(CG_Engine main.cpp ${IMGUI_SFML_SRCS})
+add_executable(CG_Engine main.cpp ${IMGUI_SFML_SRCS})
 #add_executable(CG_Engine super.cpp)
-add_executable(CG_Engine test.cpp)
+#add_executable(CG_Engine test.cpp)
 
 # Link GLEW and SFML libraries
 target_link_libraries(CG_Engine opengl32 glew32 sfml-graphics sfml-system sfml-window)

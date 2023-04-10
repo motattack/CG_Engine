@@ -187,46 +187,48 @@ public:
         return Mat4x4(Row(0), Row(1), Row(2), Row(3));
     };
 
-    Mat4x4 translate(const Vec3 &vec) {
-        Mat4x4 result(*this);
+    Mat4x4 translate(const Vec3 &axis) {
+        Mat4x4 translated_matrix(*this);
 
-        result[3][0] = matrix[0][0] * vec.x + matrix[1][0] * vec.y + matrix[2][0] * vec.z + matrix[3][0];
-        result[3][1] = matrix[0][1] * vec.x + matrix[1][1] * vec.y + matrix[2][1] * vec.z + matrix[3][1];
-        result[3][2] = matrix[0][2] * vec.x + matrix[1][2] * vec.y + matrix[2][2] * vec.z + matrix[3][2];
-        result[3][3] = matrix[0][3] * vec.x + matrix[1][3] * vec.y + matrix[2][3] * vec.z + matrix[3][3];
+        translated_matrix[3][0] = matrix[0][0] * axis.x + matrix[1][0] * axis.y + matrix[2][0] * axis.z + matrix[3][0];
+        translated_matrix[3][1] = matrix[0][1] * axis.x + matrix[1][1] * axis.y + matrix[2][1] * axis.z + matrix[3][1];
+        translated_matrix[3][2] = matrix[0][2] * axis.x + matrix[1][2] * axis.y + matrix[2][2] * axis.z + matrix[3][2];
+        translated_matrix[3][3] = matrix[0][3] * axis.x + matrix[1][3] * axis.y + matrix[2][3] * axis.z + matrix[3][3];
 
-        return result;
+        return translated_matrix;
     }
 
-    Mat4x4 rotate(float angle, Vec3 vec) const {
-        float cosAngle = cosf(angle);
-        float sinAngle = sinf(angle);
+    Mat4x4 rotate(float angle, Vec3 axis) const {
+        // Вычисляем синус и косинус угла поворота
+        float cos_angle = cosf(angle);
+        float sin_angle = sinf(angle);
 
-        Vec3 axis(vec.normalize());
-        Vec3 sup(axis * (1 - cosAngle));
+        Vec3 normalized_axis = axis.normalize(); // Нормализуем вектор оси вращения
+        Vec3 sup = normalized_axis * (1 - cos_angle); // Вычисляем вспомогательный вектор
 
-        Mat4x4 rotate;
-        rotate[0][0] = cosAngle + sup.x * axis.x;
-        rotate[0][1] = sup.x * axis.y + sinAngle * axis.z;
-        rotate[0][2] = sup.x * axis.z - sinAngle * axis.y;
-        rotate[0][3] = 0;
+        Mat4x4 rotation_matrix;
 
-        rotate[1][0] = sup.y * axis.x - sinAngle * axis.z;
-        rotate[1][1] = cosAngle + sup.y * axis.y;
-        rotate[1][2] = sup.y * axis.z + sinAngle * axis.x;
-        rotate[1][3] = 0;
+        rotation_matrix[0][0] = cos_angle + sup.x * normalized_axis.x;
+        rotation_matrix[0][1] = sup.x * normalized_axis.y + sin_angle * normalized_axis.z;
+        rotation_matrix[0][2] = sup.x * normalized_axis.z - sin_angle * normalized_axis.y;
+        rotation_matrix[0][3] = 0;
 
-        rotate[2][0] = sup.z * axis.x + sinAngle * axis.y;
-        rotate[2][1] = sup.z * axis.y - sinAngle * axis.x;
-        rotate[2][2] = cosAngle + sup.z * axis.z;
-        rotate[2][3] = 0;
+        rotation_matrix[1][0] = sup.y * normalized_axis.x - sin_angle * normalized_axis.z;
+        rotation_matrix[1][1] = cos_angle + sup.y * normalized_axis.y;
+        rotation_matrix[1][2] = sup.y * normalized_axis.z + sin_angle * normalized_axis.x;
+        rotation_matrix[1][3] = 0;
 
-        rotate[3][0] = 0;
-        rotate[3][1] = 0;
-        rotate[3][2] = 0;
-        rotate[3][3] = 1;
+        rotation_matrix[2][0] = sup.z * normalized_axis.x + sin_angle * normalized_axis.y;
+        rotation_matrix[2][1] = sup.z * normalized_axis.y - sin_angle * normalized_axis.x;
+        rotation_matrix[2][2] = cos_angle + sup.z * normalized_axis.z;
+        rotation_matrix[2][3] = 0;
 
-        return Mat4x4(*this * rotate);
+        rotation_matrix[3][0] = 0;
+        rotation_matrix[3][1] = 0;
+        rotation_matrix[3][2] = 0;
+        rotation_matrix[3][3] = 1;
+
+        return Mat4x4(*this * rotation_matrix);
     }
 
     Mat4x4 Scale(const Vec3 &vec) {
@@ -270,38 +272,44 @@ public:
     };
 
     static Mat4x4 lookAt(const Vec3 &eye, const Vec3 &center, const Vec3 &up) {
-        Vec3 f((center - eye).normalize());
-        Vec3 s(f.crossProduct(up).normalize());
-        Vec3 u(s.crossProduct(f));
+        Vec3 direction((center - eye).normalize()); // Вычисляем вектор направления камеры
+
+        Vec3 right(direction.crossProduct(up).normalize()); // Вычисляем вектор направления вправо от камеры
+
+        Vec3 cameraUp(right.crossProduct(direction)); // Вычисляем вектор направления вверх от камеры
 
         Mat4x4 result(1.0f);
-        result[0][0] = s.x;
-        result[1][0] = s.y;
-        result[2][0] = s.z;
-        result[0][1] = u.x;
-        result[1][1] = u.y;
-        result[2][1] = u.z;
-        result[0][2] = -f.x;
-        result[1][2] = -f.y;
-        result[2][2] = -f.z;
-        result[3][0] = -s.dotProduct(eye);
-        result[3][1] = -u.dotProduct(eye);
-        result[3][2] = f.dotProduct(eye);
+
+        result[0][0] = right.x;
+        result[1][0] = right.y;
+        result[2][0] = right.z;
+        result[0][1] = cameraUp.x;
+        result[1][1] = cameraUp.y;
+        result[2][1] = cameraUp.z;
+        result[0][2] = -direction.x;
+        result[1][2] = -direction.y;
+        result[2][2] = -direction.z;
+        result[3][0] = -right.dotProduct(eye);
+        result[3][1] = -cameraUp.dotProduct(eye);
+        result[3][2] = direction.dotProduct(eye);
 
         return result;
     }
 
     static Mat4x4 perspective(float fovy, float aspect, float zNear, float zFar) {
-        assert(abs(aspect - std::numeric_limits<float>::epsilon()) > static_cast<float>(0));
+        assert(abs(aspect - std::numeric_limits<float>::epsilon()) > static_cast<float>(0)); // Проверка деления на 0
 
-        float tanHalfFovy = tanf(fovy / 2.0f);
+        float tanHalfFovy = tanf(fovy / 2.0f); // Вычисление тангенса половины угла обзора
 
         Mat4x4 result(0.0f);
+
+        // Расчет элементов матрицы проекции
         result[0][0] = 1.0f / (aspect * tanHalfFovy);
         result[1][1] = 1.0f / (tanHalfFovy);
         result[2][2] = -(zFar + zNear) / (zFar - zNear);
         result[2][3] = -1.0f;
         result[3][2] = -(2.0f * zFar * zNear) / (zFar - zNear);
+
         return result;
     }
 
