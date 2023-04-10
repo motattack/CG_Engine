@@ -116,8 +116,13 @@ public:
         return Mat2x2(1.0f);
     };
 
+    float det() {
+        return matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1];
+    }
+
     Mat2x2 reverse() {
-        float divideDet = 1 / (matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1]);
+        float divideDet = 1 / det();
+
         return {matrix[1][1] * divideDet,
                 -matrix[0][1] * divideDet,
                 -matrix[1][0] * divideDet,

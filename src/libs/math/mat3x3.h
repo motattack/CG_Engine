@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include "vec3.h"
+#include "mat2x2.h"
 #include <vector>
 #include <array>
 
@@ -11,24 +12,42 @@ public:
     Mat3x3() = default;
 
     explicit Mat3x3(float number) {
-        matrix[0][0] = number; matrix[0][1] = 0; matrix[0][2] = 0;
-        matrix[1][0] = 0; matrix[1][1] = number; matrix[1][2] = 0;
-        matrix[2][0] = 0; matrix[2][1] = 0; matrix[2][2] = number;
+        matrix[0][0] = number;
+        matrix[0][1] = 0;
+        matrix[0][2] = 0;
+        matrix[1][0] = 0;
+        matrix[1][1] = number;
+        matrix[1][2] = 0;
+        matrix[2][0] = 0;
+        matrix[2][1] = 0;
+        matrix[2][2] = number;
     };
 
 
     Mat3x3(float a, float b, float c,
            float d, float e, float f,
            float g, float h, float i) {
-        matrix[0][0] = a; matrix[0][1] = d; matrix[0][2] = g;
-        matrix[1][0] = b; matrix[1][1] = e; matrix[1][2] = h;
-        matrix[2][0] = c; matrix[2][1] = f; matrix[2][2] = i;
+        matrix[0][0] = a;
+        matrix[0][1] = d;
+        matrix[0][2] = g;
+        matrix[1][0] = b;
+        matrix[1][1] = e;
+        matrix[1][2] = h;
+        matrix[2][0] = c;
+        matrix[2][1] = f;
+        matrix[2][2] = i;
     }
 
     Mat3x3(const Vec3 &first, const Vec3 &second, const Vec3 &third) {
-        matrix[0][0] = first.x; matrix[0][1] = second.x; matrix[0][2] = third.x;
-        matrix[1][0] = first.y; matrix[1][1] = second.y; matrix[1][2] = third.y;
-        matrix[2][0] = first.z; matrix[2][1] = second.z; matrix[2][2] = third.z;
+        matrix[0][0] = first.x;
+        matrix[0][1] = second.x;
+        matrix[0][2] = third.x;
+        matrix[1][0] = first.y;
+        matrix[1][1] = second.y;
+        matrix[1][2] = third.y;
+        matrix[2][0] = first.z;
+        matrix[2][1] = second.z;
+        matrix[2][2] = third.z;
     }
 
     Mat3x3(const Mat3x3 &other) = default;
@@ -140,24 +159,42 @@ public:
         return Mat3x3(1.0f);
     };
 
+    float det() {
+        Mat2x2 A(matrix[1][1], matrix[1][2], matrix[2][1], matrix[2][2]);
+        Mat2x2 B(matrix[0][1], matrix[0][2], matrix[2][1], matrix[2][2]);
+        Mat2x2 C(matrix[0][1], matrix[0][2], matrix[1][1], matrix[1][2]);
+
+        return matrix[0][0] * A.det() - matrix[1][0] * B.det() + matrix[2][0] * C.det();
+    }
+
     Mat3x3 reverse() {
-        float det = matrix[0][0] * (matrix[1][1] * matrix[2][2] - matrix[2][1] * matrix[1][2])
-                    - matrix[1][0] * (matrix[0][1] * matrix[2][2] - matrix[2][1] * matrix[0][2])
-                    + matrix[2][0] * (matrix[0][1] * matrix[1][2] - matrix[1][1] * matrix[0][2]);
-
         Mat3x3 result;
-        result.matrix[0][0] = (matrix[1][1] * matrix[2][2] - matrix[2][1] * matrix[1][2]) * (1 / det);
-        result.matrix[1][0] = -(matrix[1][0] * matrix[2][2] - matrix[2][0] * matrix[1][2]) * (1 / det);
-        result.matrix[2][0] = (matrix[1][0] * matrix[2][1] - matrix[2][0] * matrix[1][1]) * (1 / det);
-        result.matrix[0][1] = -(matrix[0][1] * matrix[2][2] - matrix[2][1] * matrix[0][2]) * (1 / det);
-        result.matrix[1][1] = (matrix[0][0] * matrix[2][2] - matrix[2][0] * matrix[0][2]) * (1 / det);
-        result.matrix[2][1] = -(matrix[0][0] * matrix[2][1] - matrix[2][0] * matrix[0][1]) * (1 / det);
-        result.matrix[0][2] = (matrix[0][1] * matrix[1][2] - matrix[1][1] * matrix[0][2]) * (1 / det);
-        result.matrix[1][2] = -(matrix[0][0] * matrix[1][2] - matrix[1][0] * matrix[0][2]) * (1 / det);
-        result.matrix[2][2] = (matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1]) * (1 / det);
-
-        return result;
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                Mat2x2 subMatrix = getSubMatrix(i, j);
+                float sign = (i + j) % 2 == 0 ? 1 : -1;
+                float cofactor = subMatrix.det() * sign;
+                result[j][i] = cofactor / det();
+            }
+        }
+        return result.transpose();
     };
+
+    Mat2x2 getSubMatrix(int exclude_row, int exclude_col) const {
+        Mat2x2 subMatrix;
+        int row = 0, col = 0;
+        for (int i = 0; i < 3; ++i) {
+            if (i == exclude_row) continue;
+            for (int j = 0; j < 3; ++j) {
+                if (j == exclude_col) continue;
+                subMatrix[row][col] = matrix[i][j];
+                ++col;
+            }
+            ++row;
+            col = 0;
+        }
+        return subMatrix;
+    }
 
     Mat3x3 transpose() {
         return Mat3x3(Column(0), Column(1), Column(2));

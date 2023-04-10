@@ -23,6 +23,8 @@
 #include <gtc/matrix_access.hpp>
 #include <gtc/matrix_transform.hpp>
 
+#include <iostream>
+
 /* \\\\\\\\\\\\\\\ TEST FOR VEC 2 ////////////// */
 
 TEST_CASE("Constructor", "[Vector]") {
@@ -1765,35 +1767,38 @@ TEST_CASE("*vec Mat4x4", "[Mat]") {
     REQUIRE(res2.z == res1.z);
     REQUIRE(res2.w == res1.w);
 }
-/*
-TEST_CASE("Reverse Mat4x4", "[Mat]") {
-	glm::mat4 MathOne = glm::mat4(1, 2, 3, 4, 5, 6, 7, 8, 9);
-	glm::mat4 res2 = glm::inverse(MathOne);
 
-	Mat4x4 MatOne(1, 2, 3, 4, 5, 6, 7, 8, 9);
-	Mat4x4 res1 = MatOne.reverse();
+//// Maybe fix
+//TEST_CASE("Reverse Mat4x4", "[Mat]") {
+//	glm::mat4 MathOne = glm::mat4(3, 3, 0, 1, 3, 2, 7, 7, 0, 7, 0, 2, 1, 7, 2, 0);
+//	glm::mat4 res2 = glm::inverse(MathOne);
+//
+//	Mat4x4 MatOne(3, 3, 0, 1, 3, 2, 7, 7, 0, 7, 0, 2, 1, 7, 2, 0);
+//	Mat4x4 res1 = MatOne.reverse();
+//
+//    std::cout << res1[0][0] << " " << res2[0][0] << std::endl;
+//
+//    REQUIRE(res1[0][0] == res2[0][0]);
+//    REQUIRE(res1[0][1] == res2[0][1]);
+//    REQUIRE(res1[0][2] == res2[0][2]);
+//    REQUIRE(res1[0][3] == res2[0][3]);
+//
+//    REQUIRE(res1[1][0] == res2[1][0]);
+//    REQUIRE(res1[1][1] == res2[1][1]);
+//    REQUIRE(res1[1][2] == res2[1][2]);
+//    REQUIRE(res1[1][3] == res2[1][3]);
+//
+//    REQUIRE(res1[2][0] == res2[2][0]);
+//    REQUIRE(res1[2][1] == res2[2][1]);
+//    REQUIRE(res1[2][2] == res2[2][2]);
+//    REQUIRE(res1[2][3] == res2[2][3]);
+//
+//    REQUIRE(res1[3][0] == res2[3][0]);
+//    REQUIRE(res1[3][1] == res2[3][1]);
+//    REQUIRE(res1[3][2] == res2[3][2]);
+//    REQUIRE(res1[3][3] == res2[3][3]);
+//}
 
-    REQUIRE(res1[0][0] == res2[0][0]);
-    REQUIRE(res1[0][1] == res2[0][1]);
-    REQUIRE(res1[0][2] == res2[0][2]);
-    REQUIRE(res1[0][3] == res2[0][3]);
-
-    REQUIRE(res1[1][0] == res2[1][0]);
-    REQUIRE(res1[1][1] == res2[1][1]);
-    REQUIRE(res1[1][2] == res2[1][2]);
-    REQUIRE(res1[1][3] == res2[1][3]);
-
-    REQUIRE(res1[2][0] == res2[2][0]);
-    REQUIRE(res1[2][1] == res2[2][1]);
-    REQUIRE(res1[2][2] == res2[2][2]);
-    REQUIRE(res1[2][3] == res2[2][3]);
-
-    REQUIRE(res1[3][0] == res2[3][0]);
-    REQUIRE(res1[3][1] == res2[3][1]);
-    REQUIRE(res1[3][2] == res2[3][2]);
-    REQUIRE(res1[3][3] == res2[3][3]);
-}
-*/
 TEST_CASE("Transpose Mat4x4", "[Mat]") {
     glm::mat4 MathOne = glm::mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
     glm::mat4 res2 = glm::transpose(MathOne);
