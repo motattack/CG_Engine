@@ -7,6 +7,7 @@
 #include <varray.h>
 #include <vec3.h>
 #include <mat4x4.h>
+#include "common.h"
 
 using namespace std;
 
@@ -71,11 +72,12 @@ int main() {
         userInput(window);
         float time = clock.getElapsedTime().asSeconds();
         float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
+        float yValue = std::sin(time) / 2.0f + 0.5f; // 0.0f - 1.0f
 
         // Vector
         Vec3 myVector;
-        myVector.x = 1.0f;
-        myVector.y = 0.5f;
+        myVector.x = xValue;
+        myVector.y = yValue;
         myVector.z = 0.31f;
 
         myShader.setVec3("colors", myVector);
@@ -84,6 +86,7 @@ int main() {
         model = Mat4x4(1.0f);
         model = model.Scale(Vec3(0.5f, 0.5f, 0.5f));
         model = model.translate(myPos);
+        model = model.rotate(radians(-55.0f) * time, Vec3(xValue, yValue, 0.5f));
         myShader.setMat4("model", model);
 
         /* Render */
