@@ -95,7 +95,17 @@ int main() {
 
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // hehe
 
+        // One shape
         myShader.use();
+        VAO.bind();
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        // two Shape
+        model = Mat4x4(1.0f);
+        model = model.Scale(Vec3(0.5f));
+        model = model.translate(Vec3(-0.5f, -0.2f, 0.0f));
+        model = model.rotate(radians(-55.0f) * time, Vec3(xValue, yValue, 0.5f));
+        myShader.setMat4("model", model);
         VAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
