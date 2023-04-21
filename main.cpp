@@ -1,6 +1,7 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
+#include <cmath>
 
 using namespace std;
 
@@ -118,17 +119,17 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) nullptr);
     glEnableVertexAttribArray(0);
 
-    float red = -1.0f;
-
+    sf::Clock clock;
     while (window.isOpen()) {
         /* Update */
-        glUniform1f(glGetUniformLocation(program, "x_color"), red);
-        glUniform1f(glGetUniformLocation(program, "y_color"), 1.0f);
-        glUniform1f(glGetUniformLocation(program, "z_color"), 0.1f);
+        float time = clock.getElapsedTime().asSeconds();
+        float x_value = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
+        float y_value = std::sin(time) / 2.0f + 0.5f; // 0.0f - 1.0f
+        float z_value = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
 
-        red += 0.1;
-        if (red > 1.0f)
-            red = -1.0f;
+        glUniform1f(glGetUniformLocation(program, "x_color"), x_value); // Red
+        glUniform1f(glGetUniformLocation(program, "y_color"), y_value); // Green
+        glUniform1f(glGetUniformLocation(program, "z_color"), 1.0f);   // Blue
 
         /* Render */
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f
