@@ -87,7 +87,7 @@ int main() {
         model = model.Scale(Vec3(0.5f, 0.5f, 0.5f));
         model = model.translate(myPos);
         model = model.rotate(radians(-55.0f) * time, Vec3(xValue, yValue, 0.5f));
-        myShader.setMat4("model", model);
+        myShader.setMat4x4("model", model);
 
         /* Render */
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f
@@ -105,7 +105,7 @@ int main() {
         model = model.Scale(Vec3(0.5f));
         model = model.translate(Vec3(-0.5f, -0.2f, 0.0f));
         model = model.rotate(radians(-55.0f) * time, Vec3(xValue, yValue, 0.5f));
-        myShader.setMat4("model", model);
+        myShader.setMat4x4("model", model);
         VAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 3);
 

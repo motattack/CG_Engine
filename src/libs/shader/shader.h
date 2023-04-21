@@ -6,7 +6,11 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <vec2.h>
 #include <vec3.h>
+#include <vec4.h>
+#include <mat2x2.h>
+#include <mat3x3.h>
 #include <mat4x4.h>
 
 const int BUFF_SIZE = 512;
@@ -108,6 +112,14 @@ public:
         glUniform1f(glGetUniformLocation(ID, name.c_str()), val);
     };
 
+    void setVec2(const std::string &name, float x, float y) const {
+        glUniform2f(glGetUniformLocation(this->ID, name.c_str()), x, y);
+    };
+
+    void setVec2(const std::string &name, const Vec2 &value) const {
+        glUniform2fv(glGetUniformLocation(this->ID, name.c_str()), 1, &value.x);
+    };
+
     void setVec3(const std::string &name, float x, float y, float z) const {
         glUniform3f(glGetUniformLocation(this->ID, name.c_str()), x, y, z);
     };
@@ -116,7 +128,23 @@ public:
         glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, &value.x);
     };
 
-    void setMat4(const std::string &name, const Mat4x4 &value) {
+    void setVec4(const std::string &name, float x, float y, float z, float w) const {
+        glUniform4f(glGetUniformLocation(this->ID, name.c_str()), x, y, z, w);
+    };
+
+    void setVec4(const std::string &name, const Vec4 &value) const {
+        glUniform4fv(glGetUniformLocation(this->ID, name.c_str()), 1, &value.x);
+    };
+
+    void setMat2x2(const std::string &name, const Mat2x2 &value) const {
+        glUniformMatrix2fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, &value.matrix[0][0]);
+    }
+
+    void setMat3x3(const std::string &name, const Mat3x3 &value) const {
+        glUniformMatrix3fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, &value.matrix[0][0]);
+    };
+
+    void setMat4x4(const std::string &name, const Mat4x4 &value) const {
         glUniformMatrix4fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, &value.matrix[0][0]);
     }
 };
