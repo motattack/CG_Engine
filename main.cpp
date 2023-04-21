@@ -42,7 +42,7 @@ int main() {
 
     vBuffer VBO(vertexRectangle, sizeof(vertexRectangle) / sizeof(float));
     vArray VAO;
-    VAO.attrPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) nullptr);
+    vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) nullptr);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexRectangle), &vertexRectangle, GL_STATIC_DRAW);
 
@@ -76,7 +76,7 @@ int main() {
         window.display();
 
         // Poll events
-        sf::Event event;
+        sf::Event event{};
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
