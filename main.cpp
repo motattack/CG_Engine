@@ -9,7 +9,7 @@
 using namespace std;
 
 // pos and color
-float vertexRectangle[] = {
+float vertex[] = {
         -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
@@ -40,11 +40,11 @@ int main() {
     /* Buffers */
     //unsigned int VAO;
 
-    vBuffer VBO(vertexRectangle, sizeof(vertexRectangle) / sizeof(float));
+    vBuffer VBO(vertex, sizeof(vertex) / sizeof(float));
     vArray VAO;
     vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) nullptr);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexRectangle), &vertexRectangle, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), &vertex, GL_STATIC_DRAW);
 
     /* Position Attribute */
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) nullptr);
