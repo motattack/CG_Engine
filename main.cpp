@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
 #include <cmath>
+#include <shader.h>
 
 using namespace std;
 
@@ -11,27 +12,6 @@ float vertexRectangle[] = {
         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
 };
-
-const char *vertexShaderData =
-        "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "layout (location = 1) in vec3 aColor;\n"
-        "out vec3 curColor;\n"
-        "void main()\n"
-        "{\n"
-        "	curColor = aColor;\n"
-        "	gl_Position = vec4(aPos, 1.0f);\n"
-        "}\0";
-
-const char *fragmentShaderData =
-        "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "in vec3 curColor;\n"
-        "uniform float x_color;\n"
-        "void main()\n"
-        "{\n"
-        "	FragColor = vec4(x_color * curColor.x, curColor.y, curColor.z ,1.0f);\n"
-        "}\0";
 
 int main() {
     sf::ContextSettings settings;
@@ -52,50 +32,8 @@ int main() {
     }
 
     /* Shader */
-    // vertex
-    GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
-
-    glShaderSource(vertex, 1, &vertexShaderData, NULL);
-    glCompileShader(vertex);
-
-    int success;
-    char infolog[512];
-
-    glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-
-    if (!success) {
-        glGetShaderInfoLog(vertex, 512, NULL, infolog);
-        std::cout << "Error shader vertex: " << infolog << std::endl;
-    }
-    //fragment
-    GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
-
-    glShaderSource(fragment, 1, &fragmentShaderData, NULL);
-    glCompileShader(fragment);
-
-    glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-
-    if (!success) {
-        glGetShaderInfoLog(fragment, 512, NULL, infolog);
-        std::cout << "Error shader fragment:" << infolog << std::endl;
-    }
-
-    //Program
-    GLuint program = glCreateProgram();
-
-    glAttachShader(program, vertex);
-    glAttachShader(program, fragment);
-    glLinkProgram(program);
-
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
-
-    if (!success) {
-        glGetProgramInfoLog(program, 512, NULL, infolog);
-        std::cout << "Error shader program: " << infolog << std::endl;
-    }
-
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
+    Shader myShader("C:/Users/motattack/CLionProjects/CG_Engine/src/libs/shader/exec/vShader.glsl",
+                    "C:/Users/motattack/CLionProjects/CG_Engine/src/libs/shader/exec/fShader.glsl");
 
     /* Buffers */
     unsigned int VBO, VAO;
@@ -109,11 +47,11 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexRectangle), &vertexRectangle, GL_STATIC_DRAW);
 
     /* Position Attribute */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) nullptr);
     glEnableVertexAttribArray(0);
 
     /* Color Attribute*/
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     sf::Clock clock;
@@ -122,7 +60,7 @@ int main() {
         float time = clock.getElapsedTime().asSeconds();
         float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
 
-        glUniform1f(glGetUniformLocation(program, "x_color"), xValue);
+        myShader.setFloat("x_color", xValue);
 
         /* Render */
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f
@@ -130,7 +68,7 @@ int main() {
 
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // hehe
 
-        glUseProgram(program);
+        myShader.use();
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
