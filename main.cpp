@@ -15,6 +15,8 @@ float vertex[] = {
         0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
 };
 
+void onResize(const sf::Event &event); // Protype
+
 int main() {
     sf::ContextSettings settings;
     settings.depthBits = 24;
@@ -38,7 +40,6 @@ int main() {
                     "C:/Users/motattack/CLionProjects/CG_Engine/src/libs/shader/exec/fShader.glsl");
 
     /* Buffers */
-    //unsigned int VAO;
 
     vBuffer VBO(vertex, sizeof(vertex) / sizeof(float));
     vArray VAO;
@@ -80,7 +81,14 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
+            else if (event.type == sf::Event::Resized) {
+                onResize(event);
+            }
         }
     }
     return 0;
+}
+
+void onResize(const sf::Event &event) {
+    glViewport(0, 0, event.size.width, event.size.height);
 }
