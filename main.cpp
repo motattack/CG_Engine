@@ -23,6 +23,9 @@ void userInput(sf::Window &window);
 void mouseCursorPosition(const sf::Event &event); // Protype
 void mouseScrollCallback(const sf::Event &event);
 
+Mat4x4 model;
+auto myPos = Vec3(0.0f);
+
 int main() {
     sf::ContextSettings settings;
     settings.depthBits = 24;
@@ -78,8 +81,9 @@ int main() {
         myShader.setVec3("colors", myVector);
 
         // Matrix
-        auto model = Mat4x4(1.0f);
+        model = Mat4x4(1.0f);
         model = model.Scale(Vec3(0.5f, 0.5f, 0.5f));
+        model = model.translate(myPos);
         myShader.setMat4("model", model);
 
         /* Render */
@@ -118,6 +122,15 @@ void onResize(const sf::Event &event) {
 void userInput(sf::Window &window) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         window.close();
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        myPos.y += 0.005f;
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        myPos.y -= 0.005f;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        myPos.x += 0.005f;
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        myPos.x -= 0.005f;
 }
 
 void mouseCursorPosition(const sf::Event &event) {
