@@ -4,6 +4,7 @@
 #include <cmath>
 #include <shader.h>
 #include <vbuffer.h>
+#include <varray.h>
 
 using namespace std;
 
@@ -37,13 +38,11 @@ int main() {
                     "C:/Users/motattack/CLionProjects/CG_Engine/src/libs/shader/exec/fShader.glsl");
 
     /* Buffers */
-    unsigned int VAO;
+    //unsigned int VAO;
 
     vBuffer VBO(vertexRectangle, sizeof(vertexRectangle) / sizeof(float));
-
-    glGenVertexArrays(1, &VAO);
-
-    glBindVertexArray(VAO);
+    vArray VAO;
+    VAO.attrPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) nullptr);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexRectangle), &vertexRectangle, GL_STATIC_DRAW);
 
@@ -70,7 +69,7 @@ int main() {
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // hehe
 
         myShader.use();
-        glBindVertexArray(VAO);
+        VAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // Display
