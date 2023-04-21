@@ -5,8 +5,14 @@
 using namespace std;
 
 int main() {
-    sf::Window window(sf::VideoMode(1200, 800), "Hello World");
+    sf::ContextSettings settings;
+    settings.depthBits = 24;
+    settings.stencilBits = 8;
+    settings.majorVersion = 4;
+    settings.minorVersion = 3;
+    settings.attributeFlags = sf::ContextSettings::Core;
 
+    sf::Window window(sf::VideoMode(1200, 800), "Hello World");
     window.setActive(true);
 
     // Check Glew
@@ -20,9 +26,15 @@ int main() {
         /* Update */
 
         /* Render */
-
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glBegin(GL_TRIANGLES);
+        glColor3f(0.7f, 0.0f, 0.9f);
+        glVertex2f(-0.5f, -0.5f);
+        glVertex2f(0.5f, -0.5f);
+        glVertex2f(0.0f, 0.5f);
+        glEnd();
 
         // Display
         window.display();
@@ -30,9 +42,8 @@ int main() {
         // Poll events
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
+            if (event.type == sf::Event::Closed)
                 window.close();
-            }
         }
     }
     return 0;
