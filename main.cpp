@@ -19,6 +19,7 @@ void onResize(const sf::Event &event); // Protype
 void userInput(sf::Window &window);
 
 void mouseCursorPosition(const sf::Event &event); // Protype
+void mouseScrollCallback(const sf::Event &event);
 
 int main() {
     sf::ContextSettings settings;
@@ -90,6 +91,8 @@ int main() {
                 onResize(event);
             else if (event.type == sf::Event::MouseMoved)
                 mouseCursorPosition(event);
+            else if (event.type == sf::Event::MouseWheelScrolled)
+                mouseScrollCallback(event);
         }
     }
     return 0;
@@ -107,3 +110,9 @@ void userInput(sf::Window &window) {
 void mouseCursorPosition(const sf::Event &event) {
     std::cout << "Position: " << event.mouseMove.x << " " << event.mouseMove.y << std::endl;
 }
+
+void mouseScrollCallback(const sf::Event &event) {
+    std::cout << "Scroll: " << event.mouseWheelScroll.delta << std::endl;
+}
+
+// last 020 [16] [User Input]
