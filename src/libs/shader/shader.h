@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include "vec3.h"
 
 const int BUFF_SIZE = 512;
 
@@ -90,20 +91,28 @@ public:
         glDeleteShader(fragment);
     };
 
-    void use() {
+    void use() const {
         glUseProgram(this->ID);
     };
 
-    void setBool(const std::string &name, bool val) {
+    void setBool(const std::string &name, bool val) const {
         glUniform1i(glGetUniformLocation(ID, name.c_str()), (int) val);
     };
 
-    void setInt(const std::string &name, int val) {
+    void setInt(const std::string &name, int val) const {
         glUniform1i(glGetUniformLocation(ID, name.c_str()), val);
     };
 
-    void setFloat(const std::string &name, float val) {
+    void setFloat(const std::string &name, float val) const {
         glUniform1f(glGetUniformLocation(ID, name.c_str()), val);
+    };
+
+    void setVec3(const std::string &name, float x, float y, float z) const {
+        glUniform3f(glGetUniformLocation(this->ID, name.c_str()), x, y, z);
+    };
+
+    void setVec3(const std::string &name, const Vec3 &value) const {
+        glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, &value.x);
     };
 };
 

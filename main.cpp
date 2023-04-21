@@ -5,6 +5,7 @@
 #include <shader.h>
 #include <vbuffer.h>
 #include <varray.h>
+#include "vec3.h"
 
 using namespace std;
 
@@ -67,7 +68,12 @@ int main() {
         float time = clock.getElapsedTime().asSeconds();
         float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
 
-        myShader.setFloat("x_color", xValue);
+        Vec3 myVector;
+        myVector.x = 1.0f;
+        myVector.y = 0.5f;
+        myVector.z = 0.31f;
+
+        myShader.setVec3("colors", myVector);
 
         /* Render */
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f
