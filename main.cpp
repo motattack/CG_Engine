@@ -3,6 +3,7 @@
 #include <SFML/Window.hpp>
 #include <cmath>
 #include <shader.h>
+#include <vbuffer.h>
 
 using namespace std;
 
@@ -36,13 +37,13 @@ int main() {
                     "C:/Users/motattack/CLionProjects/CG_Engine/src/libs/shader/exec/fShader.glsl");
 
     /* Buffers */
-    unsigned int VBO, VAO;
+    unsigned int VAO;
+
+    vBuffer VBO(vertexRectangle, sizeof(vertexRectangle) / sizeof(float));
 
     glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
 
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexRectangle), &vertexRectangle, GL_STATIC_DRAW);
 

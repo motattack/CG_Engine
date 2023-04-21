@@ -8,6 +8,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/libs/SFML-2.5.1/include)
 # Include directories for Math, glm and test
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/math)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/shader)
+include_directories(${CMAKE_SOURCE_DIR}/src/libs/vertex)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/test)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/glm)
 
