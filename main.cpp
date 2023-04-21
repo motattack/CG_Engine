@@ -16,6 +16,7 @@ float vertex[] = {
 };
 
 void onResize(const sf::Event &event); // Protype
+void userInput(sf::Window &window);
 
 int main() {
     sf::ContextSettings settings;
@@ -58,6 +59,7 @@ int main() {
     sf::Clock clock;
     while (window.isOpen()) {
         /* Update */
+        userInput(window);
         float time = clock.getElapsedTime().asSeconds();
         float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
 
@@ -91,4 +93,9 @@ int main() {
 
 void onResize(const sf::Event &event) {
     glViewport(0, 0, event.size.width, event.size.height);
+}
+
+void userInput(sf::Window &window) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        window.close();
 }
