@@ -18,6 +18,8 @@ float vertex[] = {
 void onResize(const sf::Event &event); // Protype
 void userInput(sf::Window &window);
 
+void mouseCursorPosition(const sf::Event &event); // Protype
+
 int main() {
     sf::ContextSettings settings;
     settings.depthBits = 24;
@@ -28,6 +30,7 @@ int main() {
 
     sf::Window window(sf::VideoMode(1200, 800), "Hello World");
     window.setActive(true);
+
 
     // Check Glew
     GLenum glewError = glewInit();
@@ -83,9 +86,10 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
-            else if (event.type == sf::Event::Resized) {
+            else if (event.type == sf::Event::Resized)
                 onResize(event);
-            }
+            else if (event.type == sf::Event::MouseMoved)
+                mouseCursorPosition(event);
         }
     }
     return 0;
@@ -98,4 +102,8 @@ void onResize(const sf::Event &event) {
 void userInput(sf::Window &window) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         window.close();
+}
+
+void mouseCursorPosition(const sf::Event &event) {
+    std::cout << "Position: " << event.mouseMove.x << " " << event.mouseMove.y << std::endl;
 }
