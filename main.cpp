@@ -5,7 +5,8 @@
 #include <shader.h>
 #include <vbuffer.h>
 #include <varray.h>
-#include "vec3.h"
+#include <vec3.h>
+#include <mat4x4.h>
 
 using namespace std;
 
@@ -68,12 +69,18 @@ int main() {
         float time = clock.getElapsedTime().asSeconds();
         float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
 
+        // Vector
         Vec3 myVector;
         myVector.x = 1.0f;
         myVector.y = 0.5f;
         myVector.z = 0.31f;
 
         myShader.setVec3("colors", myVector);
+
+        // Matrix
+        auto model = Mat4x4(1.0f);
+        model = model.Scale(Vec3(0.5f, 0.5f, 0.5f));
+        myShader.setMat4("model", model);
 
         /* Render */
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f

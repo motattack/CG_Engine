@@ -6,7 +6,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "vec3.h"
+#include <vec3.h>
+#include <mat4x4.h>
 
 const int BUFF_SIZE = 512;
 
@@ -114,6 +115,10 @@ public:
     void setVec3(const std::string &name, const Vec3 &value) const {
         glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, &value.x);
     };
+
+    void setMat4(const std::string &name, const Mat4x4 &value) {
+        glUniformMatrix4fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, &value.matrix[0][0]);
+    }
 };
 
 #endif
