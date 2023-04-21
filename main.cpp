@@ -27,9 +27,12 @@ const char *vertexShaderData =
 const char *fragmentShaderData =
         "#version 330 core\n"
         "out vec4 FragColor;\n"
+        "uniform float x_color;\n"
+        "uniform float y_color;\n"
+        "uniform float z_color;\n"
         "void main()\n"
         "{\n"
-        "	FragColor = vec4(0.48f, 0.48f, 0.48f, 1.0f);\n"
+        "	FragColor = vec4(x_color, y_color, z_color, 1.0f);\n"
         "}\0";
 
 int main() {
@@ -115,8 +118,17 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) nullptr);
     glEnableVertexAttribArray(0);
 
+    float red = -1.0f;
+
     while (window.isOpen()) {
         /* Update */
+        glUniform1f(glGetUniformLocation(program, "x_color"), red);
+        glUniform1f(glGetUniformLocation(program, "y_color"), 1.0f);
+        glUniform1f(glGetUniformLocation(program, "z_color"), 0.1f);
+
+        red += 0.1;
+        if (red > 1.0f)
+            red = -1.0f;
 
         /* Render */
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f
