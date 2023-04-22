@@ -104,6 +104,7 @@ int main() {
         myVector.z = 0.31f;
 
         myShader.setVec3("colors", myVector);
+        myShader.setFloat("alpha", xValue);
 
         // Matrix
         model = Mat4x4(1.0f);
