@@ -120,6 +120,7 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(SCR_WIDTH, SCR_HEIGHT, 32), "First Window",
                             sf::Style::Titlebar | sf::Style::Close, settings);
     window.setActive(true);
+    window.setMouseCursorVisible(false);
 
     glewExperimental = GL_TRUE;
 
