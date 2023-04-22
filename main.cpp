@@ -96,6 +96,14 @@ Vec3 cameraPos = Vec3(0.0f, 0.0f, 3.0f);
 Vec3 cameraFront = Vec3(0.0f, 0.0f, -1.0f);
 Vec3 cameraUp = Vec3(0.0f, 1.0f, 0.0f);
 
+// Camera Attr
+float pitch = 0.0f;
+float yaw = -120.0f;
+float lastX = float(SCR_WIDTH) / 2.0f;
+float lastY = float(SCR_HEIGHT) / 2.0f;
+bool isFirstMouse = true;
+
+
 // Frames
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -266,7 +274,38 @@ void userInput(sf::Window &window) {
 }
 
 void mouseCursorPosition(const sf::Event &event) {
-    std::cout << "Position: " << event.mouseMove.x << " " << event.mouseMove.y << std::endl;
+    float xpos = event.mouseMove.x;
+    float ypos = event.mouseMove.y;
+
+    if (isFirstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        isFirstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f;
+
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if (pitch >= 119.0f)
+        pitch = 119.0f;
+    if (pitch <= -119.0f)
+        pitch = -119.0f;
+
+    Vec3 direction;
+    direction.x = std::cos(radians(yaw)) * std::cos(radians(pitch));
+    direction.y = std::sin(radians(pitch));
+    direction.z = std::sin(radians(yaw)) * std::cos(radians(pitch));
+    cameraFront = direction.normalize();
 }
 
 void mouseScrollCallback(const sf::Event &event) {
