@@ -55,6 +55,7 @@ int main() {
     }
 
     /* Texture */
+    stbi_set_flip_vertically_on_load(true);
     GLuint texture = loadTexture("C:/Users/motattack/CLionProjects/CG_Engine/src/libs/texture/example/head.png");
 
 
@@ -101,9 +102,9 @@ int main() {
 
         // Matrix
         model = Mat4x4(1.0f);
-        model = model.Scale(Vec3(0.5f, 0.5f, 0.5f));
+        // model = model.Scale(Vec3(0.5f, 0.5f, 0.5f));
         model = model.translate(myPos);
-        model = model.rotate(radians(-55.0f) * time, Vec3(xValue, yValue, 0.5f));
+        // model = model.rotate(radians(-55.0f) * time, Vec3(xValue, yValue, 0.5f));
         myShader.setMat4x4("model", model);
 
         /* Render */
