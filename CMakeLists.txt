@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 project(CG_Engine)
 
 # Include directories for GLEW and SFML
-include_directories(${CMAKE_SOURCE_DIR}/src/libs/glew-2.1.0/include)
+include_directories(${CMAKE_SOURCE_DIR}/src/libs/glew-2.2.0/include)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/SFML-2.5.1/include)
 
 # Include directories for Math, glm and test
@@ -15,7 +15,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/libs/glm)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/stb)
 
 # Link directories for GLEW and SFML
-link_directories(${CMAKE_SOURCE_DIR}/src/libs/glew-2.1.0/lib/Release/x64)
+link_directories(${CMAKE_SOURCE_DIR}/src/libs/glew-2.2.0/lib/Release/x64)
 link_directories(${CMAKE_SOURCE_DIR}/src/libs/SFML-2.5.1/lib)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/imgui-sfml-2.5)

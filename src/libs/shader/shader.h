@@ -13,6 +13,10 @@
 #include <mat3x3.h>
 #include <mat4x4.h>
 
+#include "glm.hpp"
+#include "gtc/matrix_transform.hpp"
+#include "gtc/type_ptr.hpp"
+
 const int BUFF_SIZE = 512;
 
 class Shader {
@@ -128,6 +132,10 @@ public:
         glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, &value.x);
     };
 
+    void setVec3(const std::string& name, const glm::vec3 &value) const {
+        glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, glm::value_ptr(value));
+    };
+
     void setVec4(const std::string &name, float x, float y, float z, float w) const {
         glUniform4f(glGetUniformLocation(this->ID, name.c_str()), x, y, z, w);
     };
@@ -147,6 +155,10 @@ public:
     void setMat4x4(const std::string &name, const Mat4x4 &value) const {
         glUniformMatrix4fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, &value.matrix[0][0]);
     }
+
+    void setMat4(const std::string& name, const glm::mat4& value) const {
+        glUniformMatrix4fv(glGetUniformLocation(this->ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+    };
 };
 
 #endif

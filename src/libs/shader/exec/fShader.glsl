@@ -7,12 +7,12 @@ in vec3 ourColor;
 
 uniform vec3 colors;
 
-uniform sampler2D texture1;
-uniform sampler2D texture2;
+uniform sampler2D container_texture;
+uniform sampler2D face_texture;
 
 uniform float alpha;
 
 void main()
 {
-    FragColor = mix(texture(texture1, TexCoords), texture(texture2, TexCoords), 0.0f);
+    FragColor = mix(texture(container_texture, TexCoords), texture(face_texture, TexCoords), 0.0f);
 }

@@ -89,8 +89,8 @@ int main() {
     settings.minorVersion = 3;
     settings.attributeFlags = sf::ContextSettings::Core;
 
-    sf::RenderWindow window(sf::VideoMode(800, 600, 32), "First Window",
-                            sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(SCR_WIDTH, SCR_HEIGHT, 32), "First Window",
+                            sf::Style::Titlebar | sf::Style::Close, settings);
     window.setActive(true);
 
     glewExperimental = GL_TRUE;
@@ -127,8 +127,9 @@ int main() {
 
     /* Texture */
     stbi_set_flip_vertically_on_load(true);
-    GLuint texture_head_1 = loadTexture("C:/Users/motattack/CLionProjects/CG_Engine/src/libs/texture/example/head.png");
-    GLuint texture_head_2 = loadTexture(
+    GLuint container_texture = loadTexture(
+            "C:/Users/motattack/CLionProjects/CG_Engine/src/libs/texture/example/head.png");
+    GLuint face_texture = loadTexture(
             "C:/Users/motattack/CLionProjects/CG_Engine/src/libs/texture/example/head2.png");
 
 
@@ -136,8 +137,8 @@ int main() {
     Shader myShader("C:/Users/motattack/CLionProjects/CG_Engine/src/libs/shader/exec/vShader.glsl",
                     "C:/Users/motattack/CLionProjects/CG_Engine/src/libs/shader/exec/fShader.glsl");
     myShader.use();
-    myShader.setInt("texture1", 0);
-    myShader.setInt("texture2", 1);
+    myShader.setInt("container_texture", 0);
+    myShader.setInt("face_texture", 1);
 
     sf::Clock clock;
     while (window.isOpen()) {
@@ -170,7 +171,7 @@ int main() {
         // Model
         model = Mat4x4(1.0f);
         model = model.Scale(Vec3(1.2f));
-        model = model.rotate(radians(-55.0f), Vec3(1.0f, 0.0f, 0.0f));
+        model = model.rotate(radians(-55.0f) * time, Vec3(1.0f, 0.0f, 0.0f));
         model = model.translate(Vec3(myPos));
         myShader.setMat4x4("model", model);
 
@@ -184,9 +185,9 @@ int main() {
         // One shape
         myShader.use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture_head_1);
+        glBindTexture(GL_TEXTURE_2D, container_texture);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture_head_2);
+        glBindTexture(GL_TEXTURE_2D, face_texture);
         VAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -207,14 +208,15 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
-            else if (event.type == sf::Event::Resized)
-                onResize(event);
-            else if (event.type == sf::Event::MouseMoved)
-                mouseCursorPosition(event);
-            else if (event.type == sf::Event::MouseWheelScrolled)
-                mouseScrollCallback(event);
+//            else if (event.type == sf::Event::Resized)
+//                onResize(event);
+//            else if (event.type == sf::Event::MouseMoved)
+//                mouseCursorPosition(event);
+//            else if (event.type == sf::Event::MouseWheelScrolled)
+//                mouseScrollCallback(event);
         }
     }
+    window.close();
     return 0;
 }
 
@@ -249,6 +251,7 @@ unsigned int loadTexture(const char *texture_path) {
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
 
+    /* Filter Options */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
@@ -258,6 +261,7 @@ unsigned int loadTexture(const char *texture_path) {
     unsigned char *data = stbi_load(texture_path, &width, &height, &nrChannels, 0);
 
     if (data) {
+        // Note it's a better way to see that what our file is like png, jpg or jpeg ?
         GLenum format;
         if (nrChannels == 1)
             format = GL_RED;
