@@ -21,61 +21,61 @@ using namespace std;
 
 // pos and color and TexCoords
 float vertex[] = {
-        /* Top Position */		/* Color */			/* TexCoords */
-        -0.5f,-0.5f, 0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,
-        0.5f,-0.5f, 0.5f,		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f,		1.0f, 1.0f, 0.0f,		0.0f, 1.0f,
-        -0.5f,-0.5f, 0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,
-        /* Bottom Position */		/* Color */			/* TexCoords */
-        -0.5f,-0.5f,-0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,
-        0.5f,-0.5f,-0.5f,		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,
-        0.5f, 0.5f,-0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-        0.5f, 0.5f,-0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-        -0.5f, 0.5f,-0.5f,		1.0f, 1.0f, 0.0f,		0.0f, 1.0f,
-        -0.5f,-0.5f,-0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,
-        /* Left Position */		/* Color */			/* TexCoords */
-        -0.5f,-0.5f,-0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,
-        -0.5f, 0.5f,-0.5f,		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-        -0.5f,-0.5f, 0.5f,		1.0f, 1.0f, 0.0f,		0.0f, 1.0f,
-        -0.5f,-0.5f,-0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,
-        /* Right Position */		/* Color */			/* TexCoords */
-        0.5f,-0.5f,-0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,
-        0.5f, 0.5f,-0.5f,		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-        0.5f,-0.5f, 0.5f,		1.0f, 1.0f, 0.0f,		0.0f, 1.0f,
-        0.5f,-0.5f,-0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,
-        /* Back Position */		/* Color */			/* TexCoords */
-        -0.5f, 0.5f,-0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,
-        0.5f, 0.5f,-0.5f,		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f,		1.0f, 1.0f, 0.0f,		0.0f, 1.0f,
-        -0.5f, 0.5f,-0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,
-        /* Front Position */		/* Color */			/* TexCoords */
-        -0.5f,-0.5f,-0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,
-        0.5f,-0.5f,-0.5f,		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,
-        0.5f,-0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-        0.5f,-0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-        -0.5f,-0.5f, 0.5f,		1.0f, 1.0f, 0.0f,		0.0f, 1.0f,
-        -0.5f,-0.5f,-0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,
+        /* Top Position */        /* Color */            /* TexCoords */
+        -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        /* Bottom Position */        /* Color */            /* TexCoords */
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        /* Left Position */        /* Color */            /* TexCoords */
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        /* Right Position */        /* Color */            /* TexCoords */
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        /* Back Position */        /* Color */            /* TexCoords */
+        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        /* Front Position */        /* Color */            /* TexCoords */
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 };
 
 Vec3 cubePositions[] = {
-        Vec3(0.0f,  0.0f,  0.0f),
-        Vec3(2.0f,  5.0f, -15.0f),
+        Vec3(0.0f, 0.0f, 0.0f),
+        Vec3(2.0f, 5.0f, -15.0f),
         Vec3(-1.5f, -2.2f, -2.5f),
         Vec3(-3.8f, -2.0f, -12.3f),
         Vec3(2.4f, -0.4f, -3.5f),
-        Vec3(-1.7f,  3.0f, -7.5f),
+        Vec3(-1.7f, 3.0f, -7.5f),
         Vec3(1.3f, -2.0f, -2.5f),
-        Vec3(1.5f,  2.0f, -2.5f),
-        Vec3(1.5f,  0.2f, -1.5f),
-        Vec3(-1.3f,  1.0f, -1.5f)
+        Vec3(1.5f, 2.0f, -2.5f),
+        Vec3(1.5f, 0.2f, -1.5f),
+        Vec3(-1.3f, 1.0f, -1.5f)
 };
 
 void onResize(const sf::Event &event); // Protype
@@ -160,6 +160,10 @@ int main() {
         float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
         float yValue = std::sin(time) / 2.0f + 0.5f; // 0.0f - 1.0f
 
+        float radius = 5.0f;
+        float camX = std::sin(time) * radius;
+        float camZ = std::cos(time) * radius;
+
         // Vector
         Vec3 myVector;
         myVector.x = xValue;
@@ -172,18 +176,17 @@ int main() {
         /* Coordinates */
         // Projection
         projection = Mat4x4::perspective(radians(45.0f), float(SCR_WIDTH) / float(SCR_HEIGHT), 0.1f, 100.0f);
-        projection *= Mat4x4::lookAt(Vec3(0), Vec3(0, 0, -1), Vec3(0, 1, 0));
         myShader.setMat4x4("projection", projection);
 
         // View
         view = Mat4x4(1.0f);
-        view = view.translate(Vec3(0.0f, 0.0f, -5.0f));
+        //view = glm::translate(view, glm::vec3(0.0f, 0.0f,-3.0f));
+        view = Mat4x4::lookAt(Vec3(camX, 0.0f, camZ), Vec3(0.0f), Vec3(0.0f, 1.0f, 0.0f));
         myShader.setMat4x4("view", view);
 
         // Model
         model = Mat4x4(1.0f);
         model = model.Scale(Vec3(1.2f));
-        model = model.rotate(radians(-55.0f) * time, Vec3(1.0f, 0.0f, 0.0f));
         model = model.translate(Vec3(myPos));
         myShader.setMat4x4("model", model);
 
@@ -192,8 +195,8 @@ int main() {
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glLineWidth(7.0f);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // hehe
+        // glLineWidth(7.0f);
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // hehe
 
         // One shape
         myShader.use();
@@ -240,14 +243,14 @@ void userInput(sf::Window &window) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         window.close();
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        myPos.y += 0.005f;
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        myPos.y -= 0.005f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        myPos.x += 0.005f;
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        myPos.x -= 0.005f;
+//    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+//        myPos.y += 0.005f;
+//    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+//        myPos.y -= 0.005f;
+//    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+//        myPos.x += 0.005f;
+//    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+//        myPos.x -= 0.005f;
 }
 
 void mouseCursorPosition(const sf::Event &event) {
