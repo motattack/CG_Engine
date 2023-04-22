@@ -17,13 +17,13 @@ using namespace std;
 
 // pos and color and TexCoords
 float vertex[] = {
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f,-0.5f,0.0f,	1.0f,0.0f,0.0f,		0.0f,0.0f,
+        0.5f,-0.5f,0.0f,	0.0f,1.0f,0.0f,		1.0f,0.0f,
+        0.0f, 0.5f,0.0f,	0.0f,0.0f,1.0f,		0.5f,1.0f,
 
-        0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+//        0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+//        -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+//        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 };
 
 void onResize(const sf::Event &event); // Protype
@@ -126,7 +126,7 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture_head_2);
         VAO.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // two Shape
         model = Mat4x4(1.0f);
@@ -135,7 +135,7 @@ int main() {
         model = model.rotate(radians(-55.0f) * time, Vec3(xValue, yValue, 0.5f));
         myShader.setMat4x4("model", model);
         VAO.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // Display
         window.display();
