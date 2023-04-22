@@ -11,6 +11,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/libs/shader)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/vertex)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/test)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/glm)
+include_directories(${CMAKE_SOURCE_DIR}/src/libs/camera)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/stb)
 

@@ -9,6 +9,7 @@
 #include <vec3.h>
 #include <mat4x4.h>
 #include <common.h>
+#include <camera.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -91,18 +92,11 @@ Mat4x4 projection;
 Mat4x4 model;
 Mat4x4 view;
 
-// Vectors
-Vec3 cameraPos = Vec3(0.0f, 0.0f, 3.0f);
-Vec3 cameraFront = Vec3(0.0f, 0.0f, -1.0f);
-Vec3 cameraUp = Vec3(0.0f, 1.0f, 0.0f);
-
-// Camera Attr
-float pitch = 0.0f;
-float yaw = -120.0f;
+// Camera
+Camera camera(Vec3(0.0f, 0.0f, 3.0f));
 float lastX = float(SCR_WIDTH) / 2.0f;
 float lastY = float(SCR_HEIGHT) / 2.0f;
 bool isFirstMouse = true;
-float zoom = 45.0f;
 
 
 // Frames
@@ -193,12 +187,12 @@ int main() {
 
         /* Coordinates */
         // Projection
-        projection = Mat4x4::perspective(radians(zoom), float(SCR_WIDTH) / float(SCR_HEIGHT), 0.1f, 100.0f);
+        projection = Mat4x4::perspective(radians(camera.Zoom), float(SCR_WIDTH) / float(SCR_HEIGHT), 0.1f, 100.0f);
         myShader.setMat4x4("projection", projection);
 
         // View
         view = Mat4x4(1.0f);
-        view = Mat4x4::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        view = camera.GetViewMatrix();
         myShader.setMat4x4("view", view);
 
         // Model
@@ -262,24 +256,25 @@ void userInput(sf::Window &window) {
     const float cameraSpeed = 3.0f * deltaTime;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        cameraPos += cameraFront * cameraSpeed;
+        camera.ProcessKeyboard(FORWARD, deltaTime);
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        cameraPos -= cameraFront * cameraSpeed;
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        cameraPos += cameraFront.crossProduct(cameraUp).normalize() * cameraSpeed;
+        camera.ProcessKeyboard(RIGHT, deltaTime);
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        cameraPos -= cameraFront.crossProduct(cameraUp).normalize() * cameraSpeed;
+        camera.ProcessKeyboard(LEFT, deltaTime);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        cameraPos += cameraUp * cameraSpeed;
+        camera.ProcessKeyboard(UP, deltaTime);
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        cameraPos -= cameraUp * cameraSpeed;
+        camera.ProcessKeyboard(DOWN, deltaTime);
 }
 
 void mouseCursorPosition(const sf::Event &event) {
     float xpos = event.mouseMove.x;
     float ypos = event.mouseMove.y;
 
-    if (isFirstMouse) {
+    if (isFirstMouse)
+    {
         lastX = xpos;
         lastY = ypos;
         isFirstMouse = false;
@@ -290,32 +285,11 @@ void mouseCursorPosition(const sf::Event &event) {
     lastX = xpos;
     lastY = ypos;
 
-    float sensitivity = 0.1f;
-
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    yaw += xoffset;
-    pitch += yoffset;
-
-    if (pitch >= 119.0f)
-        pitch = 119.0f;
-    if (pitch <= -119.0f)
-        pitch = -119.0f;
-
-    Vec3 direction;
-    direction.x = std::cos(radians(yaw)) * std::cos(radians(pitch));
-    direction.y = std::sin(radians(pitch));
-    direction.z = std::sin(radians(yaw)) * std::cos(radians(pitch));
-    cameraFront = direction.normalize();
+    camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void mouseScrollCallback(const sf::Event &event) {
-    zoom -= float(event.mouseWheelScroll.delta);
-    if (zoom >= 45.0f)
-        zoom = 45.0f;
-    if (zoom <= 20.0f)
-        zoom = 20.0f;
+    camera.ProcessMouseScroll(event.mouseWheelScroll.delta);
 }
 
 unsigned int loadTexture(const char *texture_path) {
