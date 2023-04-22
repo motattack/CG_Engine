@@ -10,19 +10,20 @@
 #include <common.h>
 
 #define STB_IMAGE_IMPLEMENTATION
+
 #include <stb_image.h>
 
 using namespace std;
 
 // pos and color and TexCoords
 float vertex[] = {
-        -0.5f,-0.5f,0.0f,	1.0f,0.0f,0.0f,		0.0f,0.0f,
-        0.5f,-0.5f,0.0f,	0.0f,1.0f,0.0f,		2.0f,0.0f,
-        0.5f, 0.5f,0.0f,	0.0f,0.0f,1.0f,		2.0f,1.0f,
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
 
-        0.5f, 0.5f,0.0f,	0.0f,0.0f,1.0f,		2.0f,1.0f,
-        -0.5f, 0.5f,0.0f,	1.0f,0.0f,1.0f,		0.0f,1.0f,
-        -0.5f,-0.5f,0.0f,	1.0f,0.0f,0.0f,		0.0f,0.0f,
+        0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 };
 
 void onResize(const sf::Event &event); // Protype
@@ -57,13 +58,16 @@ int main() {
 
     /* Texture */
     stbi_set_flip_vertically_on_load(true);
-    GLuint texture = loadTexture("C:/Users/motattack/CLionProjects/CG_Engine/src/libs/texture/example/head.png");
+    GLuint texture_head_1 = loadTexture("C:/Users/motattack/CLionProjects/CG_Engine/src/libs/texture/example/head.png");
+    GLuint texture_head_2 = loadTexture("C:/Users/motattack/CLionProjects/CG_Engine/src/libs/texture/example/head2.png");
 
 
     /* Shader */
     Shader myShader("C:/Users/motattack/CLionProjects/CG_Engine/src/libs/shader/exec/vShader.glsl",
                     "C:/Users/motattack/CLionProjects/CG_Engine/src/libs/shader/exec/fShader.glsl");
+    myShader.use();
     myShader.setInt("texture1", 0);
+    myShader.setInt("texture2", 1);
 
     /* Buffers */
 
@@ -117,7 +121,9 @@ int main() {
         // One shape
         myShader.use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glBindTexture(GL_TEXTURE_2D, texture_head_1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture_head_2);
         VAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -182,8 +188,8 @@ unsigned int loadTexture(const char *texture_path) {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 
     int width, height, nrChannels;
     unsigned char *data = stbi_load(texture_path, &width, &height, &nrChannels, 0);
