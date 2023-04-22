@@ -102,6 +102,7 @@ float yaw = -120.0f;
 float lastX = float(SCR_WIDTH) / 2.0f;
 float lastY = float(SCR_HEIGHT) / 2.0f;
 bool isFirstMouse = true;
+float zoom = 45.0f;
 
 
 // Frames
@@ -192,7 +193,7 @@ int main() {
 
         /* Coordinates */
         // Projection
-        projection = Mat4x4::perspective(radians(45.0f), float(SCR_WIDTH) / float(SCR_HEIGHT), 0.1f, 100.0f);
+        projection = Mat4x4::perspective(radians(zoom), float(SCR_WIDTH) / float(SCR_HEIGHT), 0.1f, 100.0f);
         myShader.setMat4x4("projection", projection);
 
         // View
@@ -310,7 +311,11 @@ void mouseCursorPosition(const sf::Event &event) {
 }
 
 void mouseScrollCallback(const sf::Event &event) {
-    std::cout << "Scroll: " << event.mouseWheelScroll.delta << std::endl;
+    zoom -= float(event.mouseWheelScroll.delta);
+    if (zoom >= 45.0f)
+        zoom = 45.0f;
+    if (zoom <= 20.0f)
+        zoom = 20.0f;
 }
 
 unsigned int loadTexture(const char *texture_path) {
