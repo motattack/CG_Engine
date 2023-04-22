@@ -12,6 +12,8 @@ include_directories(${CMAKE_SOURCE_DIR}/src/libs/vertex)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/test)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/glm)
 
+include_directories(${CMAKE_SOURCE_DIR}/src/libs/stb)
+
 # Link directories for GLEW and SFML
 link_directories(${CMAKE_SOURCE_DIR}/src/libs/glew-2.1.0/lib/Release/x64)
 link_directories(${CMAKE_SOURCE_DIR}/src/libs/SFML-2.5.1/lib)
