@@ -96,6 +96,10 @@ Vec3 cameraPos = Vec3(0.0f, 0.0f, 3.0f);
 Vec3 cameraFront = Vec3(0.0f, 0.0f, -1.0f);
 Vec3 cameraUp = Vec3(0.0f, 1.0f, 0.0f);
 
+// Frames
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
 
 int main() {
     sf::ContextSettings settings;
@@ -161,6 +165,10 @@ int main() {
         /* Update */
         userInput(window);
         float time = clock.getElapsedTime().asSeconds();
+
+        deltaTime = time - lastFrame;
+        lastFrame = time;
+
         float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
         float yValue = std::sin(time) / 2.0f + 0.5f; // 0.0f - 1.0f
 
@@ -241,7 +249,7 @@ void userInput(sf::Window &window) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         window.close();
 
-    const float cameraSpeed = 0.005f;
+    const float cameraSpeed = 3.0f * deltaTime;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
         cameraPos += cameraFront * cameraSpeed;
