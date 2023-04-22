@@ -1,6 +1,7 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
+#include "SFML/Graphics/RenderWindow.hpp"
 #include <cmath>
 #include <shader.h>
 #include <vbuffer.h>
@@ -12,7 +13,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stb_image.h>
-#include "SFML/Graphics/RenderWindow.hpp"
 
 #define SCR_WIDTH 1200
 #define SCR_HEIGHT 800
@@ -86,11 +86,15 @@ void mouseScrollCallback(const sf::Event &event);
 
 unsigned int loadTexture(const char *texture_path);
 
+// Matrix's
 Mat4x4 projection;
 Mat4x4 model;
 Mat4x4 view;
 
-auto myPos = Vec3(0.0f);
+// Vectors
+Vec3 cameraPos = Vec3(0.0f, 0.0f, 3.0f);
+Vec3 cameraFront = Vec3(0.0f, 0.0f, -1.0f);
+Vec3 cameraUp = Vec3(0.0f, 1.0f, 0.0f);
 
 
 int main() {
@@ -160,10 +164,6 @@ int main() {
         float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
         float yValue = std::sin(time) / 2.0f + 0.5f; // 0.0f - 1.0f
 
-        float radius = 5.0f;
-        float camX = std::sin(time) * radius;
-        float camZ = std::cos(time) * radius;
-
         // Vector
         Vec3 myVector;
         myVector.x = xValue;
@@ -180,14 +180,12 @@ int main() {
 
         // View
         view = Mat4x4(1.0f);
-        //view = glm::translate(view, glm::vec3(0.0f, 0.0f,-3.0f));
-        view = Mat4x4::lookAt(Vec3(camX, 0.0f, camZ), Vec3(0.0f), Vec3(0.0f, 1.0f, 0.0f));
+        view = Mat4x4::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         myShader.setMat4x4("view", view);
 
         // Model
         model = Mat4x4(1.0f);
         model = model.Scale(Vec3(1.2f));
-        model = model.translate(Vec3(myPos));
         myShader.setMat4x4("model", model);
 
 
@@ -243,14 +241,20 @@ void userInput(sf::Window &window) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         window.close();
 
-//    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-//        myPos.y += 0.005f;
-//    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-//        myPos.y -= 0.005f;
-//    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-//        myPos.x += 0.005f;
-//    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-//        myPos.x -= 0.005f;
+    const float cameraSpeed = 0.005f;
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        cameraPos += cameraFront * cameraSpeed;
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        cameraPos -= cameraFront * cameraSpeed;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        cameraPos += cameraFront.crossProduct(cameraUp).normalize() * cameraSpeed;
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        cameraPos -= cameraFront.crossProduct(cameraUp).normalize() * cameraSpeed;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        cameraPos += cameraUp * cameraSpeed;
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        cameraPos -= cameraUp * cameraSpeed;
 }
 
 void mouseCursorPosition(const sf::Event &event) {
