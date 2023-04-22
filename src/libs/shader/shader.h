@@ -52,7 +52,7 @@ public:
 
         this->vertex = glCreateShader(GL_VERTEX_SHADER);
 
-        glShaderSource(vertex, 1, &vShaderData, NULL);
+        glShaderSource(vertex, 1, &vShaderData, nullptr);
         glCompileShader(vertex);
 
         int success;
@@ -61,20 +61,20 @@ public:
         glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 
         if (!success) {
-            glGetShaderInfoLog(vertex, BUFF_SIZE, NULL, infoLog);
+            glGetShaderInfoLog(vertex, BUFF_SIZE, nullptr, infoLog);
             std::cout << "Error shader vertex: " << infoLog << std::endl;
         }
 
         // fragment
         this->fragment = glCreateShader(GL_FRAGMENT_SHADER);
 
-        glShaderSource(fragment, 1, &fShaderData, NULL);
+        glShaderSource(fragment, 1, &fShaderData, nullptr);
         glCompileShader(fragment);
 
         glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 
         if (!success) {
-            glGetShaderInfoLog(fragment, BUFF_SIZE, NULL, infoLog);
+            glGetShaderInfoLog(fragment, BUFF_SIZE, nullptr, infoLog);
             std::cout << "Error shader fragment:" << infoLog << std::endl;
         }
 
@@ -88,7 +88,7 @@ public:
         glGetProgramiv(ID, GL_LINK_STATUS, &success);
 
         if (!success) {
-            glGetProgramInfoLog(ID, BUFF_SIZE, NULL, infoLog);
+            glGetProgramInfoLog(ID, BUFF_SIZE, nullptr, infoLog);
             std::cout << "Error shader program: " << infoLog << std::endl;
         }
 
