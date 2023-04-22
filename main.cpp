@@ -12,6 +12,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stb_image.h>
+#include "SFML/Graphics/RenderWindow.hpp"
 
 #define SCR_WIDTH 1200
 #define SCR_HEIGHT 800
@@ -88,7 +89,8 @@ int main() {
     settings.minorVersion = 3;
     settings.attributeFlags = sf::ContextSettings::Core;
 
-    sf::Window window(sf::VideoMode(SCR_WIDTH, SCR_HEIGHT), "Hello World");
+    sf::RenderWindow window(sf::VideoMode(800, 600, 32), "First Window",
+                            sf::Style::Titlebar | sf::Style::Close);
     window.setActive(true);
 
     glewExperimental = GL_TRUE;
