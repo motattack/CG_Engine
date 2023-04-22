@@ -13,13 +13,16 @@
 
 #include <stb_image.h>
 
+#define SCR_WIDTH 1200
+#define SCR_HEIGHT 800
+
 using namespace std;
 
 // pos and color and TexCoords
 float vertex[] = {
-        -0.5f,-0.5f,0.0f,	1.0f,0.0f,0.0f,		0.0f,0.0f,
-        0.5f,-0.5f,0.0f,	0.0f,1.0f,0.0f,		1.0f,0.0f,
-        0.0f, 0.5f,0.0f,	0.0f,0.0f,1.0f,		0.5f,1.0f,
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 1.0f,
 
 //        0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
 //        -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
@@ -34,8 +37,12 @@ void mouseScrollCallback(const sf::Event &event);
 
 unsigned int loadTexture(const char *texture_path);
 
+Mat4x4 projection;
 Mat4x4 model;
+Mat4x4 view;
+
 auto myPos = Vec3(0.0f);
+
 
 int main() {
     sf::ContextSettings settings;
@@ -45,7 +52,7 @@ int main() {
     settings.minorVersion = 3;
     settings.attributeFlags = sf::ContextSettings::Core;
 
-    sf::Window window(sf::VideoMode(1200, 800), "Hello World");
+    sf::Window window(sf::VideoMode(SCR_WIDTH, SCR_HEIGHT), "Hello World");
     window.setActive(true);
 
 
@@ -59,7 +66,8 @@ int main() {
     /* Texture */
     stbi_set_flip_vertically_on_load(true);
     GLuint texture_head_1 = loadTexture("C:/Users/motattack/CLionProjects/CG_Engine/src/libs/texture/example/head.png");
-    GLuint texture_head_2 = loadTexture("C:/Users/motattack/CLionProjects/CG_Engine/src/libs/texture/example/head2.png");
+    GLuint texture_head_2 = loadTexture(
+            "C:/Users/motattack/CLionProjects/CG_Engine/src/libs/texture/example/head2.png");
 
 
     /* Shader */
@@ -106,12 +114,23 @@ int main() {
         myShader.setVec3("colors", myVector);
         myShader.setFloat("alpha", xValue);
 
-        // Matrix
+        /* Coordinates */
+        // Projection
+        projection = projection.perspective(radians(45.0f), float(SCR_WIDTH) / float(SCR_HEIGHT), 0.1f, 100.0f);
+        myShader.setMat4x4("projection", projection);
+
+        // View
+        view = Mat4x4(1.0f);
+        view = view.translate(Vec3(0.0f, 0.0f, -3.0f));
+        myShader.setMat4x4("view", view);
+
+        // Model
         model = Mat4x4(1.0f);
-        // model = model.Scale(Vec3(0.5f, 0.5f, 0.5f));
-        model = model.translate(myPos);
-        // model = model.rotate(radians(-55.0f) * time, Vec3(xValue, yValue, 0.5f));
+        model = model.Scale(Vec3(1.2f));
+        model = model.rotate(radians(-55.0f), Vec3(1.0f, 0.0f, 0.0f));
+        model = model.translate(Vec3(myPos));
         myShader.setMat4x4("model", model);
+
 
         /* Render */
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f
