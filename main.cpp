@@ -21,8 +21,6 @@
 #define SCR_WIDTH 1000
 #define SCR_HEIGHT 800
 
-using namespace std;
-
 // pos and color and TexCoords
 float vertex[] = {
         /* Top Position */        /* Color */            /* TexCoords */
@@ -69,24 +67,7 @@ float vertex[] = {
         -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 };
 
-Vec3 cubePositions[] = {
-        Vec3(0.0f, 0.0f, 0.0f),
-        Vec3(2.0f, 5.0f, -15.0f),
-        Vec3(-1.5f, -2.2f, -2.5f),
-        Vec3(-3.8f, -2.0f, -12.3f),
-        Vec3(2.4f, -0.4f, -3.5f),
-        Vec3(-1.7f, 3.0f, -7.5f),
-        Vec3(1.3f, -2.0f, -2.5f),
-        Vec3(1.5f, 2.0f, -2.5f),
-        Vec3(1.5f, 0.2f, -1.5f),
-        Vec3(-1.3f, 1.0f, -1.5f)
-};
-
-void onResize(const sf::Event &event); // Protype
 void userInput(sf::Window &window);
-
-void mouseCursorPosition(const sf::Event &event); // Protype
-void mouseScrollCallback(const sf::Event &event);
 
 unsigned int loadTexture(const char *texture_path);
 
@@ -97,9 +78,6 @@ Mat4x4 view;
 
 // Camera
 Camera camera(Vec3(0.0f, 0.0f, 3.0f));
-float lastX = float(SCR_WIDTH) / 2.0f;
-float lastY = float(SCR_HEIGHT) / 2.0f;
-bool isFirstMouse = true;
 
 
 // Frames
@@ -113,14 +91,12 @@ int main() {
     settings.stencilBits = 8;
     settings.majorVersion = 4;
     settings.minorVersion = 6;
-    settings.attributeFlags = sf::ContextSettings::Core;
 
     sf::RenderWindow window(sf::VideoMode(SCR_WIDTH, SCR_HEIGHT, 32), "First Window",
                             sf::Style::Titlebar | sf::Style::Close, settings);
-    window.setActive(true);
-    window.setMouseCursorVisible(false);
+    window.setVisible(true);
 
-    ImGui::SFML::Init(window, true);
+    ImGui::SFML::Init(window);
 
     glewExperimental = GL_TRUE;
 
@@ -222,17 +198,15 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         ImGui::SFML::Update(window, deltaClock.restart());
-        ImGui::Begin("My GUI");
-        ImGui::Text("Hello, world!");
+
+        ImGui::SetNextWindowSize(ImVec2(100, 100));
+        ImGui::Begin("Hello, world!");
+        ImGui::Button("Look at this pretty button");
         ImGui::End();
 
-        // Display
-        window.clear();
+
         ImGui::SFML::Render(window);
-
         window.display();
-
-        // std::cout << time << std::endl;
 
         // Poll events
         sf::Event event{};
@@ -240,21 +214,11 @@ int main() {
             ImGui::SFML::ProcessEvent(event);
             if (event.type == sf::Event::Closed)
                 window.close();
-            else if (event.type == sf::Event::Resized)
-                onResize(event);
-            else if (event.type == sf::Event::MouseMoved)
-                mouseCursorPosition(event);
-            else if (event.type == sf::Event::MouseWheelScrolled)
-                mouseScrollCallback(event);
         }
     }
     ImGui::SFML::Shutdown();
     window.close();
     return 0;
-}
-
-void onResize(const sf::Event &event) {
-    glViewport(0, 0, event.size.width, event.size.height);
 }
 
 void userInput(sf::Window &window) {
@@ -273,28 +237,6 @@ void userInput(sf::Window &window) {
         camera.ProcessKeyboard(UP, deltaTime);
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         camera.ProcessKeyboard(DOWN, deltaTime);
-}
-
-void mouseCursorPosition(const sf::Event &event) {
-    float xpos = event.mouseMove.x;
-    float ypos = event.mouseMove.y;
-
-    if (isFirstMouse) {
-        lastX = xpos;
-        lastY = ypos;
-        isFirstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
-
-    camera.ProcessMouseMovement(xoffset, yoffset);
-}
-
-void mouseScrollCallback(const sf::Event &event) {
-    camera.ProcessMouseScroll(event.mouseWheelScroll.delta);
 }
 
 unsigned int loadTexture(const char *texture_path) {
