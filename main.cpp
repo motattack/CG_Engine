@@ -99,6 +99,8 @@ int main() {
                             sf::Style::Titlebar | sf::Style::Close, settings);
     window.setVisible(true);
 
+    ImGui::SFML::Init(window, true);
+
     glewExperimental = GL_TRUE;
 
     if (GLEW_OK != glewInit()) {
@@ -106,8 +108,6 @@ int main() {
         return -1;
     }
     glEnable(GL_DEPTH_TEST);
-
-    ImGui::SFML::Init(window);
 
     vBuffer VBO(vertex);
     vArray VAO;
@@ -140,6 +140,8 @@ int main() {
     sf::Clock deltaClock, clock;
     while (window.isOpen()) {
         ImGui::SFML::Update(window, deltaClock.restart());
+
+        glEnable(GL_DEPTH_TEST);
 
         ImGui::Begin("Hello, world!");
         ImGui::Button("Look at this pretty button");
