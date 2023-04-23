@@ -42,7 +42,7 @@ public:
             vCode = vShaderStream.str();
             fCode = fShaderStream.str();
         }
-        catch (std::ifstream::failure e) {
+        catch (std::ifstream::failure &e) {
             std::cout << "Failed file read\n";
             return;
         }

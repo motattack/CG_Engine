@@ -198,7 +198,7 @@ public:
         return translated_matrix;
     }
 
-    Mat4x4 rotate(float angle, Vec3 axis) const {
+    [[nodiscard]] Mat4x4 rotate(float angle, Vec3 axis) const {
         // Вычисляем синус и косинус угла поворота
         float cos_angle = cosf(angle);
         float sin_angle = sinf(angle);

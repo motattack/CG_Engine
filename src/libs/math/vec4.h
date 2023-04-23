@@ -77,7 +77,7 @@ public:
     };
 
     bool operator==(const Vec4 &other) const {
-        return (x == other.x && y == other.y, z == other.z && w == other.w);
+        return (x == other.x && y == other.y && z == other.z && w == other.w);
     };
 
     bool operator!=(const Vec4 &other) const {

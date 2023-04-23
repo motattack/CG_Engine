@@ -1,0 +1,69 @@
+#include <iostream>
+#include <GL/glew.h>
+#include <SFML/Window.hpp>
+#include "SFML/Graphics/RenderWindow.hpp"
+#include <varray.h>
+#include <imgui.h>
+#include <imgui-SFML.h>
+
+#define SCR_WIDTH 1200
+#define SCR_HEIGHT 800
+
+int main() {
+    sf::ContextSettings settings;
+    settings.depthBits = 24;
+    settings.stencilBits = 8;
+    settings.majorVersion = 3;
+    settings.minorVersion = 0;
+    settings.attributeFlags = sf::ContextSettings::Default;
+
+    sf::RenderWindow window(sf::VideoMode(SCR_WIDTH, SCR_HEIGHT, 32), "First Window",
+                            sf::Style::Titlebar | sf::Style::Close, settings);
+    ImGui::SFML::Init(window);
+
+    glewExperimental = GL_TRUE;
+
+    // Check Glew
+    GLenum glewError = glewInit();
+    if (glewError != GLEW_OK) {
+        std::cout << "Error:: glew not init =(: " << glewGetErrorString(glewError) << std::endl;
+        return -1;
+    }
+
+    // OpenGL Settings;
+    glEnable(GL_DEPTH_TEST);
+
+    /* Buffers */
+
+    vArray VAO;
+
+
+    sf::Clock clock, deltaClock;
+    while (window.isOpen()) {
+        /* Render */
+        glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        ImGui::SFML::Update(window, deltaClock.restart());
+
+        ImGui::Begin("My window");
+
+        ImGui::Text("Hello, world!");
+
+        ImGui::End();
+
+        window.clear();
+        ImGui::SFML::Render(window);
+        window.display();
+
+        // Poll events
+        sf::Event event{};
+        while (window.pollEvent(event)) {
+            ImGui::SFML::ProcessEvent(window, event);
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+    }
+    ImGui::SFML::Shutdown();
+    return 0;
+}

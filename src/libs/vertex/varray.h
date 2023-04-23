@@ -12,17 +12,13 @@ public:
         bind();
     };
 
-    static void
-    attrPointer(GLuint ind, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer) {
+    static void attrPointer(GLuint ind, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer) {
         glVertexAttribPointer(ind, size, type, normalized, stride, pointer);
         glEnableVertexAttribArray(ind);
     };
 
-    void bind(int f = -1) const {
-        if (!f)
-            glBindVertexArray(0);
-        else
-            glBindVertexArray(ID);
+    void bind() const {
+        glBindVertexArray(ID);
     };
 
     void remove() {

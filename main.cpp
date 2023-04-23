@@ -1,3 +1,6 @@
+#include <imgui.h>
+#include <imgui-SFML.h>
+
 #include <iostream>
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
@@ -15,7 +18,7 @@
 
 #include <stb_image.h>
 
-#define SCR_WIDTH 1200
+#define SCR_WIDTH 1000
 #define SCR_HEIGHT 800
 
 using namespace std;
@@ -109,13 +112,15 @@ int main() {
     settings.depthBits = 24;
     settings.stencilBits = 8;
     settings.majorVersion = 4;
-    settings.minorVersion = 3;
+    settings.minorVersion = 6;
     settings.attributeFlags = sf::ContextSettings::Core;
 
     sf::RenderWindow window(sf::VideoMode(SCR_WIDTH, SCR_HEIGHT, 32), "First Window",
                             sf::Style::Titlebar | sf::Style::Close, settings);
     window.setActive(true);
     window.setMouseCursorVisible(false);
+
+    ImGui::SFML::Init(window, true);
 
     glewExperimental = GL_TRUE;
 
@@ -131,23 +136,19 @@ int main() {
 
     /* Buffers */
 
-    vBuffer VBO(vertex, sizeof(vertex) / sizeof(float));
+    vBuffer VBO(vertex);
     vArray VAO;
-    vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), &vertex, GL_STATIC_DRAW);
 
     /* Position Attribute */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) 0);
-    glEnableVertexAttribArray(0);
+    vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
 
     /* Color Attribute*/
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    vArray::attrPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
 
-    /* Textue Coordinates Attribute */
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    /* Texture Coordinates Attribute */
+    vArray::attrPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
 
     /* Texture */
     stbi_set_flip_vertically_on_load(true);
@@ -155,6 +156,7 @@ int main() {
             "../res/texture/example/head.png");
     GLuint face_texture = loadTexture(
             "../res/texture/example/head2.png");
+    GLuint sucher = loadTexture("../res/texture/example/sucher.png");
 
 
     /* Shader */
@@ -163,8 +165,9 @@ int main() {
     myShader.use();
     myShader.setInt("container_texture", 0);
     myShader.setInt("face_texture", 1);
+    myShader.setInt("sucher", 2);
 
-    sf::Clock clock;
+    sf::Clock deltaClock, clock;
     while (window.isOpen()) {
         /* Update */
         userInput(window);
@@ -198,23 +201,17 @@ int main() {
         // Model
         model = Mat4x4(1.0f);
         model = model.Scale(Vec3(1.2f));
+        model = model.rotate(radians(-55.0f) * time, Vec3(1.0f, 0.0f, 0.0f));
         myShader.setMat4x4("model", model);
+//        std::cout << radians(-55.0f) * time << std::endl;
 
 
         /* Render */
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // glLineWidth(7.0f);
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // hehe
-
-        // One shape
-        myShader.use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, container_texture);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, face_texture);
-        VAO.bind();
+        glLineWidth(7.0f);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // hehe
 
         // 1 elem
         myShader.use();
@@ -222,15 +219,25 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, container_texture);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, face_texture);
-        VAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        ImGui::SFML::Update(window, deltaClock.restart());
+        ImGui::Begin("My GUI");
+        ImGui::Text("Hello, world!");
+        ImGui::End();
+
         // Display
+        window.clear();
+        ImGui::SFML::Render(window);
+
         window.display();
+
+        // std::cout << time << std::endl;
 
         // Poll events
         sf::Event event{};
         while (window.pollEvent(event)) {
+            ImGui::SFML::ProcessEvent(event);
             if (event.type == sf::Event::Closed)
                 window.close();
             else if (event.type == sf::Event::Resized)
@@ -241,6 +248,7 @@ int main() {
                 mouseScrollCallback(event);
         }
     }
+    ImGui::SFML::Shutdown();
     window.close();
     return 0;
 }
@@ -252,8 +260,6 @@ void onResize(const sf::Event &event) {
 void userInput(sf::Window &window) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         window.close();
-
-    const float cameraSpeed = 3.0f * deltaTime;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
         camera.ProcessKeyboard(FORWARD, deltaTime);
@@ -273,8 +279,7 @@ void mouseCursorPosition(const sf::Event &event) {
     float xpos = event.mouseMove.x;
     float ypos = event.mouseMove.y;
 
-    if (isFirstMouse)
-    {
+    if (isFirstMouse) {
         lastX = xpos;
         lastY = ypos;
         isFirstMouse = false;

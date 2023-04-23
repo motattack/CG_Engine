@@ -7,16 +7,13 @@ class vBuffer {
 private:
     unsigned int ID{};
 public:
-    vBuffer(float *data, int size) {
+    explicit vBuffer(float *data) {
         glGenBuffers(1, &ID);
         bind();
-        glBufferData(GL_ARRAY_BUFFER, size * sizeof(data), data, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
     };
 
-    void bind(int f = -1) const {
-        if (!f)
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-        else
+    void bind() const {
             glBindBuffer(GL_ARRAY_BUFFER, ID);
     };
 
