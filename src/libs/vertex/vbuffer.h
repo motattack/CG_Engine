@@ -2,6 +2,8 @@
 #define CG_ENGINE_VBUFFER_H
 
 #include <GL/glew.h>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
 class vBuffer {
 private:

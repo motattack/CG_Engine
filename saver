@@ -1,13 +1,18 @@
 #include <imgui.h>
 #include <imgui-SFML.h>
+
 #include <iostream>
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
 #include "SFML/Graphics/RenderWindow.hpp"
-#include "camera.h"
+#include <cmath>
 #include <shader.h>
 #include <vbuffer.h>
 #include <varray.h>
+#include <vec3.h>
+#include <mat4x4.h>
+#include <common.h>
+#include <camera.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -62,11 +67,7 @@ float vertex[] = {
         -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 };
 
-void onResize(const sf::Event &event); // Protype
 void userInput(sf::Window &window);
-
-void mouseCursorPosition(const sf::Event &event); // Protype
-void mouseScrollCallback(const sf::Event &event);
 
 unsigned int loadTexture(const char *texture_path);
 
@@ -77,9 +78,6 @@ Mat4x4 view;
 
 // Camera
 Camera camera(Vec3(0.0f, 0.0f, 3.0f));
-float lastX = float(SCR_WIDTH) / 2.0f;
-float lastY = float(SCR_HEIGHT) / 2.0f;
-bool isFirstMouse = true;
 
 
 // Frames
@@ -91,37 +89,42 @@ int main() {
     sf::ContextSettings settings;
     settings.depthBits = 24;
     settings.stencilBits = 8;
-    settings.majorVersion = 3;
-    settings.minorVersion = 0;
-    settings.attributeFlags = sf::ContextSettings::Default;
+    settings.majorVersion = 4;
+    settings.minorVersion = 6;
+    settings.attributeFlags = sf::ContextSettings::Core;
 
-    sf::RenderWindow window(sf::VideoMode(800, 600, 32), "First Window",
+    sf::RenderWindow window(sf::VideoMode(SCR_WIDTH, SCR_HEIGHT, 32), "First Window",
                             sf::Style::Titlebar | sf::Style::Close, settings);
     window.setVisible(true);
 
     glewExperimental = GL_TRUE;
 
-    if (GLEW_OK != glewInit()) {
-        std::cout << "Error: glew not init =(" << std::endl;
+    // Check Glew
+    GLenum glewError = glewInit();
+    if (glewError != GLEW_OK) {
+        std::cout << "Error:: glew not init =(: " << glewGetErrorString(glewError) << std::endl;
         return -1;
     }
+
+    // OpenGL Settings;
     glEnable(GL_DEPTH_TEST);
 
     ImGui::SFML::Init(window);
 
+    /* Buffers */
     vBuffer VBO(vertex);
     vArray VAO;
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), &vertex, GL_STATIC_DRAW);
 
+    /* Position Attribute */
     vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
 
+    /* Color Attribute*/
     vArray::attrPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
 
+    /* Texture Coordinates Attribute */
     vArray::attrPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
-
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
-    //glBindVertexArray(0);
 
     /* Texture */
     stbi_set_flip_vertically_on_load(true);
@@ -129,6 +132,7 @@ int main() {
             "../res/texture/example/head.png");
     GLuint face_texture = loadTexture(
             "../res/texture/example/head2.png");
+
 
     /* Shader */
     Shader myShader("../res/shader/vShader.glsl",
@@ -179,22 +183,25 @@ int main() {
         model = model.Scale(Vec3(1.2f));
         model = model.rotate(radians(-55.0f) * time, Vec3(1.0f, 0.0f, 0.0f));
         myShader.setMat4x4("model", model);
+        std::cout << time << std::endl;
 
-        glClearColor(0.7f, 0.7f, 7.0f, 0.0f);
+
+        /* Render */
+        glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+//        glLineWidth(7.0f);
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // hehe
+
+        // 1 elem
+        myShader.use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, container_texture);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, face_texture);
-        VAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 36);
-        vArray::unbind();
 
         ImGui::SFML::Render(window);
-
-        myShader.use();
-
         window.display();
 
         // Poll events
@@ -203,29 +210,16 @@ int main() {
             ImGui::SFML::ProcessEvent(event);
             if (event.type == sf::Event::Closed)
                 window.close();
-            else if (event.type == sf::Event::Resized)
-                onResize(event);
-            else if (event.type == sf::Event::MouseMoved)
-                mouseCursorPosition(event);
-            else if (event.type == sf::Event::MouseWheelScrolled)
-                mouseScrollCallback(event);
         }
     }
-
     ImGui::SFML::Shutdown();
     window.close();
     return 0;
 }
 
-void onResize(const sf::Event &event) {
-    glViewport(0, 0, event.size.width, event.size.height);
-}
-
 void userInput(sf::Window &window) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         window.close();
-
-    const float cameraSpeed = 3.0f * deltaTime;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
         camera.ProcessKeyboard(FORWARD, deltaTime);
@@ -239,28 +233,6 @@ void userInput(sf::Window &window) {
         camera.ProcessKeyboard(UP, deltaTime);
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         camera.ProcessKeyboard(DOWN, deltaTime);
-}
-
-void mouseCursorPosition(const sf::Event &event) {
-    float xpos = event.mouseMove.x;
-    float ypos = event.mouseMove.y;
-
-    if (isFirstMouse) {
-        lastX = xpos;
-        lastY = ypos;
-        isFirstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
-
-    camera.ProcessMouseMovement(xoffset, yoffset);
-}
-
-void mouseScrollCallback(const sf::Event &event) {
-    camera.ProcessMouseScroll(event.mouseWheelScroll.delta);
 }
 
 unsigned int loadTexture(const char *texture_path) {

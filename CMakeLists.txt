@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.25)
 project(CG_Engine)
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -g -fsanitize=address")
+set(CMAKE_CXX_STANDARD 20)
+
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -g")
 
 # Include directories for GLEW and SFML
-include_directories(${CMAKE_SOURCE_DIR}/src/libs/glew-2.2.0/include)
+include_directories(${CMAKE_SOURCE_DIR}/src/libs/glew-2.1.0/include)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/SFML-2.5.1/include)
 
 # Include directories for Math, glm and test
@@ -18,13 +20,11 @@ include_directories(${CMAKE_SOURCE_DIR}/src/libs/camera)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/stb)
 
 # Link directories for GLEW and SFML
-link_directories(${CMAKE_SOURCE_DIR}/src/libs/glew-2.2.0/lib/Release/x64)
+link_directories(${CMAKE_SOURCE_DIR}/src/libs/glew-2.1.0/lib/Release/x64)
 link_directories(${CMAKE_SOURCE_DIR}/src/libs/SFML-2.5.1/lib)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/imgui-sfml-2.6)
 file(GLOB IMGUI_SFML_SRCS ${CMAKE_SOURCE_DIR}/src/libs/imgui-sfml-2.6/*.cpp)
-
-add_library(imgui_sfml ${IMGUI_SFML_SRCS})
 
 # Add executable
 add_executable(CG_Engine main.cpp ${IMGUI_SFML_SRCS})

@@ -2,6 +2,8 @@
 #define CG_ENGINE_VARRAY_H
 
 #include <GL/glew.h>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
 class vArray {
 private:
@@ -19,6 +21,10 @@ public:
 
     void bind() const {
         glBindVertexArray(ID);
+    };
+
+    static void unbind() {
+        glBindVertexArray(0);
     };
 
     void remove() {
