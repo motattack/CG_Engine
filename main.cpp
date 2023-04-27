@@ -98,6 +98,7 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600, 32), "First Window",
                             sf::Style::Titlebar | sf::Style::Close, settings);
     window.setVisible(true);
+    window.setFramerateLimit(75);
 
     ImGui::SFML::Init(window, true);
 
@@ -202,7 +203,9 @@ int main() {
             ImGui::End();
         }
 
+        float FPS = ImGui::GetIO().Framerate;
         ImGui::Begin("Hello, world!");
+        ImGui::Text("FPS = %f", FPS);
         ImGui::Button("Look at this pretty button");
         ImGui::DragFloat3("Scale", scale_value, 0.1f, 0.01f, 5.0f);
         ImGui::SliderFloat("alpha", &alpha, 0.0f, 1.0f);
