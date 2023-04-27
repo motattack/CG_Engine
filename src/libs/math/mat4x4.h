@@ -283,15 +283,17 @@ public:
         result[0][0] = right.x;
         result[1][0] = right.y;
         result[2][0] = right.z;
+        result[3][0] = -right.dotProduct(eye);
+
         result[0][1] = cameraUp.x;
         result[1][1] = cameraUp.y;
         result[2][1] = cameraUp.z;
+        result[3][2] = direction.dotProduct(eye);
+
         result[0][2] = -direction.x;
         result[1][2] = -direction.y;
         result[2][2] = -direction.z;
-        result[3][0] = -right.dotProduct(eye);
         result[3][1] = -cameraUp.dotProduct(eye);
-        result[3][2] = direction.dotProduct(eye);
 
         return result;
     }

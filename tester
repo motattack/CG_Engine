@@ -1,112 +1,171 @@
-#include <imgui.h>
-#include <imgui-SFML.h>
-#include <iostream>
-#include <GL/glew.h>
-#include <SFML/Window.hpp>
-#include "SFML/Graphics/RenderWindow.hpp"
-#include <vbuffer.h>
-#include <varray.h>
+class Cumera {
+public:
+    Vec3 pos;
+    Vec3 direction = Vec3(0.0f, 0.0f, -1.0f);
+    Vec3 up = Vec3(0.0f, 1.0f, 0.0f);
+    Vec3 right;
+    sf::Vector2i prevPos;
+    sf::Vector2i curPos;
+    float w;
+    float h;
 
-#define SCR_WIDTH 1000
-#define SCR_HEIGHT 800
+    bool firstClick = true;
 
-// pos and color and TexCoords
-float vertex[] = {
-        /* Top Position */        /* Color */            /* TexCoords */
-        -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        /* Bottom Position */        /* Color */            /* TexCoords */
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        /* Left Position */        /* Color */            /* TexCoords */
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        /* Right Position */        /* Color */            /* TexCoords */
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        /* Back Position */        /* Color */            /* TexCoords */
-        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        /* Front Position */        /* Color */            /* TexCoords */
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-};
+    float speed = 0.1f;
+    float sens = 5.0f;
+    float pitch = -0.0f;
+    float yaw = 90.0f;
 
-
-int main() {
-    sf::ContextSettings settings;
-    settings.depthBits = 24;
-    settings.stencilBits = 8;
-    settings.majorVersion = 3;
-    settings.minorVersion = 0;
-    settings.attributeFlags = sf::ContextSettings::Core;
-
-    sf::RenderWindow window(sf::VideoMode(SCR_WIDTH, SCR_HEIGHT, 32), "First Window",
-                            sf::Style::Titlebar | sf::Style::Close, settings);
-
-    glewExperimental = GL_TRUE;
-
-    // Check Glew
-    GLenum glewError = glewInit();
-    if (glewError != GLEW_OK) {
-        std::cout << "Error:: glew not init =(: " << glewGetErrorString(glewError) << std::endl;
-        return -1;
+    Cumera(float width, float height, Vec3 pos1) {
+        pos = pos1;
+        w = width;
+        h = height;
     }
 
-    // OpenGL Settings;
-    glEnable(GL_DEPTH_TEST);
-
-    ImGui::SFML::Init(window);
-
-    sf::Clock deltaClock;
-    while (window.isOpen()) {
-        ImGui::SFML::Update(window, deltaClock.restart());
-
-        ImGui::Begin("Hello, world!");
-        ImGui::Button("Look at this pretty button");
-        ImGui::End();
+    void look(float fov, float nearPlane, float farPlane, int shaderId, const char* uniform) {
 
 
-        /* Render */
-        glClearColor(0.7f, 0.7f, 7.0f, 0.0f); // 0.0f - 1.0f
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glUniformMatrix4fv(glGetUniformLocation(shaderId, uniform), 1, GL_FALSE, &matPV.matrix[0][0]);
 
-        ImGui::SFML::Render(window);
-        window.display();
-// sf::ContextSettings(24, 8, 0, 4, 6)
-        // Poll events
-        sf::Event event{};
-        while (window.pollEvent(event)) {
-            ImGui::SFML::ProcessEvent(event);
-            if (event.type == sf::Event::Closed)
-                window.close();
+        Mat4 matPV = Perspective(45.0f, static_cast<float>(w / h), 0.1f, 100.0f) * LookAt(pos, pos + direction, up);
+        Mat4 model = matPV.E();
+
+        glUniformMatrix4fv(glGetUniformLocation(shaderId, "model"), 1, GL_FALSE, &(model).matrix[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(shaderId, "matPV"), 1, GL_FALSE, &(matPV).matrix[0][0]);
+    }
+
+    void move(bool* isGo, sf::RenderWindow &window) {
+        sf::Event windowEvent;
+
+        /*direction.x = cos(-89.0f * rad) * cos(0.0f * rad);
+        direction.y = sin(0.0f * rad);
+        direction.z = sin(-89.0f * rad) * cos(0.0f * rad);*/
+        Vec3 right = CrossProduct(direction, Vec3(0, 1, 0)).Normalize();
+        up = CrossProduct(right, direction).Normalize();
+        while (window.pollEvent(windowEvent)) { // обработка ивентов
+            //ImGui::SFML::ProcessEvent(windowEvent);
+            switch (windowEvent.type)
+            {
+                case sf::Event::Closed:
+                    *isGo = false;
+                    break;
+                case sf::Event::KeyPressed: {
+                    if (windowEvent.key.code == sf::Keyboard::W) {
+                        pos += direction * (speed);
+                        cout << "press W\n";
+                    }
+                    if (windowEvent.key.code == sf::Keyboard::S) {
+                        cout << "press S\n";
+                        pos -= direction * (speed);
+                    }
+                    if (windowEvent.key.code == sf::Keyboard::D) {
+                        cout << "press D\n";
+                        pos += CrossProduct(direction, up).Normalize() * (speed);
+                    }
+                    if (windowEvent.key.code == sf::Keyboard::A) {
+                        cout << "press A\n";
+                        pos -= CrossProduct(direction, up).Normalize() * (speed);
+                    }
+                    if (windowEvent.key.code == sf::Keyboard::Space) {
+                        cout << "press Sp\n";
+                        pos += up * (speed);
+                    }
+                    if (windowEvent.key.code == sf::Keyboard::X) {
+                        cout << "press X\n";
+                        pos -= up * (speed);
+                    }
+                    if (windowEvent.key.code == sf::Keyboard::LShift) {
+                        cout << "press LS\n";
+                        speed = 0.4f;
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            if (windowEvent.type == sf::Event::MouseMoved) {
+                curPos = sf::Mouse::getPosition(window);
+
+                if (firstClick) {
+                    firstClick = false;
+                    prevPos = curPos;
+                }
+
+                yaw += speed * (float)(curPos.x - prevPos.x);//sens * (float)(curPos.y - (h / 2)) / h;
+                pitch += speed * (float)(prevPos.y - curPos.y);//sens * (float)(curPos.x - (w / 2)) / w;
+
+                prevPos = curPos;
+
+                if (pitch >= 89.0f) {
+                    pitch = 89.0f;
+                }
+                if (pitch <= -89.0f) {
+                    pitch = -89.0f;
+                }
+
+                direction.x = cos(rad * yaw) * cos(rad * pitch);
+                direction.y = sin(rad * pitch);
+                direction.z = sin(rad * yaw) * cos(rad * pitch);
+
+                direction = direction.Normalize();
+                up = CrossProduct(CrossProduct(direction, Vec3(0.0f, 1.0f, 0.0f)).Normalize(), direction).Normalize();
+                /*direction = QRotation(direction, CrossProduct(direction, up), -rotX).Normalize();
+                up = CrossProduct(CrossProduct(direction, Vec3(0.0f, 1.0f, 0.0f)), direction).Normalize();
+
+
+
+
+                direction = QRotation(direction, up, -rotY);*/
+                //sf::Mouse::setPosition(sf::Vector2i(800 / 2, 600 / 2), window);
+            }
+            else if (sf::Event::MouseButtonReleased) {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                    firstClick = true;
+                }
+            }
+            //if (1/*sf::Event::MouseButtonPressed*/) {
+            //	if (1/*sf::Mouse::isButtonPressed(sf::Mouse::Left)*/) {
+
+
+            //		if (firstClick) {
+            //			firstClick = false;
+            //		}
+
+            //		prevPos = curPos;
+            //		curPos = sf::Mouse::getPosition(window);
+
+            //		float rotX = curPos.x - prevPos.x;//sens * (float)(curPos.y - (h / 2)) / h;
+            //		float rotY = curPos.y - prevPos.y;//sens * (float)(curPos.x - (w / 2)) / w;
+            //		//float rotY = curPos.x - prevPos.x;
+
+            //		Vec3 newDirection = QRotation(direction, CrossProduct(direction, up), -rotX);
+
+            //		if (abs(angle(newDirection, up) - rad * (90.0f)) <= rad * 85.0f)
+            //		{
+            //			direction = newDirection;
+            //		}
+
+            //		direction = QRotation(direction, up, -rotY);
+
+            //	}
+            //}
+            /*		else if (sf::Event::MouseButtonReleased) {
+                        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                            firstClick = true;
+                        }
+                    }
+
+                    */
+            //pos += direction;
+            //cout << angle();
+            //direction = QRotation(direction, CrossProduct(direction, up).Normalize(), -rotX);
+            //direction = glm::rotate(direction,  glm::radians( - rotY), up);
+
+
+
         }
+
+        //cout << pos<<'\n';
     }
-    ImGui::SFML::Shutdown();
-    window.close();
-    return 0;
-}
+};
