@@ -206,11 +206,13 @@ int main() {
         float FPS = ImGui::GetIO().Framerate;
         ImGui::Begin("Hello, world!");
         ImGui::Text("FPS = %f", FPS);
+
         ImGui::Button("Look at this pretty button");
         ImGui::DragFloat3("Scale", scale_value, 0.1f, 0.01f, 5.0f);
         ImGui::SliderFloat("alpha", &alpha, 0.0f, 1.0f);
         ImGui::ColorEdit3("Color", color_value);
         ImGui::Checkbox("Texture", &isTexture);
+        ImGui::SameLine();
         ImGui::Checkbox("Color", &isColor);
         ImGui::SliderAngle("Angle", &angle);
         if (ImGui::Button("Hey press me")) {
