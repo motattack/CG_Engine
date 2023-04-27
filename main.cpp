@@ -137,6 +137,8 @@ int main() {
     myShader.setInt("container_texture", 0);
     myShader.setInt("face_texture", 1);
 
+    bool mySecondWindow = false;
+
     sf::Clock deltaClock, clock;
     while (window.isOpen()) {
         /* Update */
@@ -191,6 +193,15 @@ int main() {
 
         glEnable(GL_DEPTH_TEST);
 
+        if (mySecondWindow)
+        {
+            ImGui::Begin("GUI 2");
+            ImGui::Text("Hehe.");
+            if (ImGui::Button("Exit"))
+                mySecondWindow = false;
+            ImGui::End();
+        }
+
         ImGui::Begin("Hello, world!");
         ImGui::Button("Look at this pretty button");
         ImGui::DragFloat3("Scale", scale_value, 0.1f, 0.01f, 5.0f);
@@ -199,9 +210,11 @@ int main() {
         ImGui::Checkbox("Texture", &isTexture);
         ImGui::Checkbox("Color", &isColor);
         ImGui::SliderAngle("Angle", &angle);
-        if (ImGui::Button("Hey press me"))
-        {
+        if (ImGui::Button("Hey press me")) {
             std::cout << "push" << std::endl;
+        }
+        if (ImGui::Button("Window")) {
+            mySecondWindow = true;
         }
         ImGui::End();
 
