@@ -199,6 +199,10 @@ int main() {
         ImGui::Checkbox("Texture", &isTexture);
         ImGui::Checkbox("Color", &isColor);
         ImGui::SliderAngle("Angle", &angle);
+        if (ImGui::Button("Hey press me"))
+        {
+            std::cout << "push" << std::endl;
+        }
         ImGui::End();
 
         ImGui::SFML::Render(window);
