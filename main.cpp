@@ -149,14 +149,14 @@ int main() {
         float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
         float yValue = std::sin(time) / 2.0f + 0.5f; // 0.0f - 1.0f
 
-        // Vector
-        Vec3 myVector;
-        myVector.x = xValue;
-        myVector.y = yValue;
-        myVector.z = 0.31f;
-
-        myShader.setVec3("colors", myVector);
         myShader.setFloat("alpha", xValue);
+
+        // GUI
+        static float scale_value[3] = {1.0f, 1.0f, 1.0f};
+        static float color_value[3] = {1.0f, 1.0f, 1.0f};
+
+        myShader.setVec3("colors", color_value[0], color_value[1], color_value[2]);
+
 
         /* Coordinates */
         // Projection
@@ -169,7 +169,6 @@ int main() {
         myShader.setMat4x4("view", view);
 
         // Model
-        static float scale_value[3] = { 1.0f ,1.0f , 1.0f };
         model = Mat4x4(1.0f);
         model = model.Scale(Vec3(scale_value[0], scale_value[1], scale_value[2]));
         model = model.rotate(radians(-55.0f) * time, Vec3(1.0f, 0.0f, 0.0f));
@@ -193,6 +192,7 @@ int main() {
         ImGui::Begin("Hello, world!");
         ImGui::Button("Look at this pretty button");
         ImGui::DragFloat3("Scale", scale_value, 0.1f, 0.01f, 5.0f);
+        ImGui::SliderFloat3("Color", color_value, 0.0f, 1.0f);
         ImGui::End();
 
         ImGui::SFML::Render(window);
