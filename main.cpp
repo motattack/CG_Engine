@@ -155,9 +155,11 @@ int main() {
         static float scale_value[3] = {1.0f, 1.0f, 1.0f};
         static float color_value[3] = {1.0f, 1.0f, 1.0f};
         static bool isTexture = false;
+        static bool isColor = false;
 
         myShader.setVec3("colors", color_value[0], color_value[1], color_value[2]);
         myShader.setBool("isTexture", isTexture);
+        myShader.setBool("isColor", isColor);
 
 
         /* Coordinates */
@@ -196,6 +198,7 @@ int main() {
         ImGui::DragFloat3("Scale", scale_value, 0.1f, 0.01f, 5.0f);
         ImGui::ColorEdit3("Color", color_value);
         ImGui::Checkbox("Texture", &isTexture);
+        ImGui::Checkbox("Color", &isColor);
         ImGui::End();
 
         ImGui::SFML::Render(window);
