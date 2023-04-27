@@ -169,9 +169,9 @@ int main() {
         myShader.setMat4x4("view", view);
 
         // Model
-        static float scale_value = 1.2f;
+        static float scale_value[3] = { 1.0f ,1.0f , 1.0f };
         model = Mat4x4(1.0f);
-        model = model.Scale(Vec3(scale_value));
+        model = model.Scale(Vec3(scale_value[0], scale_value[1], scale_value[2]));
         model = model.rotate(radians(-55.0f) * time, Vec3(1.0f, 0.0f, 0.0f));
         myShader.setMat4x4("model", model);
 
@@ -192,7 +192,7 @@ int main() {
 
         ImGui::Begin("Hello, world!");
         ImGui::Button("Look at this pretty button");
-        ImGui::DragFloat("Scale", &scale_value, 0.1f,  0.01f, 5.0f);
+        ImGui::DragFloat3("Scale", scale_value, 0.1f, 0.01f, 5.0f);
         ImGui::End();
 
         ImGui::SFML::Render(window);
