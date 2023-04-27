@@ -146,20 +146,17 @@ int main() {
         deltaTime = time - lastFrame;
         lastFrame = time;
 
-        float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
-        float yValue = std::sin(time) / 2.0f + 0.5f; // 0.0f - 1.0f
-
-        myShader.setFloat("alpha", xValue);
-
         // GUI
         static float scale_value[3] = {1.0f, 1.0f, 1.0f};
         static float color_value[3] = {1.0f, 1.0f, 1.0f};
         static bool isTexture = false;
         static bool isColor = false;
+        static float alpha = 0.2f;
 
         myShader.setVec3("colors", color_value[0], color_value[1], color_value[2]);
         myShader.setBool("isTexture", isTexture);
         myShader.setBool("isColor", isColor);
+        myShader.setFloat("alpha", alpha);
 
 
         /* Coordinates */
@@ -196,6 +193,7 @@ int main() {
         ImGui::Begin("Hello, world!");
         ImGui::Button("Look at this pretty button");
         ImGui::DragFloat3("Scale", scale_value, 0.1f, 0.01f, 5.0f);
+        ImGui::SliderFloat("alpha", &alpha, 0.0f, 1.0f);
         ImGui::ColorEdit3("Color", color_value);
         ImGui::Checkbox("Texture", &isTexture);
         ImGui::Checkbox("Color", &isColor);
