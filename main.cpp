@@ -192,7 +192,7 @@ int main() {
         ImGui::Begin("Hello, world!");
         ImGui::Button("Look at this pretty button");
         ImGui::DragFloat3("Scale", scale_value, 0.1f, 0.01f, 5.0f);
-        ImGui::SliderFloat3("Color", color_value, 0.0f, 1.0f);
+        ImGui::ColorEdit3("Color", color_value);
         ImGui::End();
 
         ImGui::SFML::Render(window);
