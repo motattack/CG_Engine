@@ -152,6 +152,7 @@ int main() {
         static bool isTexture = false;
         static bool isColor = false;
         static float alpha = 0.2f;
+        static float angle = -55.0f;
 
         myShader.setVec3("colors", color_value[0], color_value[1], color_value[2]);
         myShader.setBool("isTexture", isTexture);
@@ -172,7 +173,7 @@ int main() {
         // Model
         model = Mat4x4(1.0f);
         model = model.Scale(Vec3(scale_value[0], scale_value[1], scale_value[2]));
-        model = model.rotate(radians(-55.0f) * time, Vec3(1.0f, 0.0f, 0.0f));
+        model = model.rotate(radians(-55.0f) * angle, Vec3(1.0f, 0.0f, 0.0f));
         myShader.setMat4x4("model", model);
 
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f);
@@ -197,6 +198,7 @@ int main() {
         ImGui::ColorEdit3("Color", color_value);
         ImGui::Checkbox("Texture", &isTexture);
         ImGui::Checkbox("Color", &isColor);
+        ImGui::SliderAngle("Angle", &angle);
         ImGui::End();
 
         ImGui::SFML::Render(window);
