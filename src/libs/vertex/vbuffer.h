@@ -13,7 +13,6 @@ public:
         glGenBuffers(1, &ID);
         bind();
         glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-        std::cout << data << std::endl;
     };
 
     void bind() const {

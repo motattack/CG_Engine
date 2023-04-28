@@ -122,15 +122,15 @@ int main() {
 
     vArray::attrPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (6 * sizeof(float)));
 
+    // Normals Attribute
+    vArray::attrPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (8 * sizeof(float)));
+
     /* Light Buffers */
     vArray lightCubeVAO;
     vBuffer lightCubeVBO(vertex, sizeof(vertex));
 
     /* Light Position Attribute */
     vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) nullptr);
-
-    // Normals Attribute
-    vArray::attrPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (8 * sizeof(float)));
 
     /* Texture */
     stbi_set_flip_vertically_on_load(true);
@@ -161,8 +161,11 @@ int main() {
 
         // First Object
         myShader.use();
+
+        // Light
         myShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         myShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+        myShader.setVec3("lightPos", lightPos);
 
         /* Coordinates */
         // Projection
@@ -211,7 +214,7 @@ int main() {
 
         ImGui::SFML::Render(window);
 
-        myShader.use();
+        glEnable(GL_DEPTH_TEST);
 
         window.display();
 
