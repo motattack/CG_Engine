@@ -171,7 +171,6 @@ int main() {
         // Light
         myShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         myShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        lightPos = Vec3(camX, 0.0f, camZ);
         myShader.setVec3("lightPos", lightPos);
         myShader.setVec3("viewPos", camera.Position);
         myShader.setFloat("shininess", shininess);
@@ -189,6 +188,7 @@ int main() {
 
         // Model
         model = Mat4x4(1.0f);
+        model = model.rotate(radians(-55.0f) * time, Vec3(0.7f, 1.0f, 0.0f));
         myShader.setMat4x4("model", model);
         VAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 36);
