@@ -169,11 +169,11 @@ int main() {
         myShader.use();
 
         // Light
-        myShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        myShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        myShader.setVec3("lightPos", lightPos);
+        myShader.setVec3("light.position", lightPos);
         myShader.setVec3("viewPos", camera.Position);
-        myShader.setFloat("shininess", shininess);
+        myShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        myShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        myShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
         // Material
         myShader.setVec3("material.ambient", Vec3(1.0f, 0.5f, 0.31f));
