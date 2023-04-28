@@ -139,15 +139,18 @@ int main() {
     GLuint face_texture = loadTexture(
             "../res/texture/example/head2.png");
 
-    GLuint diffuseMap = loadTexture("../res/texture/example/headContainer.png");
+    GLuint diffuseMap = loadTexture("../res/texture/example/container2.png");
+    GLuint specularMap = loadTexture("../res/texture/example/container2_specular.png");
 
     /* Shader */
     Shader myShader("../res/shader/vShader.glsl",
                     "../res/shader/fShader.glsl");
     myShader.use();
     myShader.setInt("material.diffuse", 0);
-    myShader.setInt("container_texture", 0);
-    myShader.setInt("face_texture", 1);
+    myShader.setInt("material.specular", 1);
+
+//    myShader.setInt("container_texture", 0);
+//    myShader.setInt("face_texture", 1);
     Shader lightCubeShader("../res/Shader/vShader.glsl", "../res/Shader/lCube.frag");
 
     sf::Clock deltaClock, clock;
@@ -200,9 +203,9 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, container_texture);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, face_texture);
+        glBindTexture(GL_TEXTURE_2D, specularMap);
         VAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
