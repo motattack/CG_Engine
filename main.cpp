@@ -155,6 +155,9 @@ int main() {
 
         deltaTime = time - lastFrame;
         lastFrame = time;
+        float radius = 3.0f;
+        float camX = std::sin(time) * radius;
+        float camZ = std::cos(time) * radius;
 
         // Gui Variables
         static float shininess = 32.0f;
@@ -168,6 +171,7 @@ int main() {
         // Light
         myShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         myShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+        lightPos = Vec3(camX, 0.0f, camZ);
         myShader.setVec3("lightPos", lightPos);
         myShader.setVec3("viewPos", camera.Position);
         myShader.setFloat("shininess", shininess);
