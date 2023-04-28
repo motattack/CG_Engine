@@ -183,6 +183,35 @@ int main() {
         float radius = 3.0f;
         float camX = std::sin(time) * radius;
         float camZ = std::cos(time) * radius;
+        float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
+
+        // Gui Variables
+        // Directional Light
+        static float dir_direction[3] = {-0.2f, -1.0f, -0.5f};
+        static float dir_ambient[3] = {0.2f, 0.2f, 0.2f};
+        static float dir_diffuse[3] = {0.4f, 0.4f, 0.4f};
+        static float dir_specular[3] = {0.6f, 0.6f, 0.6f};
+
+        // Point Light
+        //static float point_position
+        static float point_ambient[3] = {0.2f, 0.2f, 0.2f};
+        static float point_diffuse[3] = {0.5f, 0.5f, 0.5f};
+        static float point_specular[3] = {1.0f, 1.0f, 1.0f};
+        static float point_constant = 1.0f;
+        static float point_linear = 0.09f;
+        static float point_quadratic = 0.032f;
+
+        // Spot Light
+        static float spot_ambient[3] = {0.2f, 0.2f, 0.2f};
+        static float spot_diffuse[3] = {1.0f, 1.0f, 1.0f};
+        static float spot_specular[3] = {1.0f, 1.0f, 1.0f};
+        static float spot_constant = 1.0f;
+        static float spot_linear = 0.09f;
+        static float spot_quadratic = 0.032f;
+        static float spot_cutOff = 12.5f;
+        static float spot_outerCutOff = 18.5f;
+
+        static float cubeMapPos[3] = {0.0f, 0.0f, 0.0f};
 
         // Gui Variables
         glClearColor(0.7f, 0.7f, 7.0f, 1.0f);
@@ -191,37 +220,47 @@ int main() {
         // First Object
         myShader.use();
 
-        //  Flashlights
-        myShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.5f);
-        myShader.setVec3("dirLight.ambient", Vec3(0.2f));
-        myShader.setVec3("dirLight.diffuse", Vec3(0.4f));
-        myShader.setVec3("dirLight.specular", Vec3(0.5f));
+        // Directional Light
+        myShader.setVec3("dirLight.direction", Vec3(dir_direction[0], dir_direction[1], dir_direction[2]));
+        myShader.setVec3("dirLight.ambient", Vec3(dir_ambient[0], dir_ambient[1], dir_ambient[2]));
+        myShader.setVec3("dirLight.diffuse", Vec3(dir_diffuse[0], dir_ambient[1], dir_ambient[2]));
+        myShader.setVec3("dirLight.specular", Vec3(dir_specular[0], dir_ambient[1], dir_ambient[3]));
 
+        // Point Lights
         for (int i = 0; i < 4; i++) {
-            myShader.setVec3("pointLights[" + std::to_string(i) + "].position", pointLightPositions[i]);
-            myShader.setVec3("pointLights[" + std::to_string(i) + "].ambient", Vec3(0.2f));
-            myShader.setVec3("pointLights[" + std::to_string(i) + "].diffuse", Vec3(0.4f));
-            myShader.setVec3("pointLights[" + std::to_string(i) + "].specular", Vec3(0.9f));
-            myShader.setFloat("pointLights[" + std::to_string(i) + "].constant", 1.0f);
-            myShader.setFloat("pointLights[" + std::to_string(i) + "].linear", 0.09f);
-            myShader.setFloat("pointLights[" + std::to_string(i) + "].quadratic", 0.032f);
+            myShader.setVec3(("pointLights[" + std::to_string(i) + "].position").c_str(),
+                             pointLightPositions[i] * xValue);
+            myShader.setVec3(("pointLights[" + std::to_string(i) + "].ambient").c_str(),
+                             Vec3(point_ambient[0], point_ambient[1], point_ambient[2]));
+            myShader.setVec3(("pointLights[" + std::to_string(i) + "].diffuse").c_str(),
+                             Vec3(point_diffuse[0], point_diffuse[1], point_diffuse[2]));
+            myShader.setVec3(("pointLights[" + std::to_string(i) + "].specular").c_str(),
+                             Vec3(point_specular[0], point_specular[1], point_specular[2]));
+            myShader.setFloat(("pointLights[" + std::to_string(i) + "].constant").c_str(), point_constant);
+            myShader.setFloat(("pointLights[" + std::to_string(i) + "].linear").c_str(), point_linear);
+            myShader.setFloat(("pointLights[" + std::to_string(i) + "].quadratic").c_str(), point_quadratic);
         }
 
-        // Spot Lights
+        // Spot Light
         myShader.setVec3("spotLight.position", camera.Position);
         myShader.setVec3("spotLight.direction", camera.Front);
         myShader.setVec3("viewPos", camera.Position);
-        myShader.setVec3("spotLight.ambient", 0.2f, 0.2f, 0.2f);
-        myShader.setVec3("spotLight.diffuse", 0.5f, 0.5f, 0.5f);
-        myShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0);
-        myShader.setFloat("spotLight.constant", 1.0f);
-        myShader.setFloat("spotLight.linear", 0.09f);
-        myShader.setFloat("spotLight.quadratic", 0.032f);
-        myShader.setFloat("spotLight.cutOff", cos(radians(13.0f)));
-        myShader.setFloat("spotLight.outerCutOff", cos(radians(15.5f)));
+        myShader.setVec3("spotLight.ambient", Vec3(spot_ambient[0], spot_ambient[1], spot_ambient[2]));
+        myShader.setVec3("spotLight.diffuse", Vec3(spot_diffuse[0], spot_diffuse[1], spot_diffuse[2]));
+        myShader.setVec3("spotLight.specular", Vec3(spot_specular[0], spot_specular[1], spot_specular[2]));
+        myShader.setFloat("spotLight.constant", spot_constant);
+        myShader.setFloat("spotLight.linear", spot_linear);
+        myShader.setFloat("spotLight.quadratic", spot_quadratic);
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            myShader.setFloat("spotLight.cutOff", cos(radians(spot_cutOff)));
+            myShader.setFloat("spotLight.outerCutOff", cos(radians(spot_outerCutOff)));
+        } else {
+            myShader.setFloat("spotLight.cutOff", cos(radians(0.0f)));
+            myShader.setFloat("spotLight.outerCutOff", cos(radians(0.0f)));
+
+        }
 
         // Material
-        myShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
         myShader.setFloat("material.shininess", 64.0f);
 
         /* Coordinates */
@@ -239,15 +278,27 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap);
 
-        for (auto cubePosition: cubePositions) {
-            // Model
-            model = Mat4x4(1.0f);
-            model = model.translate(Vec3(cubePosition));
-            model = model.rotate(radians(-55.0f) * time, Vec3(0.0f, 1.0f, 0.0f));
+        // We Draw a map with three loop cuz we are rendering in 3D so each axies need a loop like (x -> i, y -> j, z -> k).
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                for (int k = 0; k < 10; k++)
+                {
+                    // We will set blocks like minecraft and we wannna make it to a hollow huge Maps with 10x10x10 cubes
+                    if (i == 0 || i == 9 || j == 0 || j == 9 || k == 9)
+                    {
+                        // Model
+                        model = Mat4x4(1.0f);
+                        model = model.translate(Vec3(i + cubeMapPos[0], j + cubeMapPos[1], k + cubeMapPos[2]));
+                        //model = glm::rotate(model, glm::radians(-55.0f) * time, glm::vec3(0.0f, 1.0f, 0.0f));
 
-            myShader.setMat4x4("model", model);
-            VAO.bind();
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+                        myShader.setMat4x4("model", model);
+                        VAO.bind();
+                        glDrawArrays(GL_TRIANGLES, 0, 36);
+                    }
+                }
+            }
         }
         vArray::unbind();
 
@@ -257,7 +308,7 @@ int main() {
         lightCubeShader.setMat4x4("view", view);
 
 
-        for (auto pointLightPosition : pointLightPositions) {
+        for (auto pointLightPosition: pointLightPositions) {
             // Model
             model = Mat4x4(1.0f);
             model = model.translate(pointLightPosition);
@@ -287,6 +338,34 @@ int main() {
         float FPS = ImGui::GetIO().Framerate;
         ImGui::Begin("Hello, world!");
         ImGui::Text("FPS = %f", FPS);
+
+        ImGuiStyle* style = &ImGui::GetStyle();
+        style->Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
+        ImGui::PopStyleColor();
+
+        ImGui::SliderFloat3("Map Position", cubeMapPos, -10.0f, 10.0f);
+        ImGui::Text("Directional Light");
+        ImGui::SliderFloat3("Directional Direction", dir_direction, -2.0f, 2.0f);
+        ImGui::SliderFloat3("Directional Ambient", dir_ambient, 0.0f, 1.0f);
+        ImGui::SliderFloat3("Directional Diffuse", dir_diffuse, 0.0f, 1.0f);
+        ImGui::SliderFloat3("Directional Specular", dir_specular, 0.0f, 1.0f);
+        ImGui::Text("Point Light");
+        ImGui::SliderFloat3("Point Ambient", point_ambient, 0.0f, 1.0f);
+        ImGui::SliderFloat3("Point Diffuse", point_diffuse, 0.0f, 1.0f);
+        ImGui::SliderFloat3("Point Specular", point_specular, 0.0f, 1.0f);
+        ImGui::SliderFloat("Point Constant", &point_constant, -1.0f, 1.0f);
+        ImGui::SliderFloat("Point Linear", &point_linear, -1.0f, 1.0f);
+        ImGui::SliderFloat("Point Quadratic", &point_quadratic, -1.0f, 1.0f);
+        ImGui::Text("Spot Light");
+        ImGui::SliderFloat3("Spot Ambient", spot_ambient, 0.0f, 1.0f);
+        ImGui::SliderFloat3("Spot Diffuse", spot_diffuse, 0.0f, 1.0f);
+        ImGui::SliderFloat3("Spot Specular", spot_specular, 0.0f, 1.0f);
+        ImGui::SliderFloat("Spot Constant", &spot_constant, -1.0f, 1.0f);
+        ImGui::SliderFloat("Spot Linear", &spot_linear, -1.0f, 1.0f);
+        ImGui::SliderFloat("Spot Quadratic", &spot_quadratic, -1.0f, 1.0f);
+        ImGui::SliderFloat("Spot CutOff", &spot_cutOff, 0.0f, 100.0f);
+        ImGui::SliderFloat("Spot OuterCutOff", &spot_outerCutOff, 0.0f, 100.0f);
         ImGui::End();
 
         ImGui::SFML::Render(window);
