@@ -155,6 +155,11 @@ int main() {
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // First Object
+        myShader.use();
+        myShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        myShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+
         /* Coordinates */
         // Projection
         projection = Mat4x4::perspective(radians(camera.Zoom), float(SCR_WIDTH) / float(SCR_HEIGHT), 0.1f, 100.0f);
