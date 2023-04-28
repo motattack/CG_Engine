@@ -13,7 +13,7 @@
 
 #include <stb_image.h>
 
-#define SCR_WIDTH 1000
+#define SCR_WIDTH 1200
 #define SCR_HEIGHT 800
 
 // pos and color and TexCoords
@@ -166,6 +166,7 @@ int main() {
         myShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         myShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
         myShader.setVec3("lightPos", lightPos);
+        myShader.setVec3("viewPos", camera.Position);
 
         /* Coordinates */
         // Projection
