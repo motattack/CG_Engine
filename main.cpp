@@ -3,8 +3,8 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
-#include "SFML/Graphics/RenderWindow.hpp"
-#include "camera.h"
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <camera.h>
 #include <shader.h>
 #include <vbuffer.h>
 #include <varray.h>
@@ -112,7 +112,7 @@ int main() {
     settings.minorVersion = 0;
     settings.attributeFlags = sf::ContextSettings::Default;
 
-    sf::RenderWindow window(sf::VideoMode(800, 600, 32), "First Window",
+    sf::RenderWindow window(sf::VideoMode(SCR_WIDTH, SCR_HEIGHT, 32), "First Window",
                             sf::Style::Titlebar | sf::Style::Close, settings);
     window.setVisible(true);
     window.setFramerateLimit(75);
@@ -159,13 +159,11 @@ int main() {
     /* Shader */
     Shader myShader("../res/shader/vShader.glsl",
                     "../res/shader/fShader.glsl");
+    Shader lightCubeShader("../res/Shader/lCube.vert",
+                           "../res/Shader/lCube.frag");
     myShader.use();
     myShader.setInt("material.diffuse", 0);
     myShader.setInt("material.specular", 1);
-
-//    myShader.setInt("container_texture", 0);
-//    myShader.setInt("face_texture", 1);
-    Shader lightCubeShader("../res/Shader/vShader.glsl", "../res/Shader/lCube.frag");
 
     sf::Clock deltaClock, clock;
     while (window.isOpen()) {
@@ -180,23 +178,25 @@ int main() {
         float camZ = std::cos(time) * radius;
 
         // Gui Variables
-        glClearColor(0.7f, 0.7f, 7.0f, 0.0f);
+        glClearColor(0.7f, 0.7f, 7.0f, 1.0f);
+        glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // First Object
         myShader.use();
 
-        // Light
-        myShader.setVec3("light.position", lightPos);
-        myShader.setVec3("light.direction", -0.2f, -1.0f, -0.4f);
+        //  Flashlights
+        myShader.setVec3("light.position", camera.Position);
+        myShader.setVec3("light.direction", camera.Front);
         myShader.setVec3("viewPos", camera.Position);
         myShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
         myShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
         myShader.setVec3("light.specular", 1.0f, 1.0f, 1.0);
-
         myShader.setFloat("light.constant", 1.0f);
         myShader.setFloat("light.linear", 0.09f);
         myShader.setFloat("light.quadratic", 0.032f);
+        myShader.setFloat("light.cutOff", cos(radians(13.0f)));
+        myShader.setFloat("light.outerCutOff", cos(radians(15.5f)));
 
         // Material
         myShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
@@ -212,34 +212,30 @@ int main() {
         view = camera.GetViewMatrix();
         myShader.setMat4x4("view", view);
 
-        // Model
-        model = Mat4x4(1.0f);
-        model = model.rotate(radians(-55.0f) * time, Vec3(0.7f, 1.0f, 0.0f));
-        myShader.setMat4x4("model", model);
-        VAO.bind();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, diffuseMap);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap);
+
+        model = Mat4x4(1.0f);
+        model = model.translate(Vec3(cubePositions[0]));
+        model = model.rotate(radians(-55.0f) * time, Vec3(0.0f, 1.0f, 0.0f));
+
+        myShader.setMat4x4("model", model);
         VAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        for (int i = 0; i < 10; i++)
-        {
-            // Model
-            model = Mat4x4(1.0f);
-            model = model.translate(Vec3(cubePositions[i]));
-            model = model.rotate(radians(-55.0f) * time, Vec3(0.0f, 1.0f, 0.0f));
-
-            myShader.setMat4x4("model", model);
-            VAO.bind();
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-            vArray::unbind();
-        }
+//        for (int i = 0; i < 10; i++) {
+//            // Model
+//            model = Mat4x4(1.0f);
+//            model = model.translate(Vec3(cubePositions[i]));
+//            model = model.rotate(radians(-55.0f) * time, Vec3(0.0f, 1.0f, 0.0f));
+//
+//            myShader.setMat4x4("model", model);
+//            VAO.bind();
+//            glDrawArrays(GL_TRIANGLES, 0, 36);
+//        }
+        vArray::unbind();
 
         // Second Object
         lightCubeShader.use();
