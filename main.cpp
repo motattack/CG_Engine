@@ -175,6 +175,11 @@ int main() {
         myShader.setVec3("viewPos", camera.Position);
         myShader.setFloat("shininess", shininess);
 
+        // Material
+        myShader.setVec3("material.ambient", Vec3(1.0f, 0.5f, 0.31f));
+        myShader.setVec3("material.diffuse", Vec3(1.0f, 0.5f, 0.31f));
+        myShader.setVec3("material.specular", Vec3(0.5f));
+        myShader.setFloat("material.shininess", 64.0f);
 
         /* Coordinates */
         // Projection
