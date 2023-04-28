@@ -311,7 +311,8 @@ int main() {
         for (auto pointLightPosition: pointLightPositions) {
             // Model
             model = Mat4x4(1.0f);
-            model = model.translate(pointLightPosition);
+            model = model.translate(pointLightPosition * xValue);
+            model = model.Scale(Vec3(0.3f));
             lightCubeShader.setMat4x4("model", model);
             lightCubeVAO.bind();
             glDrawArrays(GL_TRIANGLES, 0, 36);
