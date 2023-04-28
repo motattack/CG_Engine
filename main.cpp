@@ -194,6 +194,10 @@ int main() {
         myShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
         myShader.setVec3("light.specular", 1.0f, 1.0f, 1.0);
 
+        myShader.setFloat("light.constant", 1.0f);
+        myShader.setFloat("light.linear", 0.09f);
+        myShader.setFloat("light.quadratic", 0.032f);
+
         // Material
         myShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
         myShader.setFloat("material.shininess", 64.0f);
@@ -237,18 +241,18 @@ int main() {
             vArray::unbind();
         }
 
-//        // Second Object
-//        lightCubeShader.use();
-//        lightCubeShader.setMat4x4("projection", projection);
-//        lightCubeShader.setMat4x4("view", view);
-//        // Model
-//        model = Mat4x4(1.0f);
-//        model = model.translate(lightPos);
-//        model = model.Scale(Vec3(0.3f));
-//        lightCubeShader.setMat4x4("model", model);
-//        lightCubeVAO.bind();
-//        glDrawArrays(GL_TRIANGLES, 0, 36);
-//        vArray::unbind();
+        // Second Object
+        lightCubeShader.use();
+        lightCubeShader.setMat4x4("projection", projection);
+        lightCubeShader.setMat4x4("view", view);
+        // Model
+        model = Mat4x4(1.0f);
+        model = model.translate(lightPos);
+        model = model.Scale(Vec3(0.3f));
+        lightCubeShader.setMat4x4("model", model);
+        lightCubeVAO.bind();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        vArray::unbind();
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
