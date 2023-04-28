@@ -139,10 +139,13 @@ int main() {
     GLuint face_texture = loadTexture(
             "../res/texture/example/head2.png");
 
+    GLuint diffuseMap = loadTexture("../res/texture/example/headContainer.png");
+
     /* Shader */
     Shader myShader("../res/shader/vShader.glsl",
                     "../res/shader/fShader.glsl");
     myShader.use();
+    myShader.setInt("material.diffuse", 0);
     myShader.setInt("container_texture", 0);
     myShader.setInt("face_texture", 1);
     Shader lightCubeShader("../res/Shader/vShader.glsl", "../res/Shader/lCube.frag");
@@ -160,8 +163,6 @@ int main() {
         float camZ = std::cos(time) * radius;
 
         // Gui Variables
-        static float shininess = 32.0f;
-
         glClearColor(0.7f, 0.7f, 7.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -173,12 +174,10 @@ int main() {
         myShader.setVec3("viewPos", camera.Position);
         myShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
         myShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
-        myShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        myShader.setVec3("light.specular", 1.0f, 1.0f, 1.0);
 
         // Material
-        myShader.setVec3("material.ambient", Vec3(1.0f, 0.5f, 0.31f));
-        myShader.setVec3("material.diffuse", Vec3(1.0f, 0.5f, 0.31f));
-        myShader.setVec3("material.specular", Vec3(0.5f));
+        myShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
         myShader.setFloat("material.shininess", 64.0f);
 
         /* Coordinates */
@@ -196,6 +195,8 @@ int main() {
         model = model.rotate(radians(-55.0f) * time, Vec3(0.7f, 1.0f, 0.0f));
         myShader.setMat4x4("model", model);
         VAO.bind();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glActiveTexture(GL_TEXTURE0);
@@ -225,7 +226,6 @@ int main() {
         float FPS = ImGui::GetIO().Framerate;
         ImGui::Begin("Hello, world!");
         ImGui::Text("FPS = %f", FPS);
-        ImGui::SliderFloat("shininess", &shininess, 0.0f, 600.0f);
         ImGui::End();
 
         ImGui::SFML::Render(window);
