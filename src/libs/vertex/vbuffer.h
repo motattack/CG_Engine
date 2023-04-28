@@ -9,10 +9,11 @@ class vBuffer {
 private:
     unsigned int ID{};
 public:
-    explicit vBuffer(float *data) {
+    explicit vBuffer(float *data, GLsizeiptr size) {
         glGenBuffers(1, &ID);
         bind();
-        glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+        std::cout << data << std::endl;
     };
 
     void bind() const {

@@ -75,6 +75,8 @@ Mat4x4 projection;
 Mat4x4 model;
 Mat4x4 view;
 
+Vec3 lightPos = Vec3(1.2f, 1.0f, 1.5f);
+
 // Camera
 Camera camera(Vec3(0.0f, 0.0f, 3.0f));
 float lastX = float(SCR_WIDTH) / 2.0f;
@@ -110,10 +112,8 @@ int main() {
     }
     glEnable(GL_DEPTH_TEST);
 
-    vBuffer VBO(vertex);
+    vBuffer VBO(vertex, sizeof(vertex));
     vArray VAO;
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), &vertex, GL_STATIC_DRAW);
 
     vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
 
@@ -121,8 +121,12 @@ int main() {
 
     vArray::attrPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
 
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
-    //glBindVertexArray(0);
+    /* Light Buffers */
+    vArray lightCubeVAO;
+    vBuffer lightCubeVBO(vertex, sizeof(vertex));
+
+    /* Light Position Attribute */
+    vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
 
     /* Texture */
     stbi_set_flip_vertically_on_load(true);
@@ -137,8 +141,7 @@ int main() {
     myShader.use();
     myShader.setInt("container_texture", 0);
     myShader.setInt("face_texture", 1);
-
-    bool mySecondWindow = false;
+    Shader lightCubeShader("../res/Shader/vShader.glsl", "../res/Shader/lCube.frag");
 
     sf::Clock deltaClock, clock;
     while (window.isOpen()) {
@@ -149,19 +152,8 @@ int main() {
         deltaTime = time - lastFrame;
         lastFrame = time;
 
-        // GUI
-        static float scale_value[3] = {1.0f, 1.0f, 1.0f};
-        static float color_value[3] = {1.0f, 1.0f, 1.0f};
-        static bool isTexture = false;
-        static bool isColor = false;
-        static float alpha = 0.2f;
-        static float angle = -55.0f;
-
-        myShader.setVec3("colors", color_value[0], color_value[1], color_value[2]);
-        myShader.setBool("isTexture", isTexture);
-        myShader.setBool("isColor", isColor);
-        myShader.setFloat("alpha", alpha);
-
+        glClearColor(0.7f, 0.7f, 7.0f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* Coordinates */
         // Projection
@@ -175,12 +167,9 @@ int main() {
 
         // Model
         model = Mat4x4(1.0f);
-        model = model.Scale(Vec3(scale_value[0], scale_value[1], scale_value[2]));
-        model = model.rotate(radians(-55.0f) * angle, Vec3(1.0f, 0.0f, 0.0f));
         myShader.setMat4x4("model", model);
-
-        glClearColor(0.7f, 0.7f, 7.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        VAO.bind();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, container_texture);
@@ -188,39 +177,27 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, face_texture);
         VAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // Second Object
+        lightCubeShader.use();
+        lightCubeShader.setMat4x4("projection", projection);
+        lightCubeShader.setMat4x4("view", view);
+        // Model
+        model = Mat4x4(1.0f);
+        model = model.translate(lightPos);
+        model = model.Scale(Vec3(0.3f));
+        lightCubeShader.setMat4x4("model", model);
+        lightCubeVAO.bind();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         vArray::unbind();
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
         glEnable(GL_DEPTH_TEST);
 
-        if (mySecondWindow)
-        {
-            ImGui::Begin("GUI 2");
-            ImGui::Text("Hehe.");
-            if (ImGui::Button("Exit"))
-                mySecondWindow = false;
-            ImGui::End();
-        }
-
         float FPS = ImGui::GetIO().Framerate;
         ImGui::Begin("Hello, world!");
         ImGui::Text("FPS = %f", FPS);
-
-        ImGui::Button("Look at this pretty button");
-        ImGui::DragFloat3("Scale", scale_value, 0.1f, 0.01f, 5.0f);
-        ImGui::SliderFloat("alpha", &alpha, 0.0f, 1.0f);
-        ImGui::ColorEdit3("Color", color_value);
-        ImGui::Checkbox("Texture", &isTexture);
-        ImGui::SameLine();
-        ImGui::Checkbox("Color", &isColor);
-        ImGui::SliderAngle("Angle", &angle);
-        if (ImGui::Button("Hey press me")) {
-            std::cout << "push" << std::endl;
-        }
-        if (ImGui::Button("Window")) {
-            mySecondWindow = true;
-        }
         ImGui::End();
 
         ImGui::SFML::Render(window);
