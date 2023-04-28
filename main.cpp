@@ -63,19 +63,26 @@ float vertex[] = {
 
 };
 
-
-Vec3 cubePositions[] = {
-        Vec3(0.0f, 0.0f, 0.0f),
-        Vec3(2.0f, 5.0f, -15.0f),
-        Vec3(-1.5f, -2.2f, -2.5f),
-        Vec3(-3.8f, -2.0f, -12.3f),
-        Vec3(2.4f, -0.4f, -3.5f),
-        Vec3(-1.7f, 3.0f, -7.5f),
-        Vec3(1.3f, -2.0f, -2.5f),
-        Vec3(1.5f, 2.0f, -2.5f),
-        Vec3(1.5f, 0.2f, -1.5f),
-        Vec3(-1.3f, 1.0f, -1.5f)
+Vec3 pointLightPositions[] = {
+        Vec3(0.7f, 0.2f, 2.0f),
+        Vec3(2.3f, -3.3f, -4.0f),
+        Vec3(-4.0f, 2.0f, -12.0f),
+        Vec3(0.0f, 0.0f, -3.0f)
 };
+
+Vec3 cubePositions[] =
+        {
+                Vec3(0.0f, 0.0f, 0.0f),
+                Vec3(2.0f, 5.0f, -15.0f),
+                Vec3(-1.5f, -2.2f, -2.5f),
+                Vec3(-3.8f, -2.0f, -12.3f),
+                Vec3(2.4f, -0.4f, -3.5f),
+                Vec3(-1.7f, 3.0f, -7.5f),
+                Vec3(1.3f, -2.0f, -2.5f),
+                Vec3(1.5f, 2.0f, -2.5f),
+                Vec3(1.5f, 0.2f, -1.5f),
+                Vec3(-1.3f, 1.0f, -1.5f)
+        };
 
 void onResize(const sf::Event &event); // Protype
 void userInput(sf::Window &window);
@@ -179,24 +186,39 @@ int main() {
 
         // Gui Variables
         glClearColor(0.7f, 0.7f, 7.0f, 1.0f);
-        glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // First Object
         myShader.use();
 
         //  Flashlights
-        myShader.setVec3("light.position", camera.Position);
-        myShader.setVec3("light.direction", camera.Front);
+        myShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.5f);
+        myShader.setVec3("dirLight.ambient", Vec3(0.2f));
+        myShader.setVec3("dirLight.diffuse", Vec3(0.4f));
+        myShader.setVec3("dirLight.specular", Vec3(0.5f));
+
+        for (int i = 0; i < 4; i++) {
+            myShader.setVec3("pointLights[" + std::to_string(i) + "].position", pointLightPositions[i]);
+            myShader.setVec3("pointLights[" + std::to_string(i) + "].ambient", Vec3(0.2f));
+            myShader.setVec3("pointLights[" + std::to_string(i) + "].diffuse", Vec3(0.4f));
+            myShader.setVec3("pointLights[" + std::to_string(i) + "].specular", Vec3(0.9f));
+            myShader.setFloat("pointLights[" + std::to_string(i) + "].constant", 1.0f);
+            myShader.setFloat("pointLights[" + std::to_string(i) + "].linear", 0.09f);
+            myShader.setFloat("pointLights[" + std::to_string(i) + "].quadratic", 0.032f);
+        }
+
+        // Spot Lights
+        myShader.setVec3("spotLight.position", camera.Position);
+        myShader.setVec3("spotLight.direction", camera.Front);
         myShader.setVec3("viewPos", camera.Position);
-        myShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-        myShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
-        myShader.setVec3("light.specular", 1.0f, 1.0f, 1.0);
-        myShader.setFloat("light.constant", 1.0f);
-        myShader.setFloat("light.linear", 0.09f);
-        myShader.setFloat("light.quadratic", 0.032f);
-        myShader.setFloat("light.cutOff", cos(radians(13.0f)));
-        myShader.setFloat("light.outerCutOff", cos(radians(15.5f)));
+        myShader.setVec3("spotLight.ambient", 0.2f, 0.2f, 0.2f);
+        myShader.setVec3("spotLight.diffuse", 0.5f, 0.5f, 0.5f);
+        myShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0);
+        myShader.setFloat("spotLight.constant", 1.0f);
+        myShader.setFloat("spotLight.linear", 0.09f);
+        myShader.setFloat("spotLight.quadratic", 0.032f);
+        myShader.setFloat("spotLight.cutOff", cos(radians(13.0f)));
+        myShader.setFloat("spotLight.outerCutOff", cos(radians(15.5f)));
 
         // Material
         myShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
@@ -217,24 +239,32 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap);
 
-        model = Mat4x4(1.0f);
-        model = model.translate(Vec3(cubePositions[0]));
-        model = model.rotate(radians(-55.0f) * time, Vec3(0.0f, 1.0f, 0.0f));
+        for (auto cubePosition: cubePositions) {
+            // Model
+            model = Mat4x4(1.0f);
+            model = model.translate(Vec3(cubePosition));
+            model = model.rotate(radians(-55.0f) * time, Vec3(0.0f, 1.0f, 0.0f));
 
-        myShader.setMat4x4("model", model);
-        VAO.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+            myShader.setMat4x4("model", model);
+            VAO.bind();
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        vArray::unbind();
 
-//        for (int i = 0; i < 10; i++) {
-//            // Model
-//            model = Mat4x4(1.0f);
-//            model = model.translate(Vec3(cubePositions[i]));
-//            model = model.rotate(radians(-55.0f) * time, Vec3(0.0f, 1.0f, 0.0f));
-//
-//            myShader.setMat4x4("model", model);
-//            VAO.bind();
-//            glDrawArrays(GL_TRIANGLES, 0, 36);
-//        }
+        // Second Object
+        lightCubeShader.use();
+        lightCubeShader.setMat4x4("projection", projection);
+        lightCubeShader.setMat4x4("view", view);
+
+
+        for (auto pointLightPosition : pointLightPositions) {
+            // Model
+            model = Mat4x4(1.0f);
+            model = model.translate(pointLightPosition);
+            lightCubeShader.setMat4x4("model", model);
+            lightCubeVAO.bind();
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
         vArray::unbind();
 
         // Second Object
