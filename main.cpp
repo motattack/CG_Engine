@@ -63,6 +63,20 @@ float vertex[] = {
 
 };
 
+
+Vec3 cubePositions[] = {
+        Vec3(0.0f, 0.0f, 0.0f),
+        Vec3(2.0f, 5.0f, -15.0f),
+        Vec3(-1.5f, -2.2f, -2.5f),
+        Vec3(-3.8f, -2.0f, -12.3f),
+        Vec3(2.4f, -0.4f, -3.5f),
+        Vec3(-1.7f, 3.0f, -7.5f),
+        Vec3(1.3f, -2.0f, -2.5f),
+        Vec3(1.5f, 2.0f, -2.5f),
+        Vec3(1.5f, 0.2f, -1.5f),
+        Vec3(-1.3f, 1.0f, -1.5f)
+};
+
 void onResize(const sf::Event &event); // Protype
 void userInput(sf::Window &window);
 
@@ -174,6 +188,7 @@ int main() {
 
         // Light
         myShader.setVec3("light.position", lightPos);
+        myShader.setVec3("light.direction", -0.2f, -1.0f, -0.4f);
         myShader.setVec3("viewPos", camera.Position);
         myShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
         myShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
@@ -209,18 +224,31 @@ int main() {
         VAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        // Second Object
-        lightCubeShader.use();
-        lightCubeShader.setMat4x4("projection", projection);
-        lightCubeShader.setMat4x4("view", view);
-        // Model
-        model = Mat4x4(1.0f);
-        model = model.translate(lightPos);
-        model = model.Scale(Vec3(0.3f));
-        lightCubeShader.setMat4x4("model", model);
-        lightCubeVAO.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        vArray::unbind();
+        for (int i = 0; i < 10; i++)
+        {
+            // Model
+            model = Mat4x4(1.0f);
+            model = model.translate(Vec3(cubePositions[i]));
+            model = model.rotate(radians(-55.0f) * time, Vec3(0.0f, 1.0f, 0.0f));
+
+            myShader.setMat4x4("model", model);
+            VAO.bind();
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            vArray::unbind();
+        }
+
+//        // Second Object
+//        lightCubeShader.use();
+//        lightCubeShader.setMat4x4("projection", projection);
+//        lightCubeShader.setMat4x4("view", view);
+//        // Model
+//        model = Mat4x4(1.0f);
+//        model = model.translate(lightPos);
+//        model = model.Scale(Vec3(0.3f));
+//        lightCubeShader.setMat4x4("model", model);
+//        lightCubeVAO.bind();
+//        glDrawArrays(GL_TRIANGLES, 0, 36);
+//        vArray::unbind();
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
