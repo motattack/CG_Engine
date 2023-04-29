@@ -5,11 +5,11 @@
 Скачиваем assimp - https://github.com/assimp/assimp/releases
 Скачиваем cmake - https://cmake.org/download/
 
-Распаковываем assimp и cmake в однку папку. Рядом создаём папку build.
+Распаковываем assimp и cmake. Рядом c assimp создаём папку build.
 В консоли (переходим в директорую с нашими папками)
 ```shell
-cd build
-cmake.exe assimp-5.2.5 -G "MinGW Makefiles"
+cd C:\YOU_PATH\build
+cmake.exe C:\YOU_PATH\assimp-5.2.5 -G "MinGW Makefiles"
 ```
 
 ```shell
@@ -28,8 +28,8 @@ mingw32-make.exe
 > Перетащите exe прямо в консоль. Должно получится следующее:
 
 ```shell
-cd build
-C:\cmake-3.26.3-windows-x86_64\bin\cmake.exe assimp-5.2.5 -G "MinGW Makefiles"
+cd C:\YOU_PATH\build
+C:\cmake-3.26.3-windows-x86_64\bin\cmake.exe C:\YOU_PATH\assimp-5.2.5 -G "MinGW Makefiles"
 ```
 
 ```shell
