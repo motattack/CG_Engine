@@ -4,4 +4,5 @@ cmake-build-debug/.cmake
 cmake-build-debug/*
 !cmake-build-debug/*.dll
 !cmake-build-debug/*.exe
+!cmake-build-debug/res
 super.cpp
