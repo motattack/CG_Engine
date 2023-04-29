@@ -5,18 +5,21 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
+template<typename T>
 class vBuffer {
 private:
     unsigned int ID{};
 public:
-    explicit vBuffer(float *data, GLsizeiptr size) {
+    vBuffer() = default;
+
+    explicit vBuffer(T *data, GLsizeiptr size) {
         glGenBuffers(1, &ID);
         bind();
         glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
     };
 
     void bind() const {
-            glBindBuffer(GL_ARRAY_BUFFER, ID);
+        glBindBuffer(GL_ARRAY_BUFFER, ID);
     };
 
     void remove() {

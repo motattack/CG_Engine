@@ -2,9 +2,13 @@
 #define CG_ENGINE_MESH_H
 
 #include <string>
+#include <utility>
 #include <vector>
 
-#include "Shader.h"
+#include <shader.h>
+#include <vbuffer.h>
+#include <varray.h>
+#include <vearray.h>
 
 using namespace std;
 
@@ -22,32 +26,22 @@ struct Texture {
 
 class Mesh {
 private:
-    unsigned int VAO, VBO, EBO;
+    veArray<unsigned int> EBO;
+    vArray VAO;
+    vBuffer<Vertex> VBO;
 
     void setupMesh() {
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-        glGenBuffers(1, &EBO);
-
-        glBindVertexArray(VAO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, index.size() * sizeof(unsigned int), &index[0], GL_STATIC_DRAW);
+        VBO = vBuffer<Vertex>(&vertices[0], vertices.size() * sizeof(Vertex));
+        EBO = veArray(&index[0], index.size() * sizeof(unsigned int));
 
         // Position Attribute
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) 0);
+        vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) 0);
 
         // Normals Attribute
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Normal));
+        vArray::attrPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Normal));
 
         // Texture Attribute
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, TexCoords));
+        vArray::attrPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, TexCoords));
 
         glEnableVertexAttribArray(0);
     }
@@ -60,9 +54,9 @@ public:
 
     // Constructors
     Mesh(vector<Vertex> vertices, vector<unsigned int> index, vector<Texture> textures) {
-        this->vertices = vertices;
-        this->index = index;
-        this->textures = textures;
+        this->vertices = std::move(vertices);
+        this->index = std::move(index);
+        this->textures = std::move(textures);
 
         this->setupMesh();
     }
@@ -82,14 +76,14 @@ public:
             else if (name == "texture_specular")
                 number = to_string(specularNr++);
 
-            shader.setFloat(("material." + name + number).c_str(), i);
+            shader.setFloat("material." + name + number, i);
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
 
         glActiveTexture(GL_TEXTURE0);
 
         // Draw Mesh
-        glBindVertexArray(this->VAO);
+        this->VAO.bind();
         glDrawElements(GL_TRIANGLES, index.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }

@@ -1,14 +1,13 @@
 #ifndef CG_ENGINE_MODEL_H
 #define CG_ENGINE_MODEL_H
 
-#include "mesh.h"
-#include "Shader.h"
+#include <mesh.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "stb_image.h"
+#include <stb_image.h>
 
 #include <vector>
 #include <string>
@@ -22,8 +21,7 @@ unsigned int TextureFromFile(const char *path, const string &directory);
 
 class Model {
 public:
-
-    Model(const char *path) {
+    explicit Model(const char *path) {
         this->loadModel(path);
     }
 
@@ -31,9 +29,7 @@ public:
         for (auto mesh: meshes)
             mesh.Draw(shader);
     }
-
 private:
-
     // Model Data
     vector<Texture> textures_loaded;
     vector<Mesh> meshes;
@@ -51,7 +47,6 @@ private:
         directory = path.substr(0, path.find_last_of('/'));
 
         processNode(scene->mRootNode, scene);
-
     }
 
     void processNode(aiNode *node, const aiScene *scene) {
@@ -127,24 +122,23 @@ private:
         vector<Texture> specularMaps = loadMaterialTexture(material, aiTextureType_SPECULAR, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
-        return Mesh(vertices, indecies, textures);
+        return {vertices, indecies, textures};
     }
 
-    vector<Texture> loadMaterialTexture(aiMaterial *mat, aiTextureType type, string typeName) {
+    vector<Texture> loadMaterialTexture(aiMaterial *mat, aiTextureType type, const string& typeName) {
         vector<Texture> textures;
 
         for (int i = 0; i < mat->GetTextureCount(type); i++) {
             aiString str;
             mat->GetTexture(type, i, &str);
             bool skip = false;
-            for (int j = 0; j < textures_loaded.size(); j++) {
-                if (strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0) {
-                    textures.push_back(textures_loaded[j]);
+            for (auto & j : textures_loaded) {
+                if (strcmp(j.path.data(), str.C_Str()) == 0) {
+                    textures.push_back(j);
                     skip = true;
                     break;
                 }
             }
-
             if (!skip) {
                 Texture texture;
                 texture.id = TextureFromFile(str.C_Str(), directory);

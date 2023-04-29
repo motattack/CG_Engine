@@ -5,10 +5,6 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <camera.h>
-#include <shader.h>
-#include <vbuffer.h>
-#include <varray.h>
-#include <assimp/Importer.hpp>
 #include <model.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -65,34 +61,11 @@ float vertex[] = {
 
 };
 
-Vec3 pointLightPositions[] = {
-        Vec3(0.7f, 0.2f, 2.0f),
-        Vec3(2.3f, -3.3f, -4.0f),
-        Vec3(-4.0f, 2.0f, -12.0f),
-        Vec3(0.0f, 0.0f, -3.0f)
-};
-
-Vec3 cubePositions[] =
-        {
-                Vec3(0.0f, 0.0f, 0.0f),
-                Vec3(2.0f, 5.0f, -15.0f),
-                Vec3(-1.5f, -2.2f, -2.5f),
-                Vec3(-3.8f, -2.0f, -12.3f),
-                Vec3(2.4f, -0.4f, -3.5f),
-                Vec3(-1.7f, 3.0f, -7.5f),
-                Vec3(1.3f, -2.0f, -2.5f),
-                Vec3(1.5f, 2.0f, -2.5f),
-                Vec3(1.5f, 0.2f, -1.5f),
-                Vec3(-1.3f, 1.0f, -1.5f)
-        };
-
 void onResize(const sf::Event &event); // Protype
 void userInput(sf::Window &window);
 
 void mouseCursorPosition(const sf::Event &event); // Protype
 void mouseScrollCallback(const sf::Event &event);
-
-unsigned int loadTexture(const char *texture_path);
 
 // Matrix's
 Mat4x4 projection;
@@ -111,8 +84,6 @@ bool isFirstMouse = true;
 // Frames
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-
-Assimp::Importer imp;
 
 int main() {
     sf::ContextSettings settings;
@@ -137,44 +108,25 @@ int main() {
     }
     glEnable(GL_DEPTH_TEST);
 
-    /* Cube Buffers */
-    unsigned int VBO, VAO;
+    // Cube buffers
+    vArray VAO;
+    vBuffer VBO(vertex, sizeof(vertex));
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), &vertex, GL_STATIC_DRAW);
+    vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) nullptr);
 
-    // Position Attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) 0);
-    glEnableVertexAttribArray(0);
+    vArray::attrPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (3 * sizeof(float)));
 
-    // Color Attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    // Texture Attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    vArray::attrPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (6 * sizeof(float)));
 
     // Normals Attribute
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (8 * sizeof(float)));
-    glEnableVertexAttribArray(3);
+    vArray::attrPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (8 * sizeof(float)));
 
     /* Light Buffers */
-    GLuint lightCubeVBO, lightCubeVAO;
-
-    glGenVertexArrays(1, &lightCubeVAO);
-    glGenBuffers(1, &lightCubeVBO);
-
-    glBindVertexArray(lightCubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), &vertex, GL_STATIC_DRAW);
+    vArray lightCubeVAO;
+    vBuffer lightCubeVBO(vertex, sizeof(vertex));
 
     /* Light Position Attribute */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) 0);
-    glEnableVertexAttribArray(0);
+    vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) nullptr);
 
     stbi_set_flip_vertically_on_load(true);
 
@@ -196,9 +148,6 @@ int main() {
 
         deltaTime = time - lastFrame;
         lastFrame = time;
-        float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
-        float yValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
-        float zValue = std::sin(time) / 2.0f + 0.5f; // 0.0f - 1.0f
 
         float radius = 5.0f;
         float camX = std::sin(time) * radius;
@@ -244,7 +193,7 @@ int main() {
         model = model.translate(lightPos);
         lightCubeShader.setMat4x4("model", model);
 
-        glBindVertexArray(lightCubeVAO);
+        lightCubeVAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         ImGui::SFML::Update(window, deltaClock.restart());
@@ -326,39 +275,4 @@ void mouseCursorPosition(const sf::Event &event) {
 
 void mouseScrollCallback(const sf::Event &event) {
     camera.ProcessMouseScroll(event.mouseWheelScroll.delta);
-}
-
-unsigned int loadTexture(const char *texture_path) {
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    /* Filter Options */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load(texture_path, &width, &height, &nrChannels, 0);
-
-    if (data) {
-        // Note it's a better way to see that what our file is like png, jpg or jpeg ?
-        GLenum format;
-        if (nrChannels == 1)
-            format = GL_RED;
-        if (nrChannels == 3) // jpg file
-            format = GL_RGB;
-        if (nrChannels == 4) // png file
-            format = GL_RGBA;
-
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        std::cout << "Fail load texture\n";
-    }
-
-    stbi_image_free(data);
-
-    return textureID;
 }
