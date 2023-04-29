@@ -5,8 +5,6 @@
 
 class Vec2 {
 public:
-    Vec2() = default;
-
     explicit Vec2(float number = 0.0f) : x(number), y(number) {};
 
     Vec2(float x, float y) : x(x), y(y) {};
