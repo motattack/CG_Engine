@@ -137,6 +137,45 @@ int main() {
     }
     glEnable(GL_DEPTH_TEST);
 
+    /* Cube Buffers */
+    unsigned int VBO, VAO;
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), &vertex, GL_STATIC_DRAW);
+
+    // Position Attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) 0);
+    glEnableVertexAttribArray(0);
+
+    // Color Attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Texture Attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    // Normals Attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+
+    /* Light Buffers */
+    GLuint lightCubeVBO, lightCubeVAO;
+
+    glGenVertexArrays(1, &lightCubeVAO);
+    glGenBuffers(1, &lightCubeVBO);
+
+    glBindVertexArray(lightCubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), &vertex, GL_STATIC_DRAW);
+
+    /* Light Position Attribute */
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) 0);
+    glEnableVertexAttribArray(0);
+
     stbi_set_flip_vertically_on_load(true);
 
     /* Model */
@@ -145,6 +184,8 @@ int main() {
     /* Shader */
     Shader myShader("../res/shader/vShader.glsl",
                     "../res/shader/fShader.glsl");
+    myShader.use();
+    Shader lightCubeShader("../res/Shader/lCube.vert", "../res/Shader/lCube.frag");
 
 
     sf::Clock deltaClock, clock;
@@ -155,7 +196,13 @@ int main() {
 
         deltaTime = time - lastFrame;
         lastFrame = time;
-        float radius = 3.0f;
+        float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
+        float yValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
+        float zValue = std::sin(time) / 2.0f + 0.5f; // 0.0f - 1.0f
+
+        float radius = 5.0f;
+        float camX = std::sin(time) * radius;
+        float camZ = std::cos(time) * radius;
 
         // Gui Variables
         glClearColor(0.7f, 0.7f, 7.0f, 1.0f);
@@ -163,6 +210,14 @@ int main() {
 
         // First Object
         myShader.use();
+
+        lightPos = Vec3(camX, camZ, 0.0f);
+        myShader.setVec3("light.position", camera.Position);
+        myShader.setVec3("light.direction", camera.Front);
+        myShader.setVec3("light.ambient", Vec3(0.2f));
+        myShader.setVec3("light.diffuse", Vec3(0.4f));
+        myShader.setVec3("light.specular", Vec3(0.5f));
+        myShader.setVec3("viewPos", camera.Position);
 
         /* Coordinates */
         // Projection
@@ -180,6 +235,17 @@ int main() {
 
         // Draw your model
         myBackPack.Draw(myShader);
+
+        // Second Object
+        lightCubeShader.use();
+        lightCubeShader.setMat4x4("projection", projection);
+        lightCubeShader.setMat4x4("view", view);
+        model = Mat4x4(1.0f);
+        model = model.translate(lightPos);
+        lightCubeShader.setMat4x4("model", model);
+
+        glBindVertexArray(lightCubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
