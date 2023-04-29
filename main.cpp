@@ -131,13 +131,13 @@ int main() {
     stbi_set_flip_vertically_on_load(true);
 
     /* Model */
-    Model myBackPack("../res/Object/Backpack/backpack.obj");
+    Model myBackPack("res/Object/Backpack/backpack.obj");
 
     /* Shader */
-    Shader myShader("../res/shader/vShader.glsl",
-                    "../res/shader/fShader.glsl");
+    Shader myShader("res/shader/vShader.glsl",
+                    "res/shader/fShader.glsl");
     myShader.use();
-    Shader lightCubeShader("../res/Shader/lCube.vert", "../res/Shader/lCube.frag");
+    Shader lightCubeShader("res/Shader/lCube.vert", "res/Shader/lCube.frag");
 
 
     sf::Clock deltaClock, clock;
@@ -195,6 +195,7 @@ int main() {
 
         lightCubeVAO.bind();
         glDrawArrays(GL_TRIANGLES, 0, 36);
+        vArray::unbind();
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
