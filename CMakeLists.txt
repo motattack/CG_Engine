@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 20)
 # Include directories for GLEW and SFML
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/glew-2.1.0/include)
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/SFML-2.5.1/include)
+include_directories(${CMAKE_SOURCE_DIR}/src/libs/assimp-5.2.5/include)
 
 # Include directories for Math, glm and test
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/math)
@@ -22,6 +23,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/libs/stb)
 # Link directories for GLEW and SFML
 link_directories(${CMAKE_SOURCE_DIR}/src/libs/glew-2.1.0/lib/Release/x64)
 link_directories(${CMAKE_SOURCE_DIR}/src/libs/SFML-2.5.1/lib)
+link_directories(${CMAKE_SOURCE_DIR}/src/libs/assimp-5.2.5/lib)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/imgui-sfml-2.6)
 file(GLOB IMGUI_SFML_SRCS ${CMAKE_SOURCE_DIR}/src/libs/imgui-sfml-2.6/*.cpp)
@@ -30,4 +32,4 @@ file(GLOB IMGUI_SFML_SRCS ${CMAKE_SOURCE_DIR}/src/libs/imgui-sfml-2.6/*.cpp)
 add_executable(CG_Engine main.cpp ${IMGUI_SFML_SRCS})
 
 # Link GLEW and SFML libraries
-target_link_libraries(CG_Engine opengl32 glew32 sfml-graphics sfml-system sfml-window)
+target_link_libraries(CG_Engine libassimp-5 opengl32 glew32 sfml-graphics sfml-system sfml-window)

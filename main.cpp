@@ -8,6 +8,7 @@
 #include <shader.h>
 #include <vbuffer.h>
 #include <varray.h>
+#include <assimp/Importer.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -110,6 +111,7 @@ bool isFirstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+Assimp::Importer imp;
 
 int main() {
     sf::ContextSettings settings;
