@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-#include <CG_Engine_Core/shader/shader.h>
+#include <CG_Engine_Core/shader.h>
 #include <CG_Engine_Core/vertex/vbuffer.h>
 #include <CG_Engine_Core/vertex/varray.h>
 #include <CG_Engine_Core/vertex/vearray.h>

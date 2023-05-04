@@ -4,8 +4,8 @@
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <CG_Engine_Core/camera/camera.h>
-#include <CG_Engine_Core/model/model.h>
+#include <CG_Engine_Core/camera.h>
+#include <CG_Engine_Core/model.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 

@@ -1,7 +1,7 @@
 #ifndef CG_ENGINE_MODEL_H
 #define CG_ENGINE_MODEL_H
 
-#include <CG_Engine_Core/model/mesh.h>
+#include <CG_Engine_Core/mesh.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
