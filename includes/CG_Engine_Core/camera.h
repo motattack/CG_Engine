@@ -112,6 +112,10 @@ public:
 
         ProcessMouseMovement(xoffset, yoffset);
     }
+
+    void mouseScrollCallback(const sf::Event &event) {
+        ProcessMouseScroll(event.mouseWheelScroll.delta);
+    }
 };
 
 #endif //CG_ENGINE_CAMERA_H

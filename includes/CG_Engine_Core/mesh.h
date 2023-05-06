@@ -10,8 +10,6 @@
 #include <CG_Engine_Core/vertex/varray.h>
 #include <CG_Engine_Core/vertex/vearray.h>
 
-using namespace std;
-
 struct Vertex {
     Vec3 Position;
     Vec3 Normal;
@@ -20,8 +18,8 @@ struct Vertex {
 
 struct Texture {
     unsigned int id;
-    string type;
-    string path;
+    std::string type;
+    std::string path;
 };
 
 class Mesh {
@@ -48,12 +46,12 @@ private:
 
 public:
     // Mesh Data
-    vector<Vertex> vertices;
-    vector<unsigned int> index;
-    vector<Texture> textures;
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> index;
+    std::vector<Texture> textures;
 
     // Constructors
-    Mesh(vector<Vertex> vertices, vector<unsigned int> index, vector<Texture> textures) {
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> index, std::vector<Texture> textures) {
         this->vertices = std::move(vertices);
         this->index = std::move(index);
         this->textures = std::move(textures);
@@ -68,13 +66,13 @@ public:
         for (int i = 0; i < textures.size(); i++) {
             glActiveTexture(GL_TEXTURE0 + i);
 
-            string name = textures[i].type;
-            string number;
+            std::string name = textures[i].type;
+            std::string number;
 
             if (name == "texture_diffuse")
-                number = to_string(diffuseNr++);
+                number = std::to_string(diffuseNr++);
             else if (name == "texture_specular")
-                number = to_string(specularNr++);
+                number = std::to_string(specularNr++);
 
             shader.setFloat("material." + name + number, i);
             glBindTexture(GL_TEXTURE_2D, textures[i].id);

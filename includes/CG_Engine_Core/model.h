@@ -15,9 +15,7 @@
 #include <sstream>
 #include <iostream>
 
-using namespace std;
-
-unsigned int TextureFromFile(const char *path, const string &directory);
+unsigned int TextureFromFile(const char *path, const std::string &directory);
 
 class Model {
 public:
@@ -31,16 +29,16 @@ public:
     }
 private:
     // Model Data
-    vector<Texture> textures_loaded;
-    vector<Mesh> meshes;
-    string directory;
+    std::vector<Texture> textures_loaded;
+    std::vector<Mesh> meshes;
+    std::string directory;
 
-    void loadModel(const string &path) {
+    void loadModel(const std::string &path) {
         Assimp::Importer importer;
         const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-            cout << "ERROR::ASSIMP::" << importer.GetErrorString() << endl;
+            std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
             return;
         }
 
@@ -49,24 +47,13 @@ private:
         processNode(scene->mRootNode, scene);
     }
 
-    void processNode(aiNode *node, const aiScene *scene) {
-        // process all the node's meshes (if any)
-        for (int i = 0; i < node->mNumMeshes; i++) {
-            aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-            meshes.push_back(processMesh(mesh, scene));
-        }
-
-        // Then do the same for each of its children
-        for (int i = 0; i < node->mNumChildren; i++) {
-            processNode(node->mChildren[i], scene);
-        }
-    }
+    void processNode(aiNode *node, const aiScene *scene);
 
     Mesh processMesh(aiMesh *mesh, const aiScene *scene) {
         // Data
-        vector<Vertex> vertices;
-        vector<unsigned int> indecies;
-        vector<Texture> textures;
+        std::vector<Vertex> vertices;
+        std::vector<unsigned int> indecies;
+        std::vector<Texture> textures;
 
         // Vertex
         for (int i = 0; i < mesh->mNumVertices; i++) {
@@ -115,18 +102,18 @@ private:
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
         // Diffuse Map
-        vector<Texture> diffuseMaps = loadMaterialTexture(material, aiTextureType_DIFFUSE, "texture_diffuse");
+        std::vector<Texture> diffuseMaps = loadMaterialTexture(material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
         // Specular Map
-        vector<Texture> specularMaps = loadMaterialTexture(material, aiTextureType_SPECULAR, "texture_specular");
+        std::vector<Texture> specularMaps = loadMaterialTexture(material, aiTextureType_SPECULAR, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
         return {vertices, indecies, textures};
     }
 
-    vector<Texture> loadMaterialTexture(aiMaterial *mat, aiTextureType type, const string& typeName) {
-        vector<Texture> textures;
+    std::vector<Texture> loadMaterialTexture(aiMaterial *mat, aiTextureType type, const std::string& typeName) {
+        std::vector<Texture> textures;
 
         for (int i = 0; i < mat->GetTextureCount(type); i++) {
             aiString str;
@@ -154,8 +141,21 @@ private:
 
 };
 
-unsigned int TextureFromFile(const char *path, const string &directory) {
-    string fileName = string(path);
+void Model::processNode(aiNode *node, const aiScene *scene) {
+    // process all the node's meshes (if any)
+    for (int i = 0; i < node->mNumMeshes; i++) {
+        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+        meshes.push_back(processMesh(mesh, scene));
+    }
+
+    // Then do the same for each of its children
+    for (int i = 0; i < node->mNumChildren; i++) {
+        processNode(node->mChildren[i], scene);
+    }
+}
+
+unsigned int TextureFromFile(const char *path, const std::string &directory) {
+    std::string fileName = std::string(path);
     fileName = directory + '/' + fileName;
 
     unsigned int textureID;
