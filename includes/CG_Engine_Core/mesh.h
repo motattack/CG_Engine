@@ -10,11 +10,18 @@
 #include <CG_Engine_Core/vertex/varray.h>
 #include <CG_Engine_Core/vertex/vearray.h>
 #include "texture.h"
+#include "CG_Engine_Core/algo/bounds.h"
+#include "CG_Engine_Core/models/box.h"
 
 struct Vertex {
     Vec3 pos;
     Vec3 normal;
     Vec2 texCoord;
+
+    /*
+    v1.vec3.x|v1.vec3.y|v1.vec3.z|v1.vec2.x|v1.vec2.y|
+    v2.vec3.x|v2.vec3.y|v2.vec3.z|v2.vec2.x|v2.vec2.y
+    */
 
     static std::vector<Vertex> genList(float *vertices, int noVertices) {
         std::vector<Vertex> ret(noVertices);
@@ -46,6 +53,8 @@ struct Vertex {
 
 class Mesh {
 public:
+    BoundingRegion br;
+
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     unsigned int VAO{};
@@ -54,18 +63,21 @@ public:
     aiColor4D diffuse;
     aiColor4D specular;
 
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures = {})
-            : vertices(std::move(vertices)), indices(std::move(indices)), textures(std::move(textures)), noTex(false) {
+    Mesh(BoundingRegion br, std::vector<Vertex> vertices, std::vector<unsigned int> indices,
+         std::vector<Texture> textures = {}) : br(br), vertices(std::move(vertices)), indices(std::move(indices)),
+                                               textures(std::move(textures)),
+                                               noTex(false) {
         setup();
-    }
+    };
 
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, aiColor4D diffuse, aiColor4D specular)
-            : vertices(std::move(vertices)), indices(std::move(indices)), diffuse(diffuse), specular(specular),
-              noTex(true) {
+    Mesh(BoundingRegion br, std::vector<Vertex> vertices, std::vector<unsigned int> indices, aiColor4D diffuse,
+         aiColor4D specular) : br(br), vertices(std::move(vertices)), indices(std::move(indices)), diffuse(diffuse),
+                               specular(specular),
+                               noTex(true) {
         setup();
-    }
+    };
 
-    void render(Shader shader) {
+    void render(Shader shader, Vec3 pos, Vec3 size, Box *box, bool doRender = true) {
         if (noTex) {
             // materials
             shader.set4Float("material.diffuse", diffuse);
@@ -98,13 +110,16 @@ public:
             }
         }
 
-        // EBO stuff
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        if (doRender) {
+            box->addInstance(br, pos, size);
 
-        // reset
-        glActiveTexture(GL_TEXTURE0);
+            glBindVertexArray(VAO);
+            glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+
+            // reset
+            glActiveTexture(GL_TEXTURE0);
+        }
     };
 
     void cleanup() {

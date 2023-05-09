@@ -4,10 +4,11 @@
 #include <CG_Engine_Core/model.h>
 #include <CG_Engine_Core/models/modelarray.h>
 
+
 class Sphere : public Model {
 public:
-    explicit Sphere(Vec3 pos = Vec3(0.0f), Vec3 size = Vec3(1.0f))
-            : Model(pos, size, true) {
+    Sphere(Vec3 pos = Vec3(0.0f), Vec3 size = Vec3(1.0f))
+            : Model(BoundTypes::SPHERE, pos, size, true) {
         rb.mass = 1.0f;
     }
 
@@ -20,7 +21,7 @@ class SphereArray : public ModelArray<Sphere> {
 public:
     void init() {
         model = Sphere(Vec3(0.0f), Vec3(0.25f));
-        model.init();
+        ModelArray::init();
     }
 };
 

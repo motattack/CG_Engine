@@ -9,6 +9,7 @@
 
 #include <stb_image.h>
 
+#include <cmath>
 #include <vector>
 #include <string>
 #include <fstream>
@@ -21,13 +22,16 @@ public:
     RigidBody rb;
     Vec3 size;
 
-    Model() = default;
+    BoundTypes boundType;
 
-    explicit Model(Vec3 pos = Vec3(0.0f), Vec3 size = Vec3(1.0f), bool noTex = false) : size(size), noTex(noTex) {
+    std::vector<Mesh> meshes;
+
+    explicit Model(BoundTypes boundType = BoundTypes::AABB, Vec3 pos = Vec3(0.0f), Vec3 size = Vec3(1.0f), bool noTex = false)
+            : boundType(boundType), size(size), noTex(noTex) {
         rb.pos = pos;
     };
 
-    void loadModel(const std::string& path) {
+    void loadModel(const std::string &path) {
         Assimp::Importer import;
         const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -41,7 +45,7 @@ public:
         processNode(scene->mRootNode, scene);
     };
 
-    void render(Shader shader, float dt, bool setModel = true) {
+    void render(Shader shader, float dt, Box *box, bool setModel = true, bool doRender = true) {
         rb.update(dt);
 
         if (setModel) {
@@ -54,7 +58,7 @@ public:
         shader.setFloat("material.shininess", 0.5f);
 
         for (auto &mesh: meshes) {
-            mesh.render(shader);
+            mesh.render(shader, rb.pos, size, box, doRender);
         }
     };
 
@@ -62,12 +66,11 @@ public:
         for (auto &mesh: meshes) {
             mesh.cleanup();
         }
-    };
+    }
 
 protected:
     bool noTex;
 
-    std::vector<Mesh> meshes;
     std::string directory;
 
     std::vector<Texture> textures_loaded;
@@ -83,12 +86,16 @@ protected:
         for (unsigned int i = 0; i < node->mNumChildren; i++) {
             processNode(node->mChildren[i], scene);
         }
-    }
+    };
 
     Mesh processMesh(aiMesh *mesh, const aiScene *scene) {
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
         std::vector<Texture> textures;
+
+        BoundingRegion br(boundType);
+        Vec3 min((float) (~0));        // min point = max float
+        Vec3 max(-(float) (~0));    // max point = min float
 
         // vertices
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -100,6 +107,13 @@ protected:
                     mesh->mVertices[i].y,
                     mesh->mVertices[i].z
             );
+
+            for (int j = 0; j < 3; j++) {
+                // if smaller than min
+                if (vertex.pos[j] < min[j]) min[j] = vertex.pos[j];
+                // if larger than max
+                if (vertex.pos[j] > max[j]) max[j] = vertex.pos[j];
+            }
 
             // normal vectors
             vertex.normal = Vec3(
@@ -119,6 +133,31 @@ protected:
             }
 
             vertices.push_back(vertex);
+        }
+
+        // process min/max for BR
+        if (boundType == BoundTypes::AABB) {
+            // assign max and min
+            br.min = min;
+            br.max = max;
+        } else {
+            // calculate max distance from the center
+            br.center = BoundingRegion(min, max).calculateCenter();
+            float maxRadiusSquared = 0.0f;
+
+            for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+                float radiusSquared = 0.0f; // distance for this vertex
+                for (int j = 0; j < 3; j++) {
+                    radiusSquared += (vertices[i].pos[j] - br.center[j]) * (vertices[i].pos[j] - br.center[j]);
+                }
+                if (radiusSquared > maxRadiusSquared) {
+                    // found new squared radius
+                    // a^2 > b^2 --> |a| > |b|
+                    maxRadiusSquared = radiusSquared;
+                }
+            }
+
+            br.radius = std::sqrt(maxRadiusSquared);
         }
 
         // process indices
@@ -142,7 +181,7 @@ protected:
                 aiColor4D spec(1.0f);
                 aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &spec);
 
-                return {vertices, indices, diff, spec};
+                return {br, vertices, indices, diff, spec};
             }
 
             // diffuse maps
@@ -154,7 +193,7 @@ protected:
             textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         }
 
-        return {vertices, indices, textures};
+        return Mesh(br, vertices, indices, textures);
     };
 
     std::vector<Texture> loadTextures(aiMaterial *mat, aiTextureType type) {

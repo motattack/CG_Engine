@@ -17,6 +17,7 @@
 #include "CG_Engine_Core/models/gun.h"
 #include "CG_Engine_Core/models/sphere.h"
 #include "CG_Engine_Core/physics/evn.h"
+#include "CG_Engine_Core/models/box.h"
 
 void onResize(const sf::Event &event); // Protype
 void userInput(sf::Window &window, float dt);
@@ -33,7 +34,6 @@ double dt = 0.0f; // tme btwn frames
 
 // Camera
 Camera Camera::defaultCamera(Vec3(0.0f, 0.0f, 0.0f));
-
 
 // Frames
 float lastFrame = 0.0f;
@@ -59,10 +59,18 @@ int main() {
 
     // SHADERS===============================
     Shader shader("res/assets/object.vs", "res/assets/object.fs");
-    Shader lampShader("res/assets/object.vs", "res/assets/lamp.fs");
+    Shader lampShader("res/assets/instanced/instanced.vs", "res/assets/lamp.fs");
+    Shader launchShader("res/assets/instanced/instanced.vs", "res/assets/object.fs");
+    Shader boxShader("res/assets/instanced/box.vs", "res/assets/instanced/box.fs");
 
     // MODELS==============================
     launchObjects.init();
+
+    Box box;
+    box.init();
+
+    Model m(BoundTypes::AABB, Vec3(0.0f), Vec3(0.05f));
+    m.loadModel("res/assets/models/lotr_troll/scene.gltf");
 
     // LIGHTS
     DirLight dirLight = {Vec3(-0.2f, -1.0f, -0.3f), Vec4(0.1f, 0.1f, 0.1f, 1.0f), Vec4(0.4f, 0.4f, 0.4f, 1.0f),
@@ -84,7 +92,7 @@ int main() {
 
     LampArray lamps;
     lamps.init();
-    for (auto & pointLightPosition : pointLightPositions) {
+    for (auto &pointLightPosition: pointLightPositions) {
         lamps.lightInstances.push_back(
                 {
                         pointLightPosition,
@@ -102,6 +110,9 @@ int main() {
 
     sf::Clock deltaClock, clock;
     while (screen.window.isOpen()) {
+        box.offsets.clear();
+        box.sizes.clear();
+
         // calculate dt
         float currentTime = clock.getElapsedTime().asSeconds();
         dt = currentTime - lastFrame;
@@ -111,27 +122,51 @@ int main() {
         userInput(screen.window, dt);
 
         // render
-        Screen::update();
+        screen.update();
 
         // draw shapes
         shader.activate();
+        launchShader.activate();
 
+        // camera view position
+        shader.activate();
         shader.set3Float("viewPos", Camera::defaultCamera.cameraPos);
+        launchShader.activate();
+        launchShader.set3Float("viewPos", Camera::defaultCamera.cameraPos);
 
+
+        // render lights in shader
+        shader.activate();
         dirLight.render(shader);
+        launchShader.activate();
+        dirLight.render(launchShader);
 
         for (unsigned int i = 0; i < 4; i++) {
+            shader.activate();
             lamps.lightInstances[i].render(shader, i);
+            launchShader.activate();
+            lamps.lightInstances[i].render(launchShader, i);
         }
+        shader.activate();
         shader.setInt("noPointLights", 4);
+        launchShader.activate();
+        launchShader.setInt("noPointLights", 4);
 
         if (flashlightOn) {
             s.position = Camera::defaultCamera.cameraPos;
             s.direction = Camera::defaultCamera.cameraFront;
+            shader.activate();
             s.render(shader, 0);
             shader.setInt("noSpotLights", 1);
-        } else {
+            launchShader.activate();
+            s.render(launchShader, 0);
+            launchShader.setInt("noSpotLights", 1);
+        }
+        else {
+            shader.activate();
             shader.setInt("noSpotLights", 0);
+            launchShader.activate();
+            launchShader.setInt("noSpotLights", 0);
         }
 
         // create transformation
@@ -140,11 +175,14 @@ int main() {
         view = Camera::defaultCamera.getViewMatrix();
         projection = Mat4x4::perspective(
                 radians(Camera::defaultCamera.zoom),
-                1200 / 900, 0.1f, 100.0f);
+                800 / 600, 0.1f, 100.0f);
 
+        shader.activate();
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
+        m.render(shader, dt, &box);
 
+        // launch objects
         std::stack<int> removeObjects;
         for (int i = 0; i < launchObjects.instances.size(); i++) {
             if ((Camera::defaultCamera.cameraPos - launchObjects.instances[i].pos).len() > 50.0f) {
@@ -157,15 +195,27 @@ int main() {
             removeObjects.pop();
         }
 
-        if (!launchObjects.instances.empty()) {
-            launchObjects.render(shader, dt);
+        if (launchObjects.instances.size() > 0) {
+            launchShader.activate();
+            launchShader.setMat4("view", view);
+            launchShader.setMat4("projection", projection);
+            launchObjects.render(launchShader, dt, &box);
         }
 
+        // lamps
         lampShader.activate();
         lampShader.setMat4("view", view);
         lampShader.setMat4("projection", projection);
+        lamps.render(lampShader, dt, &box);
 
-        lamps.render(lampShader, dt);
+        // render boxes
+        if (box.offsets.size() > 0) {
+            // instances exist
+            boxShader.activate();
+            boxShader.setMat4("view", view);
+            boxShader.setMat4("projection", projection);
+            box.render(boxShader);
+        }
 
         screen.window.display();
 
@@ -181,8 +231,9 @@ int main() {
     }
 
     lamps.cleanup();
-
+    box.cleanup();
     launchObjects.cleanup();
+    m.cleanup();
 
     ImGui::SFML::Shutdown();
     screen.window.close();

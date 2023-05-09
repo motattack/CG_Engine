@@ -51,6 +51,10 @@ public:
         return *this;
     };
 
+    Vec3 operator*(const Vec3& vec) const {
+        return {x * vec.x, y * vec.y, z * vec.z};
+    }
+
     Vec3 operator/(float number) const {
         if (number != 0) {
             return {x / number, y / number, z / number};
@@ -67,6 +71,26 @@ public:
         }
         return *this;
     };
+
+    float& operator[](int index) {
+        if (index == 0) return x;
+        if (index == 1) return y;
+        if (index == 2) return z;
+        throw std::out_of_range("Vec3 index out of range");
+    }
+
+    float operator[](int index) const {
+        if (index == 0) return x;
+        if (index == 1) return y;
+        if (index == 2) return z;
+        throw std::out_of_range("Vec3 index out of range");
+    }
+
+
+
+    [[nodiscard]] Vec3 abs() const {
+        return {std::abs(x), std::abs(y), std::abs(z)};
+    }
 
     [[nodiscard]] float len() const {
         return sqrtf(powf(x, 2) + powf(y, 2) + powf(z, 2));
