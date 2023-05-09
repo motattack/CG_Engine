@@ -3,7 +3,7 @@
 
 #include <CG_Engine_Core/math/vec3.h>
 
-enum class BoundTypes {
+enum class BoundTypes : unsigned char {
     AABB = 0x00,    // 0x00 = 0	// Axis-aligned bounding box
     SPHERE = 0x01    // 0x01 = 1
 };
@@ -28,7 +28,8 @@ public:
     BoundingRegion(BoundTypes type) : type(type) {};
 
     // initialize as sphere
-    BoundingRegion(Vec3 center, float radius) : type(BoundTypes::SPHERE), center(center), radius(radius) {};
+    BoundingRegion(Vec3 center, float radius) : type(BoundTypes::SPHERE), center(center), radius(radius) {}
+
 
     // initialize as AABB
     BoundingRegion(Vec3 min, Vec3 max) : type(BoundTypes::AABB), min(min), max(max) {};
@@ -45,7 +46,7 @@ public:
     // calculate dimensions
     Vec3 calculateDimensions() {
         return (type == BoundTypes::AABB) ? (max - min) : Vec3(2.0f * radius);
-    };
+    }
 
     /*
         testing methods

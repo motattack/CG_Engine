@@ -4,36 +4,36 @@
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <CG_Engine_Core/camera.h>
+#include <CG_Engine_Core/UI/camera.h>
 #include <CG_Engine_Core/model.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stb_image.h>
 #include <stack>
-#include "CG_Engine_Core/UI/screen.h"
 #include "CG_Engine_Core/light.h"
 #include "CG_Engine_Core/models/lamp.h"
 #include "CG_Engine_Core/models/gun.h"
 #include "CG_Engine_Core/models/sphere.h"
 #include "CG_Engine_Core/physics/evn.h"
 #include "CG_Engine_Core/models/box.h"
+#include "scene.h"
 
 void onResize(const sf::Event &event); // Protype
-void userInput(sf::Window &window, float dt);
+void userInput(Scene &window, float dt);
 
 // Matrix's
 Mat4x4 projection;
 Mat4x4 model;
 Mat4x4 view;
 
-Screen screen;
+//Screen screen;
 
 bool flashlightOn = false;
 double dt = 0.0f; // tme btwn frames
 
 // Camera
-Camera Camera::defaultCamera(Vec3(0.0f, 0.0f, 0.0f));
+Camera cam;
 
 // Frames
 float lastFrame = 0.0f;
@@ -42,20 +42,15 @@ SphereArray launchObjects;
 
 
 int main() {
-    glewExperimental = GL_TRUE;
+    Scene scene = Scene("OpenGL Tutorial", 800, 600);
 
-    if (GLEW_OK != glewInit()) {
-        std::cout << "Error: glew not init =(" << std::endl;
-        return -1;
-    }
-    //glEnable(GL_DEPTH_TEST);
-
-    if (!screen.init()) {
+    if (!scene.init()) {
         std::cout << "Could not open window" << std::endl;
         return -1;
     }
 
-    screen.setParameters();
+    scene.cameras.push_back(&cam);
+    scene.activeCamera = 0;
 
     // SHADERS===============================
     Shader shader("res/assets/object.vs", "res/assets/object.fs");
@@ -75,6 +70,7 @@ int main() {
     // LIGHTS
     DirLight dirLight = {Vec3(-0.2f, -1.0f, -0.3f), Vec4(0.1f, 0.1f, 0.1f, 1.0f), Vec4(0.4f, 0.4f, 0.4f, 1.0f),
                          Vec4(0.5f, 0.5f, 0.5f, 1.0f)};
+    scene.dirLight = &dirLight;
 
     Vec3 pointLightPositions[] = {
             Vec3(0.7f, 0.2f, 2.0f),
@@ -90,27 +86,33 @@ int main() {
     float k1 = 0.09f;
     float k2 = 0.032f;
 
+    PointLight pointLights[4];
+
     LampArray lamps;
     lamps.init();
-    for (auto &pointLightPosition: pointLightPositions) {
-        lamps.lightInstances.push_back(
-                {
-                        pointLightPosition,
-                        k0, k1, k2,
-                        ambient, diffuse, specular
-                });
+    for (unsigned int i = 0; i < 4; i++) {
+        pointLights[i] = {
+                pointLightPositions[i],
+                k0, k1, k2,
+                ambient, diffuse, specular
+        };
+        lamps.lightInstances.push_back(pointLights[i]);
+        scene.pointLights.push_back(&pointLights[i]);
+        States::activate(&scene.activePointLights, i);
     }
 
-    SpotLight s = {
-            Camera::defaultCamera.cameraPos, Camera::defaultCamera.cameraFront,
+    SpotLight spotLight = {
+            cam.cameraPos, cam.cameraFront,
             cos(radians(12.5f)), cos(radians(20.0f)),
             1.0f, 0.07f, 0.032f,
             Vec4(0.0f, 0.0f, 0.0f, 1.0f), Vec4(1.0f), Vec4(1.0f)
     };
+    scene.spotLights.push_back(&spotLight);
+    scene.activeSpotLights = 1;
 
     sf::Clock deltaClock, clock;
-    while (screen.window.isOpen()) {
-        box.offsets.clear();
+    while (scene.window.isOpen()) {
+        box.positions.clear();
         box.sizes.clear();
 
         // calculate dt
@@ -119,73 +121,18 @@ int main() {
         lastFrame = currentTime;
 
         // process input
-        userInput(screen.window, dt);
+        userInput(scene, dt);
 
-        // render
-        screen.update();
+        // update screen values
+        scene.update();
 
-        // draw shapes
-        shader.activate();
-        launchShader.activate();
-
-        // camera view position
-        shader.activate();
-        shader.set3Float("viewPos", Camera::defaultCamera.cameraPos);
-        launchShader.activate();
-        launchShader.set3Float("viewPos", Camera::defaultCamera.cameraPos);
-
-
-        // render lights in shader
-        shader.activate();
-        dirLight.render(shader);
-        launchShader.activate();
-        dirLight.render(launchShader);
-
-        for (unsigned int i = 0; i < 4; i++) {
-            shader.activate();
-            lamps.lightInstances[i].render(shader, i);
-            launchShader.activate();
-            lamps.lightInstances[i].render(launchShader, i);
-        }
-        shader.activate();
-        shader.setInt("noPointLights", 4);
-        launchShader.activate();
-        launchShader.setInt("noPointLights", 4);
-
-        if (flashlightOn) {
-            s.position = Camera::defaultCamera.cameraPos;
-            s.direction = Camera::defaultCamera.cameraFront;
-            shader.activate();
-            s.render(shader, 0);
-            shader.setInt("noSpotLights", 1);
-            launchShader.activate();
-            s.render(launchShader, 0);
-            launchShader.setInt("noSpotLights", 1);
-        }
-        else {
-            shader.activate();
-            shader.setInt("noSpotLights", 0);
-            launchShader.activate();
-            launchShader.setInt("noSpotLights", 0);
-        }
-
-        // create transformation
-        view = Mat4x4(1.0f);
-        projection = Mat4x4(1.0f);
-        view = Camera::defaultCamera.getViewMatrix();
-        projection = Mat4x4::perspective(
-                radians(Camera::defaultCamera.zoom),
-                800 / 600, 0.1f, 100.0f);
-
-        shader.activate();
-        shader.setMat4("view", view);
-        shader.setMat4("projection", projection);
+        scene.render(shader);
         m.render(shader, dt, &box);
 
         // launch objects
         std::stack<int> removeObjects;
         for (int i = 0; i < launchObjects.instances.size(); i++) {
-            if ((Camera::defaultCamera.cameraPos - launchObjects.instances[i].pos).len() > 50.0f) {
+            if ((scene.getActiveCamera()->cameraPos - launchObjects.instances[i].pos).len() > 50.0f) {
                 removeObjects.push(i);
                 continue;
             }
@@ -196,35 +143,31 @@ int main() {
         }
 
         if (launchObjects.instances.size() > 0) {
-            launchShader.activate();
-            launchShader.setMat4("view", view);
-            launchShader.setMat4("projection", projection);
+            scene.render(launchShader);
             launchObjects.render(launchShader, dt, &box);
         }
 
         // lamps
-        lampShader.activate();
-        lampShader.setMat4("view", view);
-        lampShader.setMat4("projection", projection);
+        scene.render(lampShader, false);
         lamps.render(lampShader, dt, &box);
 
         // render boxes
-        if (box.offsets.size() > 0) {
+        if (box.positions.size() > 0) {
             // instances exist
-            boxShader.activate();
-            boxShader.setMat4("view", view);
-            boxShader.setMat4("projection", projection);
+            scene.render(boxShader, false);
             box.render(boxShader);
         }
 
-        screen.window.display();
+        // send new frame to window
+        scene.newFrame();
 
         // Poll events
         sf::Event event{};
-        while (screen.window.pollEvent(event)) {
+        while (scene.window.pollEvent(event)) {
             ImGui::SFML::ProcessEvent(event);
+            Keyboard::keyCallback(event);
             if (event.type == sf::Event::Closed)
-                screen.window.close();
+                scene.window.close();
             else if (event.type == sf::Event::Resized)
                 onResize(event);
         }
@@ -236,7 +179,7 @@ int main() {
     m.cleanup();
 
     ImGui::SFML::Shutdown();
-    screen.window.close();
+    scene.window.close();
     return 0;
 }
 
@@ -245,35 +188,35 @@ void onResize(const sf::Event &event) {
 }
 
 void launchItem(float dt) {
-    RigidBody rb(1.0f, Camera::defaultCamera.cameraPos);
-    rb.transferEnergy(100.0f, Camera::defaultCamera.cameraFront);
+    RigidBody rb(1.0f, cam.cameraPos);
+    rb.transferEnergy(100.0f, cam.cameraFront);
     rb.applyAcceleration(Environment::gravitationalAcceleration);
     launchObjects.instances.push_back(rb);
 }
 
-void userInput(sf::Window &window, float dt) {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-        window.close();
+void userInput(Scene &scene, float dt) {
+    scene.processInput(dt);
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::L))
-        flashlightOn = !flashlightOn;
+    // update flash light
+    if (States::isActive(&scene.activeSpotLights, 0)) {
+        scene.spotLights[0]->position = scene.getActiveCamera()->cameraPos;
+        scene.spotLights[0]->direction = scene.getActiveCamera()->cameraFront;
+    }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        Camera::defaultCamera.updateCameraPos(CameraDirection::FORWARD, dt);
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        Camera::defaultCamera.updateCameraPos(CameraDirection::BACKWARD, dt);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        Camera::defaultCamera.updateCameraPos(CameraDirection::RIGHT, dt);
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        Camera::defaultCamera.updateCameraPos(CameraDirection::LEFT, dt);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        Camera::defaultCamera.updateCameraPos(CameraDirection::UP, dt);
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-        Camera::defaultCamera.updateCameraPos(CameraDirection::DOWN, dt);
+    if (Keyboard::key(sf::Keyboard::Escape)) {
+        scene.setShouldClose(true);
+    }
 
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-        Camera::defaultCamera.mouseCursorPosition(sf::Mouse::getPosition(window), window);
+    if (Keyboard::key(sf::Keyboard::L)) {
+        States::toggle(&scene.activeSpotLights, 0); // toggle spot light
+    }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+    if (Keyboard::key(sf::Keyboard::F))
         launchItem(dt);
+
+    for (int i = 0; i < 4; i++) {
+        if (Keyboard::key(static_cast<sf::Keyboard::Key>(sf::Keyboard::Num1 + i))) {
+            States::toggle(&scene.activePointLights, i);
+        }
+    }
 }

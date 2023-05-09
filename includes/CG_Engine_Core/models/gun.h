@@ -2,7 +2,7 @@
 #define CG_ENGINE_GUN_H
 
 #include "../model.h"
-#include "../camera.h"
+#include <CG_Engine_Core/UI/camera.h>
 #include "box.h"
 
 class Gun : public Model {

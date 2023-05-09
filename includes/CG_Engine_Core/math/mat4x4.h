@@ -128,6 +128,13 @@ public:
         return *this;
     }
 
+    Mat4x4 &operator=(const Vec3 &v) {
+        matrix[0][0] = v.x;
+        matrix[1][0] = v.y;
+        matrix[2][0] = v.z;
+        return *this;
+    }
+
     Vec4 operator*(const Vec4 &vec) const {
         Vec4 result;
         result.x = matrix[0][0] * vec.x + matrix[1][0] * vec.y + matrix[2][0] * vec.z + matrix[3][0] * vec.w;
