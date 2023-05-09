@@ -9,82 +9,144 @@
 #include <CG_Engine_Core/vertex/vbuffer.h>
 #include <CG_Engine_Core/vertex/varray.h>
 #include <CG_Engine_Core/vertex/vearray.h>
+#include "texture.h"
 
 struct Vertex {
-    Vec3 Position;
-    Vec3 Normal;
-    Vec2 TexCoords;
-};
+    Vec3 pos;
+    Vec3 normal;
+    Vec2 texCoord;
 
-struct Texture {
-    unsigned int id;
-    std::string type;
-    std::string path;
+    static std::vector<Vertex> genList(float *vertices, int noVertices) {
+        std::vector<Vertex> ret(noVertices);
+
+        int stride = sizeof(Vertex) / sizeof(float);
+
+        for (int i = 0; i < noVertices; i++) {
+            ret[i].pos = Vec3(
+                    vertices[i * stride + 0],
+                    vertices[i * stride + 1],
+                    vertices[i * stride + 2]
+            );
+
+            ret[i].normal = Vec3(
+                    vertices[i * stride + 3],
+                    vertices[i * stride + 4],
+                    vertices[i * stride + 5]
+            );
+
+            ret[i].texCoord = Vec2(
+                    vertices[i * stride + 6],
+                    vertices[i * stride + 7]
+            );
+        }
+
+        return ret;
+    };
 };
 
 class Mesh {
-private:
-    veArray<unsigned int> EBO;
-    vArray VAO;
-    vBuffer<Vertex> VBO;
-
-    void setupMesh() {
-        VBO = vBuffer<Vertex>(&vertices[0], vertices.size() * sizeof(Vertex));
-        EBO = veArray(&index[0], index.size() * sizeof(unsigned int));
-
-        // Position Attribute
-        vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) 0);
-
-        // Normals Attribute
-        vArray::attrPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Normal));
-
-        // Texture Attribute
-        vArray::attrPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, TexCoords));
-
-        glEnableVertexAttribArray(0);
-    }
-
 public:
-    // Mesh Data
     std::vector<Vertex> vertices;
-    std::vector<unsigned int> index;
+    std::vector<unsigned int> indices;
+    unsigned int VAO{};
+
     std::vector<Texture> textures;
+    aiColor4D diffuse;
+    aiColor4D specular;
 
-    // Constructors
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> index, std::vector<Texture> textures) {
-        this->vertices = std::move(vertices);
-        this->index = std::move(index);
-        this->textures = std::move(textures);
-
-        this->setupMesh();
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures = {})
+            : vertices(std::move(vertices)), indices(std::move(indices)), textures(std::move(textures)), noTex(false) {
+        setup();
     }
 
-    void Draw(Shader &shader) {
-        unsigned int diffuseNr = 1;
-        unsigned int specularNr = 1;
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, aiColor4D diffuse, aiColor4D specular)
+            : vertices(std::move(vertices)), indices(std::move(indices)), diffuse(diffuse), specular(specular),
+              noTex(true) {
+        setup();
+    }
 
-        for (int i = 0; i < textures.size(); i++) {
-            glActiveTexture(GL_TEXTURE0 + i);
+    void render(Shader shader) {
+        if (noTex) {
+            // materials
+            shader.set4Float("material.diffuse", diffuse);
+            shader.set4Float("material.specular", specular);
+            shader.setInt("noTex", 1);
+        } else {
+            // textures
+            unsigned int diffuseIdx = 0;
+            unsigned int specularIdx = 0;
 
-            std::string name = textures[i].type;
-            std::string number;
+            for (unsigned int i = 0; i < textures.size(); i++) {
+                // activate texture
+                glActiveTexture(GL_TEXTURE0 + i);
 
-            if (name == "texture_diffuse")
-                number = std::to_string(diffuseNr++);
-            else if (name == "texture_specular")
-                number = std::to_string(specularNr++);
+                // retrieve texture info
+                std::string name;
+                switch (textures[i].type) {
+                    case aiTextureType_DIFFUSE:
+                        name = "diffuse" + std::to_string(diffuseIdx++);
+                        break;
+                    case aiTextureType_SPECULAR:
+                        name = "specular" + std::to_string(specularIdx++);
+                        break;
+                }
 
-            shader.setFloat("material." + name + number, i);
-            glBindTexture(GL_TEXTURE_2D, textures[i].id);
+                // set the shader value
+                shader.setInt(name, i);
+                // bind texture
+                textures[i].bind();
+            }
         }
 
-        glActiveTexture(GL_TEXTURE0);
-
-        // Draw Mesh
-        this->VAO.bind();
-        glDrawElements(GL_TRIANGLES, index.size(), GL_UNSIGNED_INT, 0);
+        // EBO stuff
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
-    }
+
+        // reset
+        glActiveTexture(GL_TEXTURE0);
+    };
+
+    void cleanup() {
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
+        glDeleteBuffers(1, &EBO);
+    };
+
+private:
+    unsigned int VBO{}, EBO{};
+
+    bool noTex;
+
+    void setup() {
+        // create buffers/arrays
+        glGenVertexArrays(1, &VAO); // vertex array object
+        glGenBuffers(1, &VBO); // vertex buffer object
+        glGenBuffers(1, &EBO); // element buffer object
+
+        glBindVertexArray(VAO);
+
+        // load data into VBO
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+
+        // load data into EBO
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+        // set vertex attribute pointers
+        // vertex.position
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) 0);
+        // vertex.normal
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) (offsetof(Vertex, normal)));
+        // vertex.texCoord
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) (offsetof(Vertex, texCoord)));
+
+        glBindVertexArray(0);
+    };
 };
 
 #endif //CG_ENGINE_MESH_H

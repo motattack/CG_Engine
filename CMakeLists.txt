@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-set(ENGINE_PROJECT_NAME CG_Engine_Core)
+set(ENGINE_PROJECT_NAME CG_Engine)
 project(${ENGINE_PROJECT_NAME})
 
 # Set the path to the GLEW library and include directory

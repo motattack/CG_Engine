@@ -1,104 +1,49 @@
-#ifndef CG_ENGINE_CAMERA_H
-#define CG_ENGINE_CAMERA_H
+#ifndef CAMERA_H
+#define CAMERA_H
 
-#include <GL/glew.h>
-#include <vector>
-#include <CG_Engine_Core/math/vec3.h>
-#include <CG_Engine_Core/math/mat4x4.h>
-#include <CG_Engine_Core/math/common.h>
+#include "CG_Engine_Core/math/vec3.h"
+#include "CG_Engine_Core/math/mat4x4.h"
+#include "CG_Engine_Core/math/common.h"
 
-enum Camera_Movement {
-    FORWARD, BACKWARD,
-    LEFT, RIGHT,
-    UP, DOWN
+enum class CameraDirection {
+    NONE = 0,
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN
 };
 
-const float YAW = -90.0f;
-const float PITCH = -0.0f;
-const float SPEED = 2.5f;
-const float SENSITIVITY = 0.1f;
-const float ZOOM = 45.0f;
-
 class Camera {
-private:
-    void updateCameraVectors() {
-        Vec3 direction;
-        direction.x = std::cos(radians(this->Yaw)) * std::cos(radians(this->Pitch));
-        direction.y = std::sin(radians(this->Pitch));
-        direction.z = std::sin(radians(this->Yaw)) * std::cos(radians(this->Pitch));
-        this->Front = direction.normalize();
-
-        // Also re-calculate for Right and Up vectors
-        this->Right = this->Front.crossProduct(this->WorldUp).normalize();
-        this->Up = this->Right.crossProduct(this->Front).normalize();
-    }
-
 public:
-    Vec3 Position;
-    Vec3 Front, Up;
-    Vec3 WorldUp;
-    Vec3 Right;
+    static Camera defaultCamera;
 
-    // Euler Angles
-    float Yaw;
-    float Pitch;
+    Vec3 cameraPos;
 
-    //Camera Options
-    float MovementSpeed;
-    float MouseSensitivity;
-    float Zoom;
+    Vec3 cameraFront;
+    Vec3 cameraUp;
+    Vec3 cameraRight;
 
-    explicit Camera(Vec3 position = Vec3(0.0f), Vec3 up = Vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH)
-            : Front(Vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM) {
-        this->Position = position;
-        this->WorldUp = up;
-        this->Yaw = yaw;
-        this->Pitch = pitch;
+    Vec3 worldUp;
+
+    float yaw; // x-axis
+    float pitch; // y-axis
+    float speed;
+    float sensitivity;
+    float zoom;
+
+    explicit Camera(Vec3 position)
+            : cameraPos(position),
+              worldUp(Vec3(0.0f, 1.0f, 0.0f)),
+              yaw(0.0f),
+              pitch(0.0f),
+              speed(2.5f),
+              sensitivity(1.0f),
+              zoom(45.0f),
+              cameraFront(Vec3(1.0f, 0.0f, 0.0f)) {
         updateCameraVectors();
-    }
-
-    Mat4x4 GetViewMatrix() const {
-        return Mat4x4::lookAt(this->Position, this->Position + this->Front, this->Up);
-    }
-
-    void ProcessMouseMovement(float xoffset, float yoffset) {
-        xoffset *= this->MouseSensitivity;
-        yoffset *= this->MouseSensitivity;
-
-        this->Yaw += xoffset;
-        this->Pitch += yoffset;
-
-        if (this->Pitch >= 89.0f)
-            this->Pitch = 89.0f;
-        if (this->Pitch <= -89.0f)
-            this->Pitch = -89.0f;
-
-        updateCameraVectors();
-    }
-
-    void ProcessKeyboard(Camera_Movement direction, float deltaTime) {
-        const float velocity = this->MovementSpeed * deltaTime;
-        if (direction == FORWARD)
-            this->Position += this->Front * velocity;
-        if (direction == BACKWARD)
-            this->Position -= this->Front * velocity;
-        if (direction == RIGHT)
-            this->Position += this->Right * velocity;
-        if (direction == LEFT)
-            this->Position -= this->Right * velocity;
-        if (direction == UP)
-            this->Position += this->Up * velocity;
-        if (direction == DOWN)
-            this->Position -= this->Up * velocity;
-    }
-
-    void ProcessMouseScroll(float yoffset) {
-        this->Zoom -= float(yoffset);
-        if (Zoom >= 45.0f)
-            Zoom = 45.0f;
-        if (Zoom <= 20.0f)
-            Zoom = 20.0f;
-    }
+    };
 
     void mouseCursorPosition(const sf::Vector2i pos, sf::Window &window) {
         sf::Vector2i center(window.getSize().x / 2, window.getSize().y / 2);
@@ -110,12 +55,75 @@ public:
         float xoffset = xpos - center.x;
         float yoffset = center.y - ypos;
 
-        ProcessMouseMovement(xoffset, yoffset);
+        updateCameraDirection(xoffset, yoffset);
     }
 
-    void mouseScrollCallback(const sf::Event &event) {
-        ProcessMouseScroll(event.mouseWheelScroll.delta);
-    }
+    void updateCameraDirection(float dx, float dy) {
+        yaw += dx;
+        pitch += dy;
+
+        if (pitch > 89.0f) {
+            pitch = 89.0f;
+        }
+        if (pitch < -89.0f) {
+            pitch = -89.0f;
+        }
+
+        updateCameraVectors();
+    }; // moving mouse
+    void updateCameraPos(CameraDirection direction, double dt) {
+        float velocity = (float) dt * speed;
+
+        switch (direction) {
+            case CameraDirection::FORWARD:
+                cameraPos += cameraFront * velocity;
+                break;
+            case CameraDirection::BACKWARD:
+                cameraPos -= cameraFront * velocity;
+                break;
+            case CameraDirection::RIGHT:
+                cameraPos += cameraRight * velocity;
+                break;
+            case CameraDirection::LEFT:
+                cameraPos -= cameraRight * velocity;
+                break;
+            case CameraDirection::UP:
+                cameraPos += cameraUp * velocity;
+                break;
+            case CameraDirection::DOWN:
+                cameraPos -= cameraUp * velocity;
+                break;
+        }
+    }; // keyboard input
+    void updateCameraZoom(float dy) {
+        if (zoom >= 1.0f && zoom <= 45.0f) {
+            zoom -= dy;
+        } else if (zoom < 1.0f) {
+            zoom = 1.0f;
+        } else { // > 45.0f
+            zoom = 45.0f;
+        }
+    }; // scroll wheel
+
+    [[nodiscard]] Mat4x4 getViewMatrix() const {
+        return Mat4x4::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    };
+
+    [[nodiscard]] float getZoom() const {
+        return zoom;
+    };
+
+private:
+    void updateCameraVectors() {
+        Vec3 direction;
+        direction.x = cosf(radians(yaw)) * cosf(radians(pitch));
+        direction.y = sinf(radians(pitch));
+        direction.z = sinf(radians(yaw)) * cosf(radians(pitch));
+        cameraFront = direction.normalize();
+
+        cameraRight = cameraFront.crossProduct(worldUp).normalize();
+        cameraUp = cameraRight.crossProduct(cameraFront).normalize();
+    };
 };
 
-#endif //CG_ENGINE_CAMERA_H
+#endif

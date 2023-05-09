@@ -10,250 +10,219 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stb_image.h>
+#include <stack>
+#include "CG_Engine_Core/UI/screen.h"
+#include "CG_Engine_Core/light.h"
+#include "CG_Engine_Core/models/lamp.h"
+#include "CG_Engine_Core/models/gun.h"
+#include "CG_Engine_Core/models/sphere.h"
+#include "CG_Engine_Core/physics/evn.h"
 
-#define SCR_WIDTH 1200
-#define SCR_HEIGHT 900
-
-// pos and color and TexCoords
-float vertex[] = {
-        /* Top Position */        /* Color */            /* TexCoords */        /* Normals */
-        -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        /* Bottom Position */        /* Color */            /* TexCoords */        /* Normals */
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-        /* Left Position */        /* Color */            /* TexCoords */            /* Normals */
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-        /* Right Position */        /* Color */            /* TexCoords */         /* Normals */
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        /* Back Position */        /* Color */            /* TexCoords */        /* Normals */
-        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        /* Front Position */        /* Color */            /* TexCoords */        /* Normals */
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-};
-
-Vec3 pointLightPositions[] = {
-        Vec3(0.7f, 0.2f, 2.0f),
-        Vec3(2.3f, -3.3f, -4.0f),
-        Vec3(-4.0f, 2.0f, -12.0f),
-        Vec3(0.0f, 0.0f, -3.0f)
-};
-
-void userInput(sf::Window &window);
+void onResize(const sf::Event &event); // Protype
+void userInput(sf::Window &window, float dt);
 
 // Matrix's
 Mat4x4 projection;
 Mat4x4 model;
 Mat4x4 view;
 
-Vec3 lightPos = Vec3(1.2f, 1.0f, 1.5f);
+Screen screen;
+
+bool flashlightOn = false;
+double dt = 0.0f; // tme btwn frames
 
 // Camera
-Camera camera(Vec3(0.0f, 0.0f, 3.0f));
+Camera Camera::defaultCamera(Vec3(0.0f, 0.0f, 0.0f));
 
 
 // Frames
-float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+SphereArray launchObjects;
 
 
 int main() {
-    sf::ContextSettings settings;
-    settings.depthBits = 24;
-    settings.stencilBits = 8;
-    settings.majorVersion = 4;
-    settings.minorVersion = 6;
-    settings.attributeFlags = sf::ContextSettings::Default;
-
-    sf::RenderWindow window(sf::VideoMode(SCR_WIDTH, SCR_HEIGHT, 32), "First Window",
-                            sf::Style::Titlebar | sf::Style::Close, settings);
-    window.setVisible(true);
-    window.setFramerateLimit(75);
-
-    ImGui::SFML::Init(window, true);
-
-    // Enable docking
-    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
     glewExperimental = GL_TRUE;
 
     if (GLEW_OK != glewInit()) {
         std::cout << "Error: glew not init =(" << std::endl;
         return -1;
     }
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
 
-    vBuffer VBO(vertex, sizeof(vertex));
-    vArray VAO;
+    if (!screen.init()) {
+        std::cout << "Could not open window" << std::endl;
+        return -1;
+    }
 
-    vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) nullptr);
+    screen.setParameters();
 
-    vArray::attrPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (3 * sizeof(float)));
+    // SHADERS===============================
+    Shader shader("res/assets/object.vs", "res/assets/object.fs");
+    Shader lampShader("res/assets/object.vs", "res/assets/lamp.fs");
 
-    vArray::attrPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (6 * sizeof(float)));
+    // MODELS==============================
+    launchObjects.init();
 
-    // Normals Attribute
-    vArray::attrPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (8 * sizeof(float)));
+    // LIGHTS
+    DirLight dirLight = {Vec3(-0.2f, -1.0f, -0.3f), Vec4(0.1f, 0.1f, 0.1f, 1.0f), Vec4(0.4f, 0.4f, 0.4f, 1.0f),
+                         Vec4(0.5f, 0.5f, 0.5f, 1.0f)};
 
-    /* Light Buffers */
-    vArray lightCubeVAO;
-    vBuffer lightCubeVBO(vertex, sizeof(vertex));
+    Vec3 pointLightPositions[] = {
+            Vec3(0.7f, 0.2f, 2.0f),
+            Vec3(2.3f, -3.3f, -4.0f),
+            Vec3(-4.0f, 2.0f, -12.0f),
+            Vec3(0.0f, 0.0f, -3.0f)
+    };
 
-    /* Light Position Attribute */
-    vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) nullptr);
+    Vec4 ambient = Vec4(0.05f, 0.05f, 0.05f, 1.0f);
+    Vec4 diffuse = Vec4(0.8f, 0.8f, 0.8f, 1.0f);
+    Vec4 specular = Vec4(1.0f);
+    float k0 = 1.0f;
+    float k1 = 0.09f;
+    float k2 = 0.032f;
 
-    /* Texture */
-    stbi_set_flip_vertically_on_load(true);
+    LampArray lamps;
+    lamps.init();
+    for (auto & pointLightPosition : pointLightPositions) {
+        lamps.lightInstances.push_back(
+                {
+                        pointLightPosition,
+                        k0, k1, k2,
+                        ambient, diffuse, specular
+                });
+    }
 
-    /* Shader */
-    Shader myShader("res/shader/vShader.glsl",
-                    "res/shader/fShader.glsl");
-    Shader lightCubeShader("res/Shader/lCube.vert",
-                           "res/Shader/lCube.frag");
-    myShader.use();
+    SpotLight s = {
+            Camera::defaultCamera.cameraPos, Camera::defaultCamera.cameraFront,
+            cos(radians(12.5f)), cos(radians(20.0f)),
+            1.0f, 0.07f, 0.032f,
+            Vec4(0.0f, 0.0f, 0.0f, 1.0f), Vec4(1.0f), Vec4(1.0f)
+    };
 
     sf::Clock deltaClock, clock;
-    while (window.isOpen()) {
-        /* Update */
-        userInput(window);
-        float time = clock.getElapsedTime().asSeconds();
+    while (screen.window.isOpen()) {
+        // calculate dt
+        float currentTime = clock.getElapsedTime().asSeconds();
+        dt = currentTime - lastFrame;
+        lastFrame = currentTime;
 
-        deltaTime = time - lastFrame;
-        lastFrame = time;
-        float xValue = std::cos(time) / 2.0f + 0.5f; // 0.0f - 1.0f
+        // process input
+        userInput(screen.window, dt);
 
-        // Gui Variables
-        glClearColor(0.7f, 0.7f, 7.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // render
+        Screen::update();
 
-        // First Object
-        myShader.use();
+        // draw shapes
+        shader.activate();
 
-        // Material
-        myShader.setFloat("material.shininess", 64.0f);
+        shader.set3Float("viewPos", Camera::defaultCamera.cameraPos);
 
-        /* Coordinates */
-        // Projection
-        projection = Mat4x4::perspective(radians(camera.Zoom), float(SCR_WIDTH) / float(SCR_HEIGHT), 0.1f, 100.0f);
-        myShader.setMat4x4("projection", projection);
+        dirLight.render(shader);
 
-        // View
-        view = Mat4x4(1.0f);
-        view = camera.GetViewMatrix();
-        myShader.setMat4x4("view", view);
-
-        // Second Object
-        lightCubeShader.use();
-        lightCubeShader.setMat4x4("projection", projection);
-        lightCubeShader.setMat4x4("view", view);
-
-
-        for (auto pointLightPosition: pointLightPositions) {
-            // Model
-            model = Mat4x4(1.0f);
-            model = model.translate(pointLightPosition * xValue);
-            model = model.Scale(Vec3(0.3f));
-            lightCubeShader.setMat4x4("model", model);
-            lightCubeVAO.bind();
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (unsigned int i = 0; i < 4; i++) {
+            lamps.lightInstances[i].render(shader, i);
         }
-        vArray::unbind();
+        shader.setInt("noPointLights", 4);
 
-        // Second Object
-        lightCubeShader.use();
-        lightCubeShader.setMat4x4("projection", projection);
-        lightCubeShader.setMat4x4("view", view);
-        // Model
-        model = Mat4x4(1.0f);
-        model = model.translate(lightPos);
-        model = model.Scale(Vec3(0.3f));
-        lightCubeShader.setMat4x4("model", model);
-        lightCubeVAO.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        vArray::unbind();
+        if (flashlightOn) {
+            s.position = Camera::defaultCamera.cameraPos;
+            s.direction = Camera::defaultCamera.cameraFront;
+            s.render(shader, 0);
+            shader.setInt("noSpotLights", 1);
+        } else {
+            shader.setInt("noSpotLights", 0);
+        }
 
-        ImGui::SFML::Update(window, deltaClock.restart());
+        // create transformation
+        view = Mat4x4(1.0f);
+        projection = Mat4x4(1.0f);
+        view = Camera::defaultCamera.getViewMatrix();
+        projection = Mat4x4::perspective(
+                radians(Camera::defaultCamera.zoom),
+                1200 / 900, 0.1f, 100.0f);
 
-        glEnable(GL_DEPTH_TEST);
+        shader.setMat4("view", view);
+        shader.setMat4("projection", projection);
 
-        float FPS = ImGui::GetIO().Framerate;
-        ImGui::Begin("Frame");
-        ImGui::Text("FPS = %f", FPS);
-        ImGui::End();
+        std::stack<int> removeObjects;
+        for (int i = 0; i < launchObjects.instances.size(); i++) {
+            if ((Camera::defaultCamera.cameraPos - launchObjects.instances[i].pos).len() > 50.0f) {
+                removeObjects.push(i);
+                continue;
+            }
+        }
+        for (int i = 0; i < removeObjects.size(); i++) {
+            launchObjects.instances.erase(launchObjects.instances.begin() + removeObjects.top());
+            removeObjects.pop();
+        }
 
-        ImGui::Begin("Selector");
-        const char *items[] = {"Option 1", "Option 2", "Option 3"};
-        static int current_item = 0;
-        ImGui::Combo("Select an option", &current_item, items, IM_ARRAYSIZE(items));
-        ImGui::End();
+        if (!launchObjects.instances.empty()) {
+            launchObjects.render(shader, dt);
+        }
 
-        ImGui::SFML::Render(window);
+        lampShader.activate();
+        lampShader.setMat4("view", view);
+        lampShader.setMat4("projection", projection);
 
-        glEnable(GL_DEPTH_TEST);
+        lamps.render(lampShader, dt);
 
-        window.display();
+        screen.window.display();
 
         // Poll events
         sf::Event event{};
-        while (window.pollEvent(event)) {
+        while (screen.window.pollEvent(event)) {
             ImGui::SFML::ProcessEvent(event);
             if (event.type == sf::Event::Closed)
-                window.close();
-            else if (event.type == sf::Event::MouseWheelScrolled)
-                camera.mouseScrollCallback(event);
+                screen.window.close();
+            else if (event.type == sf::Event::Resized)
+                onResize(event);
         }
     }
 
+    lamps.cleanup();
+
+    launchObjects.cleanup();
+
     ImGui::SFML::Shutdown();
-    window.close();
+    screen.window.close();
     return 0;
 }
 
-void userInput(sf::Window &window) {
+void onResize(const sf::Event &event) {
+    glViewport(0, 0, event.size.width, event.size.height);
+}
+
+void launchItem(float dt) {
+    RigidBody rb(1.0f, Camera::defaultCamera.cameraPos);
+    rb.transferEnergy(100.0f, Camera::defaultCamera.cameraFront);
+    rb.applyAcceleration(Environment::gravitationalAcceleration);
+    launchObjects.instances.push_back(rb);
+}
+
+void userInput(sf::Window &window, float dt) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         window.close();
 
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::L))
+        flashlightOn = !flashlightOn;
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+        Camera::defaultCamera.updateCameraPos(CameraDirection::FORWARD, dt);
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
+        Camera::defaultCamera.updateCameraPos(CameraDirection::BACKWARD, dt);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+        Camera::defaultCamera.updateCameraPos(CameraDirection::RIGHT, dt);
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        camera.ProcessKeyboard(LEFT, deltaTime);
+        Camera::defaultCamera.updateCameraPos(CameraDirection::LEFT, dt);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        camera.ProcessKeyboard(UP, deltaTime);
+        Camera::defaultCamera.updateCameraPos(CameraDirection::UP, dt);
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-        camera.ProcessKeyboard(DOWN, deltaTime);
+        Camera::defaultCamera.updateCameraPos(CameraDirection::DOWN, dt);
 
     if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-        camera.mouseCursorPosition(sf::Mouse::getPosition(window), window);
+        Camera::defaultCamera.mouseCursorPosition(sf::Mouse::getPosition(window), window);
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+        launchItem(dt);
 }
