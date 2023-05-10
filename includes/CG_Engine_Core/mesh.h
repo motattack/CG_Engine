@@ -63,21 +63,52 @@ public:
     aiColor4D diffuse;
     aiColor4D specular;
 
-    Mesh(BoundingRegion br, std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-         std::vector<Texture> textures = {}) : br(br), vertices(std::move(vertices)), indices(std::move(indices)),
-                                               textures(std::move(textures)),
-                                               noTex(false) {
-        setup();
+    // default constructor
+    Mesh() = default;
+
+    // initialize as textured object
+    explicit Mesh(BoundingRegion br, std::vector<Texture> textures = {}) : br(br), textures(std::move(textures)),
+                                                                           noTex(false) {};
+
+    // initialize as material object
+    Mesh(BoundingRegion br, aiColor4D diff, aiColor4D spec) : br(br), diffuse(diff), specular(spec), noTex(true) {};
+
+    // load vertex and index data
+    void loadData(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices) {
+        this->vertices = _vertices;
+        this->indices = _indices;
+
+        // bind VAO
+        VAO.generate();
+        VAO.bind();
+
+        // generate/set EBO
+        VAO["EBO"] = BufferObject(GL_ELEMENT_ARRAY_BUFFER);
+        VAO["EBO"].generate();
+        VAO["EBO"].bind();
+        VAO["EBO"].setData<GLuint>(this->indices.size(), &this->indices[0], GL_STATIC_DRAW);
+
+        // load data into vertex buffers
+        VAO["VBO"] = BufferObject(GL_ARRAY_BUFFER);
+        VAO["VBO"].generate();
+        VAO["VBO"].bind();
+        VAO["VBO"].setData<Vertex>(this->vertices.size(), &this->vertices[0], GL_STATIC_DRAW);
+
+        // set the vertex attribute pointers
+        VAO["VBO"].bind();
+        // vertex Positions
+        VAO["VBO"].setAttPointer<GLfloat>(0, 3, GL_FLOAT, 8, 0);
+        // normal ray
+        VAO["VBO"].setAttPointer<GLfloat>(1, 3, GL_FLOAT, 8, 3);
+        // vertex texture coords
+        VAO["VBO"].setAttPointer<GLfloat>(2, 3, GL_FLOAT, 8, 6);
+
+        VAO["VBO"].clear();
+
+        ArrayObject::clear();
     };
 
-    Mesh(BoundingRegion br, std::vector<Vertex> vertices, std::vector<unsigned int> indices, aiColor4D diffuse,
-         aiColor4D specular) : br(br), vertices(std::move(vertices)), indices(std::move(indices)), diffuse(diffuse),
-                               specular(specular),
-                               noTex(true) {
-        setup();
-    };
-
-    void render(Shader shader, Vec3 pos, Vec3 size, Box *box, bool doRender = true) {
+    void render(Shader shader, unsigned int noInstances) {
         if (noTex) {
             // materials
             shader.set4Float("material.diffuse", diffuse);
@@ -110,16 +141,11 @@ public:
             }
         }
 
-        if (doRender) {
-            box->addInstance(br, pos, size);
+        VAO.bind();
+        VAO.draw(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, noInstances);
+        ArrayObject::clear();
 
-            VAO.bind();
-            VAO.draw(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-            ArrayObject::clear();
-
-            // reset
-            glActiveTexture(GL_TEXTURE0);
-        }
+        glActiveTexture(GL_TEXTURE0);
     };
 
     void cleanup() {
@@ -129,7 +155,7 @@ public:
 private:
     unsigned int VBO{}, EBO{};
 
-    bool noTex;
+    bool noTex{};
 
     void setup() {
         // create buffers/arrays

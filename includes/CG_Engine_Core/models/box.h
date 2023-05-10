@@ -2,12 +2,10 @@
 #define CG_ENGINE_BOX_H
 
 #include <vector>
-#include <CG_Engine_Core/math/vec3.h>
-#include <CG_Engine_Core/math/mat4x4.h>
 #include <GL/glew.h>
 #include <CG_Engine_Core/shader.h>
-#include "CG_Engine_Core/algo/bounds.h"
-#include "CG_Engine_Core/glmemory.h"
+#include <CG_Engine_Core/algo/bounds.h>
+#include <CG_Engine_Core/glmemory.h>
 
 #define UPPER_BOUND 100
 

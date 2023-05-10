@@ -10,13 +10,28 @@
 #include <CG_Engine_Core/math/vec3.h>
 #include <CG_Engine_Core/light.h>
 #include <CG_Engine_Core/algo/states.h>
+#include <CG_Engine_Core/algo/octree.h>
 #include <imgui.h>
 #include <imgui-SFML.h>
 #include "CG_Engine_Core/UI/mouse.h"
 #include "CG_Engine_Core/UI/keyboard.h"
 
+// forward declarations
+namespace Octree {
+    class node;
+}
+
+class Model;
+
 class Scene {
 public:
+    trie::Trie<Model *> models;
+    trie::Trie<RigidBody *> instances;
+
+    std::vector<RigidBody *> instancesToDelete;
+
+    Octree::node *octree;
+
     /*
         callbacks
     */
@@ -30,14 +45,12 @@ public:
     /*
         constructor
     */
-    Scene() : window(sf::VideoMode(scrWidth, scrHeight, 32), "First Window",
-                     sf::Style::Titlebar | sf::Style::Close, settings) {
-    };
+    Scene() : currentId("aaaaaaaa") {}
 
     Scene(const char *title, unsigned int scrWidth, unsigned int scrHeight) : title(title),
                                                                               activeCamera(-1),
-                                                                              activePointLights(0),
-                                                                              activeSpotLights(0) {
+                                                                              activePointLights(0), activeSpotLights(0),
+                                                                              currentId("aaaaaaaa") {
 
 
         this->scrWidth = scrWidth;
@@ -50,8 +63,6 @@ public:
         initialization
     */
     bool init() {
-
-
         window.setFramerateLimit(75);
         window.setVerticalSyncEnabled(true);
         window.setActive(true);
@@ -81,7 +92,13 @@ public:
 
         glEnable(GL_DEPTH_TEST);
 
+        octree = new Octree::node(BoundingRegion(Vec3(-16.0f), Vec3(16.0f)));
+
         return true;
+    };
+
+    void prepare(Box &box) {
+        octree->update(box);
     };
 
     /*
@@ -90,13 +107,18 @@ public:
     // process input
     void processInput(float dt) {
         if (activeCamera != -1 && activeCamera < cameras.size()) {
-            // active camera exists
 
             // set camera direction
-            cameras[activeCamera]->updateCameraDirection(Mouse::getDX(), Mouse::getDY());
+            double dx = Mouse::getDX(), dy = Mouse::getDY();
+            if (dx != 0 || dy != 0) {
+                cameras[activeCamera]->updateCameraDirection(dx, dy);
+            }
 
             // set camera zoom
-            cameras[activeCamera]->updateCameraZoom(Mouse::getScrollDY());
+            double scrollDy = Mouse::getScrollDY();
+            if (scrollDy != 0) {
+                cameras[activeCamera]->updateCameraZoom(scrollDy);
+            }
 
             // set camera pos
             if (Keyboard::key(sf::Keyboard::W)) {
@@ -129,8 +151,7 @@ public:
             // set pos at end
             cameraPos = cameras[activeCamera]->cameraPos;
         }
-    }
-
+    };
 
     // update screen before each frame
     void update() {
@@ -138,20 +159,27 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     };
 
-    void newFrame() {
-        window.display();
-    }
+    // update screen after frame
+    void newFrame(Box &box) {
+        box.positions.clear();
+        box.sizes.clear();
 
+        // process pending
+        octree->processPending();
+        octree->update(box);
+
+        window.display();
+    };
 
     // set uniform shader varaibles (lighting, etc)
-    void render(Shader shader, bool applyLighting = true) {
+    void renderShader(Shader shader, bool applyLighting = true) {
         // activate shader
         shader.activate();
 
         // set camera values
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
-        shader.set4Float("viewPos", cameraPos);
+        shader.set3Float("viewPos", cameraPos);
 
         // lighting
         if (applyLighting) {
@@ -184,10 +212,20 @@ public:
         }
     };
 
+    void renderInstances(std::string modelId, Shader shader, float dt) {
+        models[modelId]->render(shader, dt, this);
+    };
+
     /*
         cleanup method
     */
     void cleanup() {
+        models.traverse([](Model *model) -> void {
+            model->cleanup();
+        });
+
+        octree->destroy();
+
         window.close();
     };
 
@@ -195,8 +233,8 @@ public:
         accessors
     */
     bool shouldClose() {
-        return !window.isOpen(); // Return true if the SFML window is closed
-    }
+        return !window.isOpen();
+    };
 
     Camera *getActiveCamera() {
         return (activeCamera >= 0 && activeCamera < cameras.size()) ? cameras[activeCamera] : nullptr;
@@ -217,39 +255,104 @@ public:
     };
 
     /*
+        Model/instance methods
+    */
+    void registerModel(Model *model) {
+        models.insert(model->id, model);
+    };
+
+    RigidBody *generateInstance(std::string modelId, Vec3 size, float mass, Vec3 pos) {
+        RigidBody *rb = models[modelId]->generateInstance(size, mass, pos);
+        if (rb) {
+            // successfully generated
+            std::string id = generateId();
+            rb->instanceId = id;
+            instances.insert(id, rb);
+            octree->addToPending(rb, models);
+            return rb;
+        }
+        return nullptr;
+    };
+
+    void initInstances() {
+        models.traverse([](Model *model) -> void {
+            model->initInstances();
+        });
+    };
+
+    void loadModels() {
+        models.traverse([](Model *model) -> void {
+            model->init();
+        });
+    };
+
+    void removeInstance(std::string instanceId) {
+        std::string targetModel = instances[instanceId]->modelId;
+
+        models[targetModel]->removeInstance(instanceId);
+
+        instances[instanceId] = nullptr;
+
+        instances.erase(instanceId);
+    };
+
+    void markForDeletion(std::string instanceId) {
+        States::activate(&instances[instanceId]->state, INSTANCE_DEAD);
+        instancesToDelete.push_back(instances[instanceId]);
+    };
+
+    void clearDeadInstances() {
+        for (RigidBody *rb: instancesToDelete) {
+            removeInstance(rb->instanceId);
+        }
+        instancesToDelete.clear();
+    };
+
+    std::string currentId;
+
+    std::string generateId() {
+        for (int i = currentId.length() - 1; i >= 0; i--) {
+            if ((int) currentId[i] != (int) 'z') {
+                currentId[i] = (char) (((int) currentId[i]) + 1);
+                break;
+            } else {
+                currentId[i] = 'a';
+            }
+        }
+        return currentId;
+    };
+
+    /*
         lights
     */
     // list of point lights
     std::vector<PointLight *> pointLights;
-    unsigned int activePointLights{};
+    unsigned int activePointLights;
     // list of spot lights
     std::vector<SpotLight *> spotLights;
-    unsigned int activeSpotLights{};
+    unsigned int activeSpotLights;
     // direction light
-    DirLight *dirLight{};
-    bool dirLightActive{};
+    DirLight *dirLight;
+    bool dirLightActive;
 
     /*
         camera
     */
     std::vector<Camera *> cameras;
-    unsigned int activeCamera{};
+    unsigned int activeCamera;
     Mat4x4 view;
     Mat4x4 projection;
-    Mat4x4 cameraPos;
+    Vec3 cameraPos;
     sf::RenderWindow window;
 protected:
-    // window object
-
     sf::ContextSettings settings;
 
     // window vals
-    const char *title{};
-    unsigned int scrWidth = 800;
-    unsigned int scrHeight = 600;
+    const char *title;
+    unsigned int scrWidth;
+    unsigned int scrHeight;
 
     float bg[4]{}; // background color
 };
-
 
 #endif //CG_ENGINE_SCENE_H

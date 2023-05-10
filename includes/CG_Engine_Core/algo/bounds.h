@@ -2,6 +2,12 @@
 #define CG_ENGINE_BOUNDS_H
 
 #include <CG_Engine_Core/math/vec3.h>
+#include "CG_Engine_Core/physics/rigidbody.h"
+
+// forward declaration
+namespace Octree {
+    class node;
+}
 
 enum class BoundTypes : unsigned char {
     AABB = 0x00,    // 0x00 = 0	// Axis-aligned bounding box
@@ -12,31 +18,56 @@ class BoundingRegion {
 public:
     BoundTypes type;
 
+    // pointer for quick access to instance
+    RigidBody *instance;
+
+    // pointer for quick access to current octree node
+    Octree::node *cell;
+
     // sphere values
     Vec3 center;
     float radius;
 
+    Vec3 ogCenter;
+    float ogRadius;
+
     // bounding box values
     Vec3 min;
     Vec3 max;
+
+    Vec3 ogMin;
+    Vec3 ogMax;
 
     /*
         Constructors
     */
 
     // initialize with type
-    BoundingRegion(BoundTypes type) : type(type) {};
+    BoundingRegion(BoundTypes type = BoundTypes::AABB) : type(type) {};
 
     // initialize as sphere
-    BoundingRegion(Vec3 center, float radius) : type(BoundTypes::SPHERE), center(center), radius(radius) {}
-
+    BoundingRegion(Vec3 center, float radius) : type(BoundTypes::SPHERE), center(center), ogCenter(center),
+                                                radius(radius), ogRadius(radius) {};
 
     // initialize as AABB
-    BoundingRegion(Vec3 min, Vec3 max) : type(BoundTypes::AABB), min(min), max(max) {};
+    BoundingRegion(Vec3 min, Vec3 max) : type(BoundTypes::AABB), min(min), ogMin(min), max(max), ogMax(max) {};
 
     /*
         Calculating values for the region
     */
+
+    // transform for instance
+    void transform() {
+        if (instance) {
+            if (type == BoundTypes::AABB) {
+                min = ogMin * instance->size + instance->pos;
+                max = ogMax * instance->size + instance->pos;
+            } else {
+                center = ogCenter * instance->size + instance->pos;
+                radius = ogRadius * instance->size.x;
+            }
+        }
+    };
 
     // center
     Vec3 calculateCenter() {
@@ -46,7 +77,7 @@ public:
     // calculate dimensions
     Vec3 calculateDimensions() {
         return (type == BoundTypes::AABB) ? (max - min) : Vec3(2.0f * radius);
-    }
+    };
 
     /*
         testing methods
@@ -58,7 +89,7 @@ public:
             // box - point must be larger than man and smaller than max
             return (pt.x >= min.x) && (pt.x <= max.x) &&
                    (pt.y >= min.y) && (pt.y <= max.y) &&
-                   (pt.z >= min.z) && (pt.z <= min.z);
+                   (pt.z >= min.z) && (pt.z <= max.z);
         } else {
             // sphere - distance must be less than radius
             // x^2 + y^2 + z^2 <= r^2
@@ -132,19 +163,12 @@ public:
             return (center - br.center).len() < (radius + br.radius);
         } else if (type == BoundTypes::SPHERE) {
             // this is a sphere, br is a box
-
-            // determine if sphere is above top, below bottom, etc
-            // find distance (squared) to the closest plane
             float distSquared = 0.0f;
             for (int i = 0; i < 3; i++) {
-                if (center[i] < br.min[i]) {
-                    // beyond min
-                    distSquared += (br.min[i] - center[i]) * (br.min[i] * center[i]);
-                } else if (center[i] > br.max[i]) {
-                    // beyond max
-                    distSquared += (center[i] - br.max[i]) * (center[i] - br.max[i]);
-                }
-                // else inside
+                // determine closest side
+                float closestPt = std::max(br.min[i], std::min(center[i], br.max[i]));
+                // add distance
+                distSquared += (closestPt - center[i]) * (closestPt - center[i]);
             }
 
             return distSquared < (radius * radius);
@@ -152,6 +176,19 @@ public:
             // this is a box, br is a sphere
             // call algorithm for br (defined in preceding else if block)
             return br.intersectsWith(*this);
+        }
+    };
+
+    // operator overload
+    bool operator==(BoundingRegion br) {
+        if (type != br.type) {
+            return false;
+        }
+
+        if (type == BoundTypes::AABB) {
+            return min == br.min && max == br.max;
+        } else {
+            return center == br.center && radius == br.radius;
         }
     };
 };
