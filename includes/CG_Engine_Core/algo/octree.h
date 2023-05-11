@@ -1,8 +1,6 @@
 #ifndef CG_ENGINE_OCTREE_H
 #define CG_ENGINE_OCTREE_H
-
-#define NO_CHILDREN 8
-#define MIN_BOUNDS 0.5
+// T
 
 #include <vector>
 #include <queue>
@@ -13,6 +11,10 @@
 #include <CG_Engine_Core/algo/bounds.h>
 #include <CG_Engine_Core/algo/trie.h>
 #include <CG_Engine_Core/model.h>
+#include <CG_Engine_Core/models/box.h>
+
+#define NO_CHILDREN 8
+#define MIN_BOUNDS 0.5
 
 // forward declaration
 class Model;
@@ -141,6 +143,7 @@ namespace Octree {
 
         // build tree (called during initialization)
         void build() {
+            // variable declarations
             BoundingRegion octants[NO_CHILDREN];
             Vec3 dimensions = region.calculateDimensions();
             std::vector<BoundingRegion> octLists[NO_CHILDREN]; // array of lists of objects in each octant
@@ -375,10 +378,10 @@ namespace Octree {
         // dynamically insert object into node
         bool insert(BoundingRegion obj) {
             /*
-        termination conditions
-        - no objects (an empty leaf node)
-        - dimensions are less than MIN_BOUNDS
-    */
+       termination conditions
+       - no objects (an empty leaf node)
+       - dimensions are less than MIN_BOUNDS
+   */
 
             Vec3 dimensions = region.calculateDimensions();
             if (objects.size() == 0 ||
@@ -502,4 +505,5 @@ namespace Octree {
         };
     };
 }
+
 #endif //CG_ENGINE_OCTREE_H

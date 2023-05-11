@@ -1,8 +1,15 @@
 #ifndef CG_ENGINE_STATES_H
 #define CG_ENGINE_STATES_H
 
+// t
+
+/*
+    namespace to tie together all states functions
+*/
+
 namespace States {
     /*
+        for example
         states = 10001101
     */
 

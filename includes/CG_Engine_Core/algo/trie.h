@@ -1,11 +1,19 @@
 #ifndef CG_ENGINE_TRIE_H
 #define CG_ENGINE_TRIE_H
+// T
 
 #include <vector>
 #include <string>
 #include <stdexcept>
 
+/*
+    trie namespace to hold together all classes related to trie
+*/
+
 namespace trie {
+    /*
+        range structure to represent bounded range
+    */
     struct Range {
         int lower;
         int upper;
@@ -19,6 +27,7 @@ namespace trie {
         }
     };
 
+    // typedef for list of ranges
     typedef std::vector<Range> charset;
 
     // charsets for keys
@@ -34,15 +43,28 @@ namespace trie {
     /*
         trie node structure
     */
+
     template<typename T>
     struct node {
-        bool exists;                // if data exists
-        T data;                        // data
-        struct node<T> **children;    // array of children
+        /*
+            trie values
+        */
+
+        // if data exists
+        bool exists;
+        // data at node
+        T data;
+        // array of children
+        struct node<T> **children;
+
+        /*
+            accessor
+        */
 
         // traverse into this node and its children
         // send data to callback if data exists
         void traverse(void(*itemViewer)(T data), unsigned int noChildren) {
+            // if has data, call callback
             if (exists) {
                 itemViewer(data);
             }
@@ -67,6 +89,8 @@ namespace trie {
         /*
             constructor
         */
+
+        // default and give specific charset
         Trie(charset chars = alpha_numeric)
                 : chars(chars), noChars(0), root(nullptr) {
             // set number of chars
@@ -92,13 +116,17 @@ namespace trie {
             int idx;
             node<T> *current = root;
 
+            // iterate through sequential key
             for (char c: key) {
+                // convert to index
                 idx = getIdx(c);
                 if (idx == -1) {
+                    // not found
                     return false;
                 }
+
+                // if child doesn't exist, create
                 if (!current->children[idx]) {
-                    // child doesn't exist yet
                     current->children[idx] = new node<T>;
                     current->children[idx]->exists = false;
                     current->children[idx]->children = new node<T> *[noChars];
@@ -106,6 +134,8 @@ namespace trie {
                         current->children[idx]->children[i] = NULL;
                     }
                 }
+
+                // go to child
                 current = current->children[idx];
             }
 
@@ -119,6 +149,7 @@ namespace trie {
         // deletion method
         bool erase(std::string key) {
             if (!root) {
+                // no data exists
                 return false;
             }
 
@@ -129,6 +160,7 @@ namespace trie {
                     return false;
                 }
 
+                // tell compiler this node has no data
                 element->exists = false;
                 return true;
             });
@@ -216,6 +248,7 @@ namespace trie {
 
             for (Range r: chars) {
                 if (r.contains((int) c)) {
+                    // found character in range
                     ret += (int) c - r.lower;
                     break;
                 } else {
@@ -240,6 +273,7 @@ namespace trie {
                 }
             }
 
+            // set node to nullptr
             top = nullptr;
         }
     };

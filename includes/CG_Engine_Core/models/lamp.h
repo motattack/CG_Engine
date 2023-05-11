@@ -1,9 +1,13 @@
 #ifndef CG_ENGINE_CORE_LAMP_H
 #define CG_ENGINE_CORE_LAMP_H
 
-#include "cube.h"
-#include "box.h"
+// T
+
 #include <CG_Engine_Core/light.h>
+#include <CG_Engine_Core/models/box.h>
+#include <CG_Engine_Core/models/cube.h>
+#include <CG_Engine_Core/material.h>
+#include <CG_Engine_Core/shader.h>
 
 class Lamp : public Cube {
 public:

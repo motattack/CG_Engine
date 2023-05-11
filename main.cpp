@@ -1,5 +1,3 @@
-#include <imgui.h>
-#include <imgui-SFML.h>
 #include <iostream>
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
@@ -21,13 +19,11 @@
 
 void userInput(Scene &window, float dt);
 
-//Screen screen;
+// Camera
+Camera cam;
 
 double dt = 0.0f; // tme btwn frames
 float lastFrame = 0.0f;
-
-// Camera
-Camera cam;
 
 Sphere sphere(10);
 
@@ -37,6 +33,7 @@ int main() {
 
     if (!scene.init()) {
         std::cout << "Could not open window" << std::endl;
+        scene.cleanup();
         return -1;
     }
 
@@ -148,7 +145,7 @@ int main() {
 
         // send new frame to window
         scene.newFrame(box);
-        scene.clearDeadInstances();
+
 
         // Poll events
         sf::Event event{};
@@ -158,12 +155,11 @@ int main() {
             if (event.type == sf::Event::Closed)
                 scene.window.close();
         }
+
+        scene.clearDeadInstances();
     }
 
     scene.cleanup();
-
-    ImGui::SFML::Shutdown();
-    scene.window.close();
     return 0;
 }
 
@@ -179,11 +175,11 @@ void launchItem(Scene &scene) {
 void userInput(Scene &scene, float dt) {
     scene.processInput(dt);
 
-    // update flash light
-    if (States::isIndexActive(&scene.activeSpotLights, 0)) {
-        scene.spotLights[0]->position = scene.getActiveCamera()->cameraPos;
-        scene.spotLights[0]->direction = scene.getActiveCamera()->cameraFront;
-    }
+//    // update flash light
+//    if (States::isIndexActive(&scene.activeSpotLights, 0)) {
+//        scene.spotLights[0]->position = scene.getActiveCamera()->cameraPos;
+//        scene.spotLights[0]->direction = scene.getActiveCamera()->cameraFront;
+//    }
 
     if (Keyboard::key(sf::Keyboard::Escape)) {
         scene.setShouldClose(true);

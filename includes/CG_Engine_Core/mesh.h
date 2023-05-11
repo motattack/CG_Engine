@@ -13,16 +13,20 @@
 #include "CG_Engine_Core/algo/bounds.h"
 #include "CG_Engine_Core/models/box.h"
 
+// T
+
 struct Vertex {
+    /*
+        vertex values
+    */
+    // position
     Vec3 pos;
+    // normal vector
     Vec3 normal;
+    // texture coordinate
     Vec2 texCoord;
 
-    /*
-    v1.vec3.x|v1.vec3.y|v1.vec3.z|v1.vec2.x|v1.vec2.y|
-    v2.vec3.x|v2.vec3.y|v2.vec3.z|v2.vec2.x|v2.vec2.y
-    */
-
+    // generate list of vertices
     static std::vector<Vertex> genList(float *vertices, int noVertices) {
         std::vector<Vertex> ret(noVertices);
 
@@ -51,24 +55,38 @@ struct Vertex {
     };
 };
 
+/*
+    class representing Mesh
+*/
+
 class Mesh {
 public:
+    // Bounding region for mesh
     BoundingRegion br;
 
+    // list of vertices
     std::vector<Vertex> vertices;
+    // list of indices
     std::vector<unsigned int> indices;
+    // vertex array object pointing to all data for the mesh
     ArrayObject VAO;
 
+    // texture list
     std::vector<Texture> textures;
+    // material diffuse value
     aiColor4D diffuse;
+    // material specular value
     aiColor4D specular;
 
-    // default constructor
-    Mesh() = default;
+    /*
+        constructors
+    */
+
+    // default
+    Mesh() {};
 
     // initialize as textured object
-    explicit Mesh(BoundingRegion br, std::vector<Texture> textures = {}) : br(br), textures(std::move(textures)),
-                                                                           noTex(false) {};
+    Mesh(BoundingRegion br, std::vector<Texture> textures = {}) : br(br), textures(textures), noTex(false) {};
 
     // initialize as material object
     Mesh(BoundingRegion br, aiColor4D diff, aiColor4D spec) : br(br), diffuse(diff), specular(spec), noTex(true) {};
@@ -108,6 +126,7 @@ public:
         ArrayObject::clear();
     };
 
+    // render number of instances using shader
     void render(Shader shader, unsigned int noInstances) {
         if (noTex) {
             // materials
@@ -148,15 +167,16 @@ public:
         glActiveTexture(GL_TEXTURE0);
     };
 
+    // free up memory
     void cleanup() {
         VAO.cleanup();
     };
 
 private:
-    unsigned int VBO{}, EBO{};
+    // true if has only materials
+    bool noTex;
 
-    bool noTex{};
-
+    // setup data with buffers
     void setup() {
         // create buffers/arrays
 

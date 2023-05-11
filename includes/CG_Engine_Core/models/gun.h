@@ -3,7 +3,10 @@
 
 #include <CG_Engine_Core/model.h>
 #include <CG_Engine_Core/UI/camera.h>
+#include <CG_Engine_Core/physics/evn.h>
 #include "../../../scene.h"
+
+// T
 
 class Gun : public Model {
 public:
@@ -19,14 +22,15 @@ public:
 
         // set position
         // multiply offset by unit vector in 2 directions
-        rb.pos = scene->getActiveCamera()->cameraPos + Vec3(scene->getActiveCamera()->cameraFront * 0.5f) -
-                 Vec3(scene->getActiveCamera()->cameraUp * 0.205f);
-        model = model.translate(rb.pos);
+        instances[0]->pos =
+                scene->getActiveCamera()->cameraPos + Vec3(scene->getActiveCamera()->cameraFront * 0.5f) -
+                Vec3(scene->getActiveCamera()->cameraUp * 0.205f);
+        model = model.translate(instances[0]->pos);
 
         float theta;
 
         // rotate around camera right using dot product
-        theta = acos(scene->getActiveCamera()->worldUp.dotProduct(scene->getActiveCamera()->cameraFront) /
+        theta = acos(Environment::worldUp.dotProduct(scene->getActiveCamera()->cameraFront) /
                      (scene->getActiveCamera()->cameraUp).len() /
                      (scene->getActiveCamera()->cameraFront).len());
         model = model.rotate(atanf(1) * 2 - theta,
@@ -35,11 +39,10 @@ public:
         // rotate around cameraUp using dot product
         Vec2 front2d = Vec2(scene->getActiveCamera()->cameraFront.x, scene->getActiveCamera()->cameraFront.z);
         theta = acos(Vec2(1.0f, 0.0f).dotProduct(front2d) / (front2d).len());
-        model = model.rotate(scene->getActiveCamera()->cameraFront.z < 0 ? theta : -theta,
-                             scene->getActiveCamera()->worldUp);
+        model = model.rotate(scene->getActiveCamera()->cameraFront.z < 0 ? theta : -theta, Environment::worldUp);
 
         // scale
-        model = model.Scale(size);
+        model = model.Scale(instances[0]->size);
 
         shader.setMat4("model", model);
 

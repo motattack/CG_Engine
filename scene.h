@@ -25,11 +25,14 @@ class Model;
 
 class Scene {
 public:
+    // tries to store models/instances
     trie::Trie<Model *> models;
     trie::Trie<RigidBody *> instances;
 
+    // list of instances that should be deleted
     std::vector<RigidBody *> instancesToDelete;
 
+    // pointer to root node in octree
     Octree::node *octree;
 
     /*
@@ -224,6 +227,11 @@ public:
             model->cleanup();
         });
 
+        // clean up tries
+        models.cleanup();
+        instances.cleanup();
+
+        // destroy octree
         octree->destroy();
 
         window.close();
@@ -262,12 +270,15 @@ public:
     };
 
     RigidBody *generateInstance(std::string modelId, Vec3 size, float mass, Vec3 pos) {
+        // generate new rigid body
         RigidBody *rb = models[modelId]->generateInstance(size, mass, pos);
         if (rb) {
-            // successfully generated
+            // successfully generated, set new and unique id for instance
             std::string id = generateId();
             rb->instanceId = id;
+            // insert into trie
             instances.insert(id, rb);
+            // insert into pending queue
             octree->addToPending(rb, models);
             return rb;
         }
@@ -287,17 +298,21 @@ public:
     };
 
     void removeInstance(std::string instanceId) {
+        // get instance's model
         std::string targetModel = instances[instanceId]->modelId;
 
+        // delete instance from model
         models[targetModel]->removeInstance(instanceId);
 
+        // remove from trie
         instances[instanceId] = nullptr;
-
         instances.erase(instanceId);
     };
 
     void markForDeletion(std::string instanceId) {
+        // activate kill switch
         States::activate(&instances[instanceId]->state, INSTANCE_DEAD);
+        // push to list
         instancesToDelete.push_back(instances[instanceId]);
     };
 
@@ -313,6 +328,7 @@ public:
     std::string generateId() {
         for (int i = currentId.length() - 1; i >= 0; i--) {
             if ((int) currentId[i] != (int) 'z') {
+                // increment then break
                 currentId[i] = (char) (((int) currentId[i]) + 1);
                 break;
             } else {
@@ -323,23 +339,34 @@ public:
     };
 
     /*
-        lights
-    */
+     lights
+ */
+
     // list of point lights
     std::vector<PointLight *> pointLights;
+    // acts as array of switches for point lights
     unsigned int activePointLights;
+
     // list of spot lights
     std::vector<SpotLight *> spotLights;
+    // acts as array of switches for spot lights
     unsigned int activeSpotLights;
+
     // direction light
     DirLight *dirLight;
+    // switch for directional light
     bool dirLightActive;
 
     /*
         camera
     */
+
+    // list of cameras
     std::vector<Camera *> cameras;
+    // index of active camera
     unsigned int activeCamera;
+
+    // camera position/matrices
     Mat4x4 view;
     Mat4x4 projection;
     Vec3 cameraPos;

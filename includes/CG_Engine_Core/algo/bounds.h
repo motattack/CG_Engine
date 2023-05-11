@@ -1,21 +1,30 @@
 #ifndef CG_ENGINE_BOUNDS_H
 #define CG_ENGINE_BOUNDS_H
+// T
 
 #include <CG_Engine_Core/math/vec3.h>
 #include "CG_Engine_Core/physics/rigidbody.h"
 
-// forward declaration
 namespace Octree {
     class node;
 }
+
+/*
+    enum for possible Bound Types
+*/
 
 enum class BoundTypes : unsigned char {
     AABB = 0x00,    // 0x00 = 0	// Axis-aligned bounding box
     SPHERE = 0x01    // 0x01 = 1
 };
 
+/*
+    class to represent bounding region
+*/
+
 class BoundingRegion {
 public:
+    // type of region
     BoundTypes type;
 
     // pointer for quick access to instance
@@ -167,7 +176,7 @@ public:
             for (int i = 0; i < 3; i++) {
                 // determine closest side
                 float closestPt = std::max(br.min[i], std::min(center[i], br.max[i]));
-                // add distance
+                // add squared distance
                 distSquared += (closestPt - center[i]) * (closestPt - center[i]);
             }
 
