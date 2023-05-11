@@ -1,18 +1,9 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <cmath>
-
 #include "CG_Engine_Core/math/vec3.h"
 #include "CG_Engine_Core/math/mat4x4.h"
 #include "CG_Engine_Core/math/common.h"
-#include "CG_Engine_Core/physics/evn.h"
-
-/*
-    enum to represent directions for movement
-*/
-
-// t
 
 enum class CameraDirection {
     NONE = 0,
@@ -24,53 +15,49 @@ enum class CameraDirection {
     DOWN
 };
 
-/*
-    camera class to help display from POV of camera
-*/
-
 class Camera {
 public:
-    /*
-        camera values
-    */
+    static Camera defaultCamera;
 
-    // position
     Vec3 cameraPos;
 
-    // camera directional values
     Vec3 cameraFront;
     Vec3 cameraUp;
     Vec3 cameraRight;
 
-    // camera rotational values
+    Vec3 worldUp;
+
     float yaw; // x-axis
     float pitch; // y-axis
-
-    // camera movement values
     float speed;
     float sensitivity;
     float zoom;
 
-    /*
-        constructor
-    */
-
-    // default and initialize with position
-    Camera(Vec3 position = Vec3(0.0f)) : cameraPos(position),
-                                         yaw(0.0f),
-                                         pitch(0.0f),
-                                         speed(2.5f),
-                                         sensitivity(1.0f),
-                                         zoom(45.0f),
-                                         cameraFront(Vec3(1.0f, 0.0f, 0.0f)) {
+    explicit Camera(Vec3 position = Vec3(0.0f))
+            : cameraPos(position),
+              worldUp(Vec3(0.0f, 1.0f, 0.0f)),
+              yaw(0.0f),
+              pitch(0.0f),
+              speed(2.5f),
+              sensitivity(1.0f),
+              zoom(45.0f),
+              cameraFront(Vec3(1.0f, 0.0f, 0.0f)) {
         updateCameraVectors();
     };
 
-    /*
-        modifiers
-    */
+    void mouseCursorPosition(const sf::Vector2i pos, sf::Window &window) {
+        sf::Vector2i center(window.getSize().x / 2, window.getSize().y / 2);
+        sf::Mouse::setPosition(center, window);
 
-    // change camera direction (mouse movement)
+        float xpos = pos.x;
+        float ypos = pos.y;
+
+        float xoffset = xpos - center.x;
+        float yoffset = center.y - ypos;
+
+        updateCameraDirection(xoffset, yoffset);
+    }
+
     void updateCameraDirection(double dx, double dy) {
         yaw += dx;
         pitch += dy;
@@ -83,9 +70,7 @@ public:
         }
 
         updateCameraVectors();
-    };
-
-    // change camera position in certain direction (keyboard)
+    }; // moving mouse
     void updateCameraPos(CameraDirection direction, double dt) {
         float velocity = (float) dt * speed;
 
@@ -109,9 +94,7 @@ public:
                 cameraPos -= cameraUp * velocity;
                 break;
         }
-    };
-
-    // change camera zoom (scroll wheel)
+    }; // keyboard input
     void updateCameraZoom(double dy) {
         if (zoom >= 1.0f && zoom <= 45.0f) {
             zoom -= dy;
@@ -120,36 +103,25 @@ public:
         } else { // > 45.0f
             zoom = 45.0f;
         }
-    };
+    }; // scroll wheel
 
-    /*
-        accessors
-    */
-
-    // get view matrix for camera
-    Mat4x4 getViewMatrix() {
+    [[nodiscard]] Mat4x4 getViewMatrix() const {
         return Mat4x4::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     };
 
-    // get zoom value for camera
-    float getZoom() {
+    [[nodiscard]] float getZoom() const {
         return zoom;
     };
 
 private:
-    /*
-        private modifier
-    */
-
-    // change camera directional vectors based on movement
     void updateCameraVectors() {
         Vec3 direction;
-        direction.x = std::cos(radians(yaw)) * std::cos(radians(pitch));
-        direction.y = std::sin(radians(pitch));
-        direction.z = std::sin(radians(yaw)) * std::cos(radians(pitch));
+        direction.x = cosf(radians(yaw)) * cosf(radians(pitch));
+        direction.y = sinf(radians(pitch));
+        direction.z = sinf(radians(yaw)) * cosf(radians(pitch));
         cameraFront = direction.normalize();
 
-        cameraRight = (cameraFront.crossProduct(Environment::worldUp)).normalize();
+        cameraRight = cameraFront.crossProduct(worldUp).normalize();
         cameraUp = cameraRight.crossProduct(cameraFront).normalize();
     };
 };

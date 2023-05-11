@@ -5,10 +5,9 @@
 #include <map>
 
 /*
-    class for buffer objects
-    - VBOs, EBOs, etc
+	class for buffer objects
+	- VBOs, EBOs, etc
 */
-
 class BufferObject {
 public:
     // value/location
@@ -16,12 +15,9 @@ public:
     // type of buffer (GL_ARRAY_BUFFER || GL_ELEMENT_ARRAY_BUFFER, etc)
     GLenum type;
 
-    /*
-        constructor
-    */
+    BufferObject() {}
 
-    // default and initialize with type
-    BufferObject(GLenum type = GL_ARRAY_BUFFER)
+    BufferObject(GLenum type)
             : type(type) {}
 
     // generate object
@@ -69,8 +65,8 @@ public:
 };
 
 /*
-    class for array objects
-    - VAO
+	class for array objects
+	- VAO
 */
 class ArrayObject {
 public:
@@ -93,11 +89,6 @@ public:
     // bind
     void bind() {
         glBindVertexArray(val);
-    }
-
-    // draw arrays
-    void draw(GLenum mode, GLuint first, GLuint count) {
-        glDrawArrays(mode, first, count);
     }
 
     // draw
