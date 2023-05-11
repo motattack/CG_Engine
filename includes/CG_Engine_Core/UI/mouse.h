@@ -1,6 +1,8 @@
 #ifndef CG_ENGINE_MOUSE_H
 #define CG_ENGINE_MOUSE_H
 
+// T
+
 class Mouse {
 public:
     static void cursorPosCallback(sf::RenderWindow &window, double _x, double _y) {
@@ -119,7 +121,7 @@ double Mouse::scrollDy = 0;
 
 bool Mouse::firstMouse = true;
 
-bool Mouse::buttons[4] = {0};
-bool Mouse::buttonsChanged[4] = {0};
+bool Mouse::buttons[sf::Mouse::ButtonCount] = {0};
+bool Mouse::buttonsChanged[sf::Mouse::ButtonCount] = {0};
 
 #endif //CG_ENGINE_MOUSE_H
