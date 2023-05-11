@@ -1,14 +1,21 @@
 #ifndef CG_ENGINE_STATES_H
 #define CG_ENGINE_STATES_H
 
+// t
+
+/*
+    namespace to tie together all states functions
+*/
+
 namespace States {
     /*
+        for example
         states = 10001101
     */
 
     // check state
     template<typename T>
-    bool isActive(T *states, int target) {
+    bool isIndexActive(T *states, int target) {
         /*
             target = 3
             1 = 00000001
@@ -25,7 +32,7 @@ namespace States {
 
     // activate state
     template<typename T>
-    void activate(T *states, int target) {
+    void activateIndex(T *states, int target) {
         /*
             target = 4
             1 = 00000001
@@ -42,7 +49,7 @@ namespace States {
 
     // uniquely activate state (no others can be active)
     template<typename T>
-    void uniquelyActivate(T *states, int target) {
+    void uniquelyActivateIndex(T *states, int target) {
         /*
             target = 4
             1 = 00000001
@@ -57,13 +64,13 @@ namespace States {
             00010000
         */
 
-        activate<T>(states, target); // activate state first
+        activateIndex<T>(states, target); // activate state first
         *states &= 1 << target; // deactivate others
     }
 
     // deactivate states
     template<typename T>
-    void deactivate(T *states, int target) {
+    void deactivateIndex(T *states, int target) {
         /*
             target = 4
             1 = 00000001
@@ -81,7 +88,7 @@ namespace States {
 
     // toggle state
     template<typename T>
-    void toggle(T *states, int target) {
+    void toggleIndex(T *states, int target) {
         /*
             target = 4
             1 = 00000001
@@ -94,6 +101,36 @@ namespace States {
         */
 
         *states ^= 1 << target;
+    }
+
+    // tell if state is active
+    template<typename T>
+    bool isActive(T *states, T state) {
+        return (*states & state) == state;
+    }
+
+    // activate state
+    template<typename T>
+    void activate(T *states, T state) {
+        *states |= state;
+    }
+
+    // uniquely activate state (no others can be active)
+    template<typename T>
+    void uniquelyActivate(T *states, T state) {
+        *states &= state;
+    }
+
+    // deactivate state
+    template<typename T>
+    void deactivate(T *states, T state) {
+        *states &= ~state;
+    }
+
+    // toggle state
+    template<typename T>
+    void toggle(T *states, T state) {
+        *states ^= state;
     }
 }
 

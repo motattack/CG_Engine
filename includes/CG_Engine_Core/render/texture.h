@@ -8,18 +8,26 @@
 
 #include <stb_image.h>
 
+// T
+
 class Texture {
 public:
-    Texture(std::string dir, std::string path, aiTextureType type)
-            : dir(std::move(dir)), path(std::move(path)), type(type) {
-        generate();
-    }
+    /*
+        constructor
+    */
 
+    // initialize with image path and type
+    Texture(std::string dir, std::string path, aiTextureType type) : dir(std::move(dir)), path(std::move(path)), type(type) {
+        generate();
+    };
+
+    // generate texture id
     void generate() {
         glGenTextures(1, &id);
     };
 
-    void load(bool flip = true) const {
+    // load texture from path
+    void load(bool flip = true) {
         stbi_set_flip_vertically_on_load(flip);
 
         int width, height, nChannels;
@@ -52,14 +60,22 @@ public:
         stbi_image_free(data);
     };
 
-    void bind() const {
+    // bind texture id
+    void bind() {
         glBindTexture(GL_TEXTURE_2D, id);
     };
 
-    // texture object
+    /*
+        texture object values
+    */
+
+    // texture id
     unsigned int id{};
+    // texture type
     aiTextureType type;
+    // directory of image
     std::string dir;
+    // name of image
     std::string path;
 };
 

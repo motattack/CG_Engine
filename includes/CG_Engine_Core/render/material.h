@@ -3,11 +3,18 @@
 
 #include <CG_Engine_Core/math/vec3.h>
 
+// T
+
 struct Material {
+    // lighting values
     Vec3 ambient;
     Vec3 diffuse;
     Vec3 specular;
     float shininess;
+
+    /*
+        static instances of common materials
+    */
 
     static Material emerald;
     static Material jade;
@@ -34,6 +41,7 @@ struct Material {
     static Material white_rubber;
     static Material yellow_rubber;
 
+    // function to mix two materials with a proportion
     static Material mix(Material m1, Material m2, float mix = 0.5f);
 };
 
@@ -85,8 +93,10 @@ Material Material::white_rubber = {Vec3(0.05, 0.05, 0.05), Vec3(0.5, 0.5, 0.5), 
 Material Material::yellow_rubber = {Vec3(0.05, 0.05, 0.0), Vec3(0.5, 0.5, 0.4), Vec3(0.7, 0.7, 0.04),
                                     .078125};
 
+// function to mix two materials with a proportion
 Material Material::mix(Material m1, Material m2, float mix) {
     return {
+            // set lighting values based on proportion
             m1.ambient * mix + m2.ambient * (1 - mix),
             m1.diffuse * mix + m2.diffuse * (1 - mix),
             m1.specular * mix + m2.specular * (1 - mix),
