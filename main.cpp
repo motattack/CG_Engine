@@ -5,18 +5,18 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <CG_Engine_Core/UI/camera.h>
-#include <CG_Engine_Core/model.h>
+#include <CG_Engine_Core/objects/model.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stb_image.h>
 #include <stack>
-#include "CG_Engine_Core/light.h"
-#include "CG_Engine_Core/models/lamp.h"
-#include "CG_Engine_Core/models/gun.h"
-#include "CG_Engine_Core/models/sphere.h"
-#include "CG_Engine_Core/physics/evn.h"
-#include "CG_Engine_Core/models/box.h"
+#include <CG_Engine_Core/render/light.h>
+#include <CG_Engine_Core/models/lamp.h>
+#include <CG_Engine_Core/models/gun.h>
+#include <CG_Engine_Core/models/sphere.h>
+#include <CG_Engine_Core/phy/evn.h>
+#include <CG_Engine_Core/models/box.h>
 #include "scene.h"
 
 void onResize(const sf::Event &event); // Protype
@@ -111,7 +111,7 @@ int main() {
     scene.activeSpotLights = 1;
 
     sf::Clock deltaClock, clock;
-    while (scene.window.isOpen()) {
+    while (!scene.shouldClose()) {
         box.positions.clear();
         box.sizes.clear();
 
@@ -163,11 +163,11 @@ int main() {
 
         // Poll events
         sf::Event event{};
-        while (scene.window.pollEvent(event)) {
+        while (scene.pollEvent(event)) {
             ImGui::SFML::ProcessEvent(event);
             Keyboard::keyCallback(event);
             if (event.type == sf::Event::Closed)
-                scene.window.close();
+                scene.cleanup();
             else if (event.type == sf::Event::Resized)
                 onResize(event);
         }
@@ -179,7 +179,7 @@ int main() {
     m.cleanup();
 
     ImGui::SFML::Shutdown();
-    scene.window.close();
+    scene.cleanup();
     return 0;
 }
 

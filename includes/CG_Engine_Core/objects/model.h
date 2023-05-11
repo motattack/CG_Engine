@@ -1,7 +1,7 @@
 #ifndef CG_ENGINE_MODEL_H
 #define CG_ENGINE_MODEL_H
 
-#include <CG_Engine_Core/mesh.h>
+#include <CG_Engine_Core/objects/mesh.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -15,7 +15,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <CG_Engine_Core/physics/rigidbody.h>
+#include <CG_Engine_Core/phy/rigidbody.h>
 
 class Model {
 public:

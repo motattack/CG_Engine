@@ -180,7 +180,7 @@ public:
         return result.transpose();
     };
 
-    Mat2x2 getSubMatrix(int exclude_row, int exclude_col) const {
+    [[nodiscard]] Mat2x2 getSubMatrix(int exclude_row, int exclude_col) const {
         Mat2x2 subMatrix;
         int row = 0, col = 0;
         for (int i = 0; i < 3; ++i) {

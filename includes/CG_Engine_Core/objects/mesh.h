@@ -5,23 +5,15 @@
 #include <utility>
 #include <vector>
 
-#include <CG_Engine_Core/shader.h>
-#include <CG_Engine_Core/vertex/vbuffer.h>
-#include <CG_Engine_Core/vertex/varray.h>
-#include <CG_Engine_Core/vertex/vearray.h>
-#include "texture.h"
-#include "CG_Engine_Core/algo/bounds.h"
-#include "CG_Engine_Core/models/box.h"
+#include <CG_Engine_Core/render/shader.h>
+#include <CG_Engine_Core/render/texture.h>
+#include <CG_Engine_Core/algo/bounds.h>
+#include <CG_Engine_Core/models/box.h>
 
 struct Vertex {
     Vec3 pos;
     Vec3 normal;
     Vec2 texCoord;
-
-    /*
-    v1.vec3.x|v1.vec3.y|v1.vec3.z|v1.vec2.x|v1.vec2.y|
-    v2.vec3.x|v2.vec3.y|v2.vec3.z|v2.vec2.x|v2.vec2.y
-    */
 
     static std::vector<Vertex> genList(float *vertices, int noVertices) {
         std::vector<Vertex> ret(noVertices);

@@ -2,10 +2,10 @@
 #define CG_ENGINE_MODELARRAY_H
 
 #include <CG_Engine_Core/math/vec3.h>
-#include <CG_Engine_Core/shader.h>
+#include <CG_Engine_Core/render/shader.h>
 #include <vector>
-#include "CG_Engine_Core/physics/rigidbody.h"
-#include "box.h"
+#include <CG_Engine_Core/phy/rigidbody.h>
+#include <CG_Engine_Core/models/box.h>
 
 #define UPPER_BOUND 100
 
@@ -21,13 +21,13 @@ public:
         posVBO = BufferObject(GL_ARRAY_BUFFER);
         posVBO.generate();
         posVBO.bind();
-        posVBO.setData<Vec3>(UPPER_BOUND, NULL, GL_DYNAMIC_DRAW);
+        posVBO.setData<Vec3>(UPPER_BOUND, nullptr, GL_DYNAMIC_DRAW);
 
         // generate size VBO
         sizeVBO = BufferObject(GL_ARRAY_BUFFER);
         sizeVBO.generate();
         sizeVBO.bind();
-        sizeVBO.setData<Vec3>(UPPER_BOUND, NULL, GL_DYNAMIC_DRAW);
+        sizeVBO.setData<Vec3>(UPPER_BOUND, nullptr, GL_DYNAMIC_DRAW);
 
         // set attribute pointers for each mesh
         for (unsigned int i = 0, size = model.meshes.size(); i < size; i++) {

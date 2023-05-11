@@ -1,9 +1,9 @@
 #ifndef CG_ENGINE_GUN_H
 #define CG_ENGINE_GUN_H
 
-#include "../model.h"
 #include <CG_Engine_Core/UI/camera.h>
-#include "box.h"
+#include <CG_Engine_Core/objects/model.h>
+#include <CG_Engine_Core/models/box.h>
 
 class Gun : public Model {
 public:

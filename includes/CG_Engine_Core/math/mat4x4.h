@@ -174,7 +174,7 @@ public:
         return result.transpose();
     }
 
-    Mat3x3 getSubMatrix(int exclude_row, int exclude_col) const {
+    [[nodiscard]] Mat3x3 getSubMatrix(int exclude_row, int exclude_col) const {
         Mat3x3 subMatrix;
         int row = 0, col = 0;
         for (int i = 0; i < 4; ++i) {

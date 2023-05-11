@@ -1,7 +1,7 @@
 #ifndef CG_ENGINE_CORE_LIGHT_H
 #define CG_ENGINE_CORE_LIGHT_H
 
-#include <CG_Engine_Core/shader.h>
+#include <CG_Engine_Core/render/shader.h>
 
 struct DirLight {
     Vec3 direction;

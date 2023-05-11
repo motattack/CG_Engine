@@ -5,9 +5,9 @@
 #include <CG_Engine_Core/math/vec3.h>
 #include <CG_Engine_Core/math/mat4x4.h>
 #include <GL/glew.h>
-#include <CG_Engine_Core/shader.h>
-#include "CG_Engine_Core/algo/bounds.h"
-#include "CG_Engine_Core/glmemory.h"
+#include <CG_Engine_Core/render/shader.h>
+#include <CG_Engine_Core/algo/bounds.h>
+#include <CG_Engine_Core/glmemory.h>
 
 #define UPPER_BOUND 100
 
@@ -69,14 +69,14 @@ public:
         VAO["posVBO"] = BufferObject(GL_ARRAY_BUFFER);
         VAO["posVBO"].generate();
         VAO["posVBO"].bind();
-        VAO["posVBO"].setData<Vec3>(UPPER_BOUND, NULL, GL_DYNAMIC_DRAW);
+        VAO["posVBO"].setData<Vec3>(UPPER_BOUND, nullptr, GL_DYNAMIC_DRAW);
         VAO["posVBO"].setAttPointer<Vec3>(1, 3, GL_FLOAT, 1, 0, 1);
 
         // size VBO - dynamic
         VAO["sizeVBO"] = BufferObject(GL_ARRAY_BUFFER);
         VAO["sizeVBO"].generate();
         VAO["sizeVBO"].bind();
-        VAO["sizeVBO"].setData<Vec3>(UPPER_BOUND, NULL, GL_DYNAMIC_DRAW);
+        VAO["sizeVBO"].setData<Vec3>(UPPER_BOUND, nullptr, GL_DYNAMIC_DRAW);
         VAO["sizeVBO"].setAttPointer<Vec3>(2, 3, GL_FLOAT, 1, 0, 1);
         VAO["sizeVBO"].clear();
 

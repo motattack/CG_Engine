@@ -14,7 +14,7 @@ public:
 
     // sphere values
     Vec3 center;
-    float radius;
+    float radius{};
 
     // bounding box values
     Vec3 min;
@@ -25,7 +25,7 @@ public:
     */
 
     // initialize with type
-    BoundingRegion(BoundTypes type) : type(type) {};
+    explicit BoundingRegion(BoundTypes type) : type(type) {};
 
     // initialize as sphere
     BoundingRegion(Vec3 center, float radius) : type(BoundTypes::SPHERE), center(center), radius(radius) {}
@@ -39,12 +39,12 @@ public:
     */
 
     // center
-    Vec3 calculateCenter() {
+    [[nodiscard]] Vec3 calculateCenter() const {
         return (type == BoundTypes::AABB) ? (min + max) / 2.0f : center;
     };
 
     // calculate dimensions
-    Vec3 calculateDimensions() {
+    [[nodiscard]] Vec3 calculateDimensions() const {
         return (type == BoundTypes::AABB) ? (max - min) : Vec3(2.0f * radius);
     }
 

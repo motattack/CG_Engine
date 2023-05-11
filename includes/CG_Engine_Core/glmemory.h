@@ -93,7 +93,8 @@ public:
 
     // draw
     void draw(GLenum mode, GLuint count, GLenum type, GLint indices, GLuint instancecount = 1) {
-        glDrawElementsInstanced(mode, count, type, (void *) indices, instancecount);
+        glDrawElementsInstanced(mode, count, type, reinterpret_cast<void *>(static_cast<uintptr_t>(indices)),
+                                instancecount);
     }
 
     // cleanup
