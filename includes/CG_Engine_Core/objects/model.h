@@ -216,6 +216,7 @@ protected:
             if (!skip) {
                 // not loaded yet
                 Texture tex(directory, str.C_Str(), type);
+                std::cout << str.C_Str() << std::endl;
                 tex.load(false);
                 textures.push_back(tex);
                 textures_loaded.push_back(tex);

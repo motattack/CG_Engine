@@ -50,18 +50,6 @@ public:
         initialization
     */
     bool init() {
-
-
-        window.setFramerateLimit(75);
-        window.setVerticalSyncEnabled(true);
-        window.setActive(true);
-
-        ImGui::SFML::Init(window, true);
-
-
-        // Enable docking
-        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
         // Set context settings properties
         settings.depthBits = 24;
         settings.stencilBits = 8;
@@ -71,6 +59,17 @@ public:
 
         window.create(sf::VideoMode(scrWidth, scrHeight), "First Window", sf::Style::Titlebar | sf::Style::Close,
                       settings);
+        window.setFramerateLimit(75);
+        window.setVerticalSyncEnabled(true);
+        window.setActive(true);
+
+
+        ImGui::SFML::Init(window);
+
+        // Enable docking
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+
 
         glewExperimental = GL_TRUE;
 
@@ -78,8 +77,8 @@ public:
             std::cout << "Error: glew not init =(" << std::endl;
             throw;
         }
-
-        glEnable(GL_DEPTH_TEST);
+//
+//        glEnable(GL_DEPTH_TEST);
 
         return true;
     };
@@ -241,10 +240,10 @@ public:
     Mat4x4 view;
     Mat4x4 projection;
     Mat4x4 cameraPos;
-
+    sf::RenderWindow window;
 protected:
     // window object
-    sf::RenderWindow window;
+
     sf::ContextSettings settings;
 
     // window vals

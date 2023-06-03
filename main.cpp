@@ -18,6 +18,7 @@
 #include <CG_Engine_Core/phy/evn.h>
 #include <CG_Engine_Core/models/box.h>
 #include "scene.h"
+#include "CG_Engine_Core/UI/gui.h"
 
 void onResize(const sf::Event &event); // Protype
 void userInput(Scene &window, float dt);
@@ -158,7 +159,14 @@ int main() {
             box.render(boxShader);
         }
 
+        ImGui::SFML::Update(scene.window, deltaClock.restart());
+
+        test(launchObjects.instances);
+        editor(launchObjects.instances);
+
         // send new frame to window
+        ImGui::SFML::Render(scene.window);
+        glEnable(GL_DEPTH_TEST);
         scene.newFrame();
 
         // Poll events

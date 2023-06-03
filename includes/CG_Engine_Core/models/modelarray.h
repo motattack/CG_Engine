@@ -7,7 +7,7 @@
 #include <CG_Engine_Core/phy/rigidbody.h>
 #include <CG_Engine_Core/models/box.h>
 
-#define UPPER_BOUND 100
+#define UPPER_BOUND 10
 
 template<class T>
 class ModelArray {

@@ -56,6 +56,10 @@ public:
 
         velocity += joules > 0 ? deltaV : -deltaV;
     };
+
+    std::string toString() const {
+        return "mass: " + std::to_string(mass);
+    }
 };
 
 
