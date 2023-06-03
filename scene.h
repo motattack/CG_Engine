@@ -5,15 +5,15 @@
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <CG_Engine_Core/render/shader.h>
-#include <CG_Engine_Core/UI/camera.h>
-#include <CG_Engine_Core/math/vec3.h>
-#include <CG_Engine_Core/render/light.h>
-#include <CG_Engine_Core/algo/states.h>
+#include <CG_Engine/render/shader.h>
+#include <CG_Engine/UI/camera.h>
+#include <CG_Engine/math/common.h>
+#include <CG_Engine/render/light.h>
+#include <CG_Engine/algo/states.h>
 #include <imgui.h>
 #include <imgui-SFML.h>
-#include <CG_Engine_Core/UI/mouse.h>
-#include <CG_Engine_Core/UI/keyboard.h>
+#include <CG_Engine/UI/mouse.h>
+#include <CG_Engine/UI/keyboard.h>
 
 class Scene {
 public:

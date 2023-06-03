@@ -1,230 +1,142 @@
-#include <imgui.h>
-#include <imgui-SFML.h>
-#include <iostream>
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <CG_Engine_Core/UI/camera.h>
-#include <CG_Engine_Core/objects/model.h>
-
-#define STB_IMAGE_IMPLEMENTATION
-
-#include <stb_image.h>
-#include <stack>
-#include <CG_Engine_Core/render/light.h>
-#include <CG_Engine_Core/models/lamp.h>
-#include <CG_Engine_Core/models/gun.h>
-#include <CG_Engine_Core/models/sphere.h>
-#include <CG_Engine_Core/phy/evn.h>
-#include <CG_Engine_Core/models/box.h>
-#include "scene.h"
-#include "CG_Engine_Core/UI/gui.h"
-
-void onResize(const sf::Event &event); // Protype
-void userInput(Scene &window, float dt);
-
-// Matrix's
-Mat4x4 projection;
-Mat4x4 model;
-Mat4x4 view;
-
-//Screen screen;
-
-bool flashlightOn = false;
-double dt = 0.0f; // tme btwn frames
-
-// Camera
-Camera cam;
-
-// Frames
-float lastFrame = 0.0f;
-
-SphereArray launchObjects;
-
+#include <iostream>
 
 int main() {
-    Scene scene = Scene("OpenGL Tutorial", 800, 600);
+    sf::ContextSettings settings;
+    settings.depthBits = 24;
+    settings.stencilBits = 8;
+    settings.majorVersion = 3;
+    settings.minorVersion = 3;
+    settings.attributeFlags = sf::ContextSettings::Core;
 
-    if (!scene.init()) {
-        std::cout << "Could not open window" << std::endl;
+    sf::Window window(sf::VideoMode(500, 500, 32), "GL_Engine",
+                      sf::Style::Titlebar | sf::Style::Close, settings);
+
+    glewExperimental = GL_TRUE;
+
+    if (GLEW_OK != glewInit()) {
+        std::cout << "Error:: glew not init =(" << std::endl;
         return -1;
     }
 
-    scene.cameras.push_back(&cam);
-    scene.activeCamera = 0;
+    const int verts = 6;
 
-    // SHADERS===============================
-    Shader shader("res/assets/object.vs", "res/assets/object.fs");
-    Shader lampShader("res/assets/instanced/instanced.vs", "res/assets/lamp.fs");
-    Shader launchShader("res/assets/instanced/instanced.vs", "res/assets/object.fs");
-    Shader boxShader("res/assets/instanced/box.vs", "res/assets/instanced/box.fs");
-
-    // MODELS==============================
-    launchObjects.init();
-
-    Box box;
-    box.init();
-
-    Model m(BoundTypes::AABB, Vec3(0.0f), Vec3(0.05f));
-    m.loadModel("res/assets/models/lotr_troll/scene.gltf");
-
-    // LIGHTS
-    DirLight dirLight = {Vec3(-0.2f, -1.0f, -0.3f), Vec4(0.1f, 0.1f, 0.1f, 1.0f), Vec4(0.4f, 0.4f, 0.4f, 1.0f),
-                         Vec4(0.5f, 0.5f, 0.5f, 1.0f)};
-    scene.dirLight = &dirLight;
-
-    Vec3 pointLightPositions[] = {
-            Vec3(0.7f, 0.2f, 2.0f),
-            Vec3(2.3f, -3.3f, -4.0f),
-            Vec3(-4.0f, 2.0f, -12.0f),
-            Vec3(0.0f, 0.0f, -3.0f)
+    float polygon[verts * (3 + 4)] = {
+            /*        position           */   /*             color              */
+            -0.5F, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 0.75f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+            0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+            0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+            0.0f, -0.75f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+            -0.5, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
     };
 
-    Vec4 ambient = Vec4(0.05f, 0.05f, 0.05f, 1.0f);
-    Vec4 diffuse = Vec4(0.8f, 0.8f, 0.8f, 1.0f);
-    Vec4 specular = Vec4(1.0f);
-    float k0 = 1.0f;
-    float k1 = 0.09f;
-    float k2 = 0.032f;
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
 
-    PointLight pointLights[4];
 
-    LampArray lamps;
-    lamps.init();
-    for (unsigned int i = 0; i < 4; i++) {
-        pointLights[i] = {
-                pointLightPositions[i],
-                k0, k1, k2,
-                ambient, diffuse, specular
-        };
-        lamps.lightInstances.push_back(pointLights[i]);
-        scene.pointLights.push_back(&pointLights[i]);
-        States::activate(&scene.activePointLights, i);
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * verts * (3 + 4), polygon, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *) 0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    const char *shaderTextVertex =
+            "#version 330 core\n"
+            "\n"
+            "layout (location = 0) in vec3 aPos;\n"
+            "layout (location = 1) in vec4 aColor;\n"
+            "\n"
+            "out vec4 fragColor;\n"
+            "\n"
+            "void main() {\n"
+            "    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);\n"
+            "    fragColor = aColor;\n"
+            "}";
+
+    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &shaderTextVertex, NULL);
+    glCompileShader(vertexShader);
+
+    char resultInfo[1000];
+    int res;
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &res);
+    if (res == 0) {
+        glGetShaderInfoLog(vertexShader, 1000, NULL, resultInfo);
+        std::cout << "Shader compile error: " << resultInfo << std::endl;
+        return -1;
     }
 
-    SpotLight spotLight = {
-            cam.cameraPos, cam.cameraFront,
-            cos(radians(12.5f)), cos(radians(20.0f)),
-            1.0f, 0.07f, 0.032f,
-            Vec4(0.0f, 0.0f, 0.0f, 1.0f), Vec4(1.0f), Vec4(1.0f)
-    };
-    scene.spotLights.push_back(&spotLight);
-    scene.activeSpotLights = 1;
+    const char *shaderTextFragment =
+            "#version 330 core\n"
+            "\n"
+            "in vec4 fragColor;\n"
+            "out vec4 outColor;\n"
+            "\n"
+            "void main(){\n"
+            "    outColor = fragColor;\n"
+            "}";
 
-    sf::Clock deltaClock, clock;
-    while (!scene.shouldClose()) {
-        box.positions.clear();
-        box.sizes.clear();
+    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, (char **const) (&shaderTextFragment), NULL);
+    glCompileShader(fragmentShader);
 
-        // calculate dt
-        float currentTime = clock.getElapsedTime().asSeconds();
-        dt = currentTime - lastFrame;
-        lastFrame = currentTime;
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &res);
+    if (res == 0) {
+        glGetShaderInfoLog(fragmentShader, 1000, NULL, resultInfo);
+        std::cout << "Shader compile error: " << resultInfo << std::endl;
+        return -1;
+    }
 
-        // process input
-        userInput(scene, dt);
+    unsigned int shaderProg;
+    shaderProg = glCreateProgram();
+    glAttachShader(shaderProg, vertexShader);
+    glAttachShader(shaderProg, fragmentShader);
+    glLinkProgram(shaderProg);
 
-        // update screen values
-        scene.update();
+    glGetProgramiv(shaderProg, GL_LINK_STATUS, &res);
+    if (res == 0) {
+        glGetProgramInfoLog(shaderProg, 1000, NULL, resultInfo);
+        std::cout << "Shader linking error: " << resultInfo << std::endl;
+        return -1;
+    }
 
-        scene.render(shader);
-        m.render(shader, dt, &box);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 
-        // launch objects
-        std::stack<int> removeObjects;
-        for (int i = 0; i < launchObjects.instances.size(); i++) {
-            if ((scene.getActiveCamera()->cameraPos - launchObjects.instances[i].pos).len() > 50.0f) {
-                removeObjects.push(i);
-                continue;
+    bool isGo = true;
+
+    while (isGo) {
+        sf::Event windowEvent{};
+
+        while (window.pollEvent(windowEvent)) {
+            switch (windowEvent.type) {
+                case sf::Event::Closed:
+                    isGo = false;
+                    break;
+                default:
+                    break;
             }
         }
-        for (int i = 0; i < removeObjects.size(); i++) {
-            launchObjects.instances.erase(launchObjects.instances.begin() + removeObjects.top());
-            removeObjects.pop();
-        }
 
-        if (launchObjects.instances.size() > 0) {
-            scene.render(launchShader);
-            launchObjects.render(launchShader, dt, &box);
-        }
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-        // lamps
-        scene.render(lampShader, false);
-        lamps.render(lampShader, dt, &box);
 
-        // render boxes
-        if (box.positions.size() > 0) {
-            // instances exist
-            scene.render(boxShader, false);
-            box.render(boxShader);
-        }
+        glUseProgram(shaderProg);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, verts);
 
-        ImGui::SFML::Update(scene.window, deltaClock.restart());
-
-        test(launchObjects.instances);
-        editor(launchObjects.instances);
-
-        // send new frame to window
-        ImGui::SFML::Render(scene.window);
-        glEnable(GL_DEPTH_TEST);
-        scene.newFrame();
-
-        // Poll events
-        sf::Event event{};
-        while (scene.pollEvent(event)) {
-            ImGui::SFML::ProcessEvent(event);
-            Keyboard::keyCallback(event);
-            if (event.type == sf::Event::Closed)
-                scene.cleanup();
-            else if (event.type == sf::Event::Resized)
-                onResize(event);
-        }
+        window.display();
     }
 
-    lamps.cleanup();
-    box.cleanup();
-    launchObjects.cleanup();
-    m.cleanup();
-
-    ImGui::SFML::Shutdown();
-    scene.cleanup();
+    window.close();
     return 0;
-}
-
-void onResize(const sf::Event &event) {
-    glViewport(0, 0, event.size.width, event.size.height);
-}
-
-void launchItem(float dt) {
-    RigidBody rb(1.0f, cam.cameraPos);
-    rb.transferEnergy(100.0f, cam.cameraFront);
-    rb.applyAcceleration(Environment::gravitationalAcceleration);
-    launchObjects.instances.push_back(rb);
-}
-
-void userInput(Scene &scene, float dt) {
-    scene.processInput(dt);
-
-    // update flash light
-    if (States::isActive(&scene.activeSpotLights, 0)) {
-        scene.spotLights[0]->position = scene.getActiveCamera()->cameraPos;
-        scene.spotLights[0]->direction = scene.getActiveCamera()->cameraFront;
-    }
-
-    if (Keyboard::key(sf::Keyboard::Escape)) {
-        scene.setShouldClose(true);
-    }
-
-    if (Keyboard::key(sf::Keyboard::L)) {
-        States::toggle(&scene.activeSpotLights, 0); // toggle spot light
-    }
-
-    if (Keyboard::key(sf::Keyboard::F))
-        launchItem(dt);
-
-    for (int i = 0; i < 4; i++) {
-        if (Keyboard::key(static_cast<sf::Keyboard::Key>(sf::Keyboard::Num1 + i))) {
-            States::toggle(&scene.activePointLights, i);
-        }
-    }
 }
