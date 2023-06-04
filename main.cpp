@@ -87,44 +87,74 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     setPolygonMode();
     glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CW);
+    glFrontFace(GL_CCW);
 
 
     int box_width, box_height, channels;
     unsigned char *data = stbi_load("res/textures/box.png", &box_width, &box_height, &channels, 0);
 
-    const int verts = 8;
+    const int verts = 36;
 
-    float cube[verts * (3 + 3 + 2)] = {
-            /*        position       */   /*             color      */ /* texture */
-/*1*/    -1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.f, 1.f,
-/*2*/    1.0f, 1.0f, -1.0f, 0.5f, 0.5f, 0.0f, 1.f, 1.f,
-/*3*/    1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.f, 0.f,
-/*4*/    -1.0f, 1.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.f, 0.f,
-/*5*/    -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.f, 0.f,
-/*6*/    1.0f, -1.0f, -1.0f, 0.5f, 0.0f, 0.5f, 0.f, 0.f,
-/*7*/    1.0f, -1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 0.f, 1.f,
-/*8*/    -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.f, 1.f
+    float cube[] = {
+            //position			normal					texture				color
+            -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+            -1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+            -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+            -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+            -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+            -1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+
+            1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+            -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+            -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+            1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+            1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+            -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+
+            1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+
+            -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+
+            1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+            1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+            1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+            1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+            1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+            1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+
+            1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+            -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+            -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+            -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f
     };
 
-    unsigned int indices[] = {
-            0, 1, 3,
-            1, 2, 3,
-            0, 4, 1,
-            1, 4, 5,
-            0, 3, 7,
-            0, 7, 4,
-            1, 6, 2,
-            1, 5, 6,
-            2, 7, 3,
-            2, 6, 7,
-            4, 7, 5,
-            5, 7, 6
-    };
+    ModelTransform polygonTrans1 = {Vec3(0.f, 0.f, 0.f),    // position
+                                    Vec3(0.f, 0.f, 0.f),    // rotation
+                                    Vec3(1.f, 1.f, 1.f)};    // scale
 
-    ModelTransform polygonTrans = {Vec3(0.f, 0.f, 0.f),
-                                   Vec3(0.f, 0.f, 0.f),
-                                   Vec3(1.f, 1.f, 1.f)};
+    ModelTransform polygonTrans2 = {Vec3(0.f, 0.f, 0.f),    // position
+                                    Vec3(0.f, 0.f, 0.f),    // rotation
+                                    Vec3(1.f, 1.f, 1.f)};    // scale
+
+    ModelTransform polygonTrans3 = {Vec3(0.f, 0.f, 0.f),    // position
+                                    Vec3(0.f, 0.f, 0.f),    // rotation
+                                    Vec3(1.f, 1.f, 1.f)};    // scale
+
+    ModelTransform lightTrans = {Vec3(0.f, 0.f, 0.f),    // position
+                                 Vec3(0.f, 0.f, 0.f),    // rotation
+                                 Vec3(0.1f, 0.1f, 0.1f)};    // scale
 
     unsigned int box_texture;
     glGenTextures(1, &box_texture);
@@ -137,38 +167,46 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     if (channels == 3)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, box_width, box_height, 0, GL_RGB,  GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, box_width, box_height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     else
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, box_width, box_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     //glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
-    unsigned int VBO, VAO, EBO;
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    glGenVertexArrays(1, &VAO);
+    unsigned int VBO_polygon, VAO_polygon;
+    glGenBuffers(1, &VBO_polygon);
+    glGenVertexArrays(1, &VAO_polygon);
 
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * verts * 8, cube, GL_STATIC_DRAW);
+    glBindVertexArray(VAO_polygon);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_polygon);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 36, indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) 0);
+    // position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*) 0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
+
+    // normal
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
+
+    // texture coords
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    Shader *shader = new Shader("res/shader/vShader.glsl", "res/shader/fShader.glsl");
+    // color
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
 
-    bool isGo = true;
+    Shader *shader = new Shader("res/shader/vShader.glsl", "res/shader/fShader.glsl");
+    Shader *light_shader = new Shader("res/shader/lCube.vert", "res/shader/lCube.frag");
+
     float dt = 0.0f;
     float lastFrame = 0.0f;
 
-    float dist = 5.f;
+
+    Vec3 lightPos(0.0f, 0.0f, 0.0f);
+    Vec3 lightColor(1.0f, 1.0f, 1.0f);
+    Vec3 ambientColor(1.0f, 1.0f, 1.0f);
 
     sf::Clock clock;
     while (window.isOpen()) {
@@ -177,34 +215,107 @@ int main() {
         lastFrame = currentTime;
         processInput(window, dt);
 
-        polygonTrans.rotation.z = dt * 60.f;
-//        polygonTrans.rotation.x = dt * 45.f;
+        polygonTrans1.rotation.z = dt * 60.0;
+        polygonTrans1.position.x = 0.6f * cos(dt * 0.5);
+        polygonTrans1.position.y = 0.6f * sin(dt * 0.5);
+        polygonTrans1.scale = Vec3(0.2f);
+
+
+        polygonTrans2.rotation.z = dt * 30.0;
+        polygonTrans2.position.x = 0.6f * cos(dt * 0.5 + 3.14158f);
+        polygonTrans2.position.y = 0.6f * sin(dt * 0.5 + 3.14158f);
+        polygonTrans2.scale = Vec3(0.2f);
+
+        polygonTrans3.scale = Vec3(0.2f);
+
+        lightPos.x = 2.0f * cos(dt * 1.2f);
+        lightPos.y = 0.0f;
+        lightPos.z = 2.0f * sin(dt * 1.2f);
+        lightTrans.position = lightPos;
+
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-        shader->use();
+        Mat4x4 p = camera.GetProjectionMatrix();
+        Mat4x4 v = camera.GetViewMatrix();
+        Mat4x4 pv = p * v;
 
         Mat4x4 model = Mat4x4(1.f);
-        model = model.translate(polygonTrans.position);
-        model = model.rotate(radians(polygonTrans.rotation.x), Vec3(1.f, 0.f, 0.f));
-        model = model.rotate(radians(polygonTrans.rotation.y), Vec3(0.f, 1.f, 0.f));
-        model = model.rotate(radians(polygonTrans.rotation.z), Vec3(0.f, 0.f, 1.f));
-        model = model.scale(Vec3(0.2f));
 
-        Mat4x4 pvm = camera.GetProjectionMatrix() * camera.GetViewMatrix() * model;
+        model = model.translate(polygonTrans1.position);
+        model = model.rotate(radians(polygonTrans1.rotation.x), Vec3(1.f, 0.f, 0.f));
+        model = model.rotate(radians(polygonTrans1.rotation.y), Vec3(0.f, 1.f, 0.f));
+        model = model.rotate(radians(polygonTrans1.rotation.z), Vec3(0.f, 0.f, 1.f));
+        model = model.scale(polygonTrans1.scale);
 
-        shader->set4Float("pvm", pvm);
+        shader->use();
+        shader->setMat4("pv", pv);
+        shader->setMat4("model", model);
         shader->setBool("wireframeMode", wireframeMode);
+        shader->set3Float("viewPos", camera.Position);
+        shader->set3Float("lightPos", lightPos);
+        shader->set3Float("lightColor", lightColor);
+        shader->set3Float("ambientColor", ambientColor);
 
         glBindTexture(GL_TEXTURE_2D, box_texture);
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(VAO_polygon);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        // 2
 
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        model = Mat4x4(1.f);
+        model = model.translate(polygonTrans2.position);
+        model = model.rotate(radians(polygonTrans2.rotation.x), Vec3(1.f, 0.f, 0.f));
+        model = model.rotate(radians(polygonTrans2.rotation.y), Vec3(0.f, 1.f, 0.f));
+        model = model.rotate(radians(polygonTrans2.rotation.z), Vec3(0.f, 0.f, 1.f));
+        model = model.scale(polygonTrans2.scale);
+
+        shader->use();
+        shader->setMat4("pv", pv);
+        shader->setMat4("model", model);
+        shader->setBool("wireframeMode", wireframeMode);
+        shader->set3Float("viewPos", camera.Position);
+        shader->set3Float("lightPos", lightPos);
+        shader->set3Float("lightColor", lightColor);
+        shader->set3Float("ambientColor", ambientColor);
+
+        glBindVertexArray(VAO_polygon);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // 3
+
+        model = Mat4x4(1.f);
+        model = model.translate(polygonTrans3.position);
+        model = model.rotate(radians(polygonTrans3.rotation.x), Vec3(1.f, 0.f, 0.f));
+        model = model.rotate(radians(polygonTrans3.rotation.y), Vec3(0.f, 1.f, 0.f));
+        model = model.rotate(radians(polygonTrans3.rotation.z), Vec3(0.f, 0.f, 1.f));
+        model = model.scale(polygonTrans3.scale);
+
+        shader->use();
+        shader->setMat4("pv", pv);
+        shader->setMat4("model", model);
+        shader->setBool("wireframeMode", wireframeMode);
+        shader->set3Float("viewPos", camera.Position);
+        shader->set3Float("lightPos", lightPos);
+        shader->set3Float("lightColor", lightColor);
+        shader->set3Float("ambientColor", ambientColor);
+
+        glBindVertexArray(VAO_polygon);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // LIGHT
+        model = Mat4x4(1.0f);
+        model = model.translate(lightTrans.position);
+        model = model.scale(lightTrans.scale);
+
+        light_shader->use();
+        light_shader->setMat4("pv", pv);
+        light_shader->setMat4("model", model);
+        light_shader->set3Float("lightColor", lightColor);
+
+        glBindVertexArray(VAO_polygon);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         window.display();
 
@@ -229,6 +340,7 @@ int main() {
         }
     }
     delete shader;
+    delete light_shader;
     window.close();
     return 0;
 }
