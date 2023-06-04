@@ -3,7 +3,7 @@
 
 class Mouse {
 public:
-    static void cursorPosCallback(sf::RenderWindow &window, double _x, double _y) {
+    static void cursorPosCallback(double _x, double _y) {
         x = _x;
         y = _y;
 
@@ -19,7 +19,7 @@ public:
         lastY = y;
     };
 
-    static void mouseButtonCallback(sf::RenderWindow &window, int button, int action, int mods) {
+    static void mouseButtonCallback(int button, int action) {
         if (action != sf::Event::MouseButtonReleased) {
             if (!buttons[button]) {
                 buttons[button] = true;
@@ -31,9 +31,8 @@ public:
         buttonsChanged[button] = action != sf::Event::MouseButtonReleased;
     };
 
-    static void mouseWheelCallback(sf::RenderWindow &window, double dx, double dy) {
-        scrollDx = dx;
-        scrollDy = dy;
+    static void mouseWheelCallback(double _delta) {
+        delta = _delta;
     };
 
     static double getMouseX() {
@@ -56,16 +55,10 @@ public:
         return _dy;
     };
 
-    static double getScrollDX() {
-        double _scrollDx = scrollDx;
-        scrollDx = 0;
-        return _scrollDx;
-    };
-
     static double getScrollDY() {
-        double _scrollDy = scrollDy;
-        scrollDy = 0;
-        return _scrollDy;
+        double _delta = delta;
+        delta = 0;
+        return _delta;
     };
 
     static bool button(int button) {
@@ -96,8 +89,7 @@ private:
     static double dx;
     static double dy;
 
-    static double scrollDx;
-    static double scrollDy;
+    static double delta;
 
     static bool firstMouse;
 
@@ -114,8 +106,7 @@ double Mouse::lastY = 0;
 double Mouse::dx = 0;
 double Mouse::dy = 0;
 
-double Mouse::scrollDx = 0;
-double Mouse::scrollDy = 0;
+double Mouse::delta = 0;
 
 bool Mouse::firstMouse = true;
 

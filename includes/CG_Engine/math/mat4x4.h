@@ -7,10 +7,10 @@ class Mat4x4 {
 public:
     Mat4x4() = default;
 
-    explicit Mat4x4(float number) : matrix{{number, 0.f,      0.f,      0.f},
-                                           {0.f,      number, 0.f,      0.f},
-                                           {0.f,      0.f,      number, 0.f},
-                                           {0.f,      0.f,      0.f,      number}} {};
+    explicit Mat4x4(float number) : matrix{{number, 0.f,    0.f,    0.f},
+                                           {0.f,    number, 0.f,    0.f},
+                                           {0.f,    0.f,    number, 0.f},
+                                           {0.f,    0.f,    0.f,    number}} {};
 
     Mat4x4(float a, float b, float c, float d,
            float e, float f, float g, float h,
@@ -330,6 +330,17 @@ public:
         result[2][2] = -1.f;
         result[3][0] = -(right + left) / (right - left);
         result[3][1] = -(top + bottom) / (top - bottom);
+        return result;
+    }
+
+    static Mat4x4 ortho(float left, float right, float bottom, float top, float zNear, float zFar) {
+        Mat4x4 result(1.f);
+        result[0][0] = 2.f / (right - left);
+        result[1][1] = 2.f / (top - bottom);
+        result[2][2] = 1.f / (zFar - zNear);
+        result[3][0] = -(right + left) / (right - left);
+        result[3][1] = -(top + bottom) / (top - bottom);
+        result[3][2] = -zNear / (zFar - zNear);
         return result;
     }
 

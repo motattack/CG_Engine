@@ -40,6 +40,12 @@ file(GLOB IMGUI_SFML_SOURCE_FILES ${CMAKE_SOURCE_DIR}/external/imgui-sfml-2.6/*.
 # Set the path to the STB directory
 set(STB_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/external/stb)
 
+# Set the path to the CATCH directory
+set(CATCH_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/external/test)
+
+# Set the path to the GLM directory
+set(GLM_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/external/glm)
+
 add_executable(${ENGINE_PROJECT_NAME}
         main.cpp
         ${IMGUI_SFML_SOURCE_FILES}
@@ -52,7 +58,6 @@ target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE assimp glew opengl32 sfml-g
 target_include_directories(${ENGINE_PROJECT_NAME} PUBLIC includes)
 
 # Add the GLEW, SFML, and IMGUI_SFML include directories to the engine core include directories
-target_include_directories(${ENGINE_PROJECT_NAME} PUBLIC ${GLEW_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} ${IMGUI_SFML_INCLUDE_DIRS} ${STB_INCLUDE_DIRS} ${ASSIMP_INCLUDE_DIRS})
-
+target_include_directories(${ENGINE_PROJECT_NAME} PUBLIC ${CATCH_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${SFML_INCLUDE_DIRS} ${IMGUI_SFML_INCLUDE_DIRS} ${STB_INCLUDE_DIRS} ${ASSIMP_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS})
 
 set_target_properties(${ENGINE_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
