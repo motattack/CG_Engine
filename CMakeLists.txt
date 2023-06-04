@@ -51,6 +51,11 @@ add_executable(${ENGINE_PROJECT_NAME}
         ${IMGUI_SFML_SOURCE_FILES}
         )
 
+#add_executable(${ENGINE_PROJECT_NAME}
+#        ${IMGUI_SFML_SOURCE_FILES}
+#        test.cpp
+#        )
+
 # Link GLEW and SFML to the engine core library
 target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE assimp glew opengl32 sfml-graphics sfml-system sfml-window)
 

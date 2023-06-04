@@ -1,5 +1,5 @@
-#ifndef CG_ENGINE_CORE_LIGHT_H
-#define CG_ENGINE_CORE_LIGHT_H
+#ifndef CG_ENGINE_LIGHT_H
+#define CG_ENGINE_LIGHT_H
 
 #include <CG_Engine/render/shader.h>
 
@@ -79,4 +79,4 @@ struct SpotLight {
 };
 
 
-#endif //CG_ENGINE_CORE_LIGHT_H
+#endif //CG_ENGINE_LIGHT_H

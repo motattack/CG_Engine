@@ -1,7 +1,7 @@
-#ifndef CG_ENGINE_CORE_MATERIAL_H
-#define CG_ENGINE_CORE_MATERIAL_H
+#ifndef CG_ENGINE_MATERIAL_H
+#define CG_ENGINE_MATERIAL_H
 
-#include <CG_Engine_Core/math/vec3.h>
+#include <CG_Engine/math/common.h>
 
 struct Material {
     Vec3 ambient;
@@ -94,4 +94,4 @@ Material Material::mix(Material m1, Material m2, float mix) {
     };
 }
 
-#endif //CG_ENGINE_CORE_MATERIAL_H
+#endif //CG_ENGINE_MATERIAL_H

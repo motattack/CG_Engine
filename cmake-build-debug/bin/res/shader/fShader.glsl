@@ -1,58 +1,84 @@
 #version 330 core
 
-struct Material {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float shininess;
-};
+out vec4 FragColor;
 
-struct Light {
-    vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float constant;
-    float linear;
-    float quadratic;
-};
-
-in vec3 vertColor;
-in vec2 texCoords;
-in vec3 vertNormal;
+in vec2 TexCoords;
 in vec3 FragPos;
+in vec3 Normal;
 
-out vec4 outColor;
+struct Material{
+    sampler2D texture_diffuse;
+    sampler2D texture_specular;
+};
 
-uniform sampler2D ourTexture;
-uniform bool wireframeMode;
+struct Light{
+    vec3 position;
+    vec3 direction;
 
-uniform vec3 viewPos;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
+vec3 direction = vec3(-0.2f, -1.0f, -0.5f);
+
+
+float constant = 1.0f;
+float linear = 0.092f;
+float quadratic = 0.032f;
+float cutOff = cos(radians(12.5f));
+float outerCutOff = cos(radians(17.5f));
+
 uniform Material material;
 uniform Light light;
+uniform vec3 viewPos;
 
 void main()
 {
-    float dist = distance(light.position, FragPos);
-    float attenuation = 1.0 / (light.constant + light.linear*dist + light.quadratic * dist * dist);
-
-    vec3 ambient = light.ambient * material.ambient * attenuation;
+    // ambient
+    vec3 ambient = light.ambient * texture(material.texture_diffuse, TexCoords).rgb;
 
     // diffuse
-    vec3 norm = normalize(vertNormal);
-    vec3 lightDir = normalize(FragPos - light.position);
-    float diff_koef = max(dot(norm, -lightDir), 0.0);
-    vec3 diffuse = light.diffuse * (diff_koef * material.diffuse) * attenuation;
+    vec3 norm = normalize(Normal);
+    vec3 lightDir = normalize(light.position - FragPos);
+    float diff = max(dot(lightDir, norm), 0.0f);
+    vec3 diffuse = light.diffuse * diff * texture(material.texture_diffuse, TexCoords).rgb;
 
     // specular
+    vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);
-    vec3 viewDir = normalize(FragPos-viewPos);
-    float spec_koef = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 64.0f);
+    vec3 specular = light.specular * spec * texture(material.texture_specular, TexCoords).rgb;
 
-    vec3 specular = light.specular * (spec_koef * material.specular) * attenuation;
+    // Intensity
+    float theta = dot(lightDir, normalize(-light.direction));
+    float epsilon = cutOff - outerCutOff;
+    float intensity = clamp((theta-outerCutOff)/epsilon, 0.0f, 1.0f);
 
-    if (wireframeMode)
-    outColor = vec4(vertColor, 1.0f);
-    else
-    outColor = texture(ourTexture, texCoords) * vec4(ambient + diffuse + specular, 1.0f);
+
+    // Attenuation
+    float Distance = length(light.position - FragPos);
+    float attenuation = 1.0f / (constant + linear * Distance + quadratic * pow(Distance, 2));
+
+    ambient *= attenuation * intensity;
+    diffuse *= attenuation * intensity;
+    specular *= attenuation * intensity;
+
+    // Directional Light
+    // ambient
+    vec3 ambient2 = light.ambient * texture(material.texture_diffuse, TexCoords).rgb;
+
+    // diffuse
+    vec3 lightDir2 = normalize(-direction);
+    float diff2 = max(dot(lightDir2, norm), 0.0f);
+    vec3 diffuse2 = light.diffuse * diff * texture(material.texture_diffuse, TexCoords).rgb;
+
+    // specular
+    vec3 reflectDir2 = reflect(-lightDir2, norm);
+    float spec2 = pow(max(dot(viewDir, reflectDir), 0.0f), 64.0f);
+    vec3 specular2 = light.specular * spec2 * texture(material.texture_specular, TexCoords).rgb;
+
+    vec3 result = (ambient + ambient2) + (diffuse + diffuse2) + (specular + specular2);
+
+    FragColor =  vec4(result, 1.0f);
 }

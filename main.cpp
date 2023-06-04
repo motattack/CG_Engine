@@ -2,17 +2,16 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <iostream>
-#include <CG_Engine/render/shader.h>
-#include <CG_Engine/math/common.h>
-#include <CG_Engine/UI/camera.h>
-#include <CG_Engine/UI/keyboard.h>
-#include <CG_Engine/UI/mouse.h>
+#include <CG_Engine/ui/camera.h>
+#include <CG_Engine/ui/keyboard.h>
+#include <CG_Engine/ui/mouse.h>
+#include <CG_Engine/objects/model.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
 
-Camera camera(Vec3(0.f, 0.f, -2.f));
+Camera camera(Vec3(0.183165, -0.0376139, 0.031249), Vec3(0.f, 1.0f, 0.f), 243.051, -20.7);
 
 bool wireframeMode = false;
 
@@ -55,40 +54,12 @@ void processInput(sf::Window &window, float dt) {
         wireframeMode = !wireframeMode;
         setPolygonMode();
     }
-};
+}
 
-struct ModelTransform {
-    Vec3 position;
-    Vec3 rotation;
-    Vec3 scale;
-};
-
-struct Material {
-    Vec3 ambient;
-    Vec3 diffuse;
-    Vec3 specular;
-    float shininess;
-};
-
-struct DirecationalLight {
-    Vec3 direction;
-
-    Vec3 ambient;
-    Vec3 diffuse;
-    Vec3 specular;
-};
-
-struct PointLight {
-    Vec3 position;
-
-    Vec3 ambient;
-    Vec3 diffuse;
-    Vec3 specular;
-
-    float constant;
-    float linear;
-    float quadratic;
-};
+// Matrix's
+Mat4x4 projection;
+Mat4x4 model;
+Mat4x4 view;
 
 int main() {
     sf::ContextSettings settings;
@@ -167,45 +138,7 @@ int main() {
             -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f
     };
 
-    Material cubeMaterials[3] = {
-            {
-                    Vec3(0.25, 0.20725, 0.20725),
-                    Vec3(1, 0.829, 0.829),
-                    Vec3(0.296648, 0.296648, 0.296648),
-                    12.f
-            }, // pearl
-            {
-                    Vec3(0.25, 0.25, 0.25),
-                    Vec3(0.4, 0.4, 0.4),
-                    Vec3(0.774597, 0.774597, 0.774597),
-                    77.f
-            }, // chrome
-            {
-                    Vec3(0.1745, 0.01175, 0.01175),
-                    Vec3(0.61424, 0.04136, 0.04136),
-                    Vec3(0.727811, 0.626959, 0.626959),
-                    77.f
-            } // ruby
-    };
-
-    const int cube_count = 100;
-
-    ModelTransform cubeTrans[cube_count];
-    int cubeMat[cube_count];
-    for (int i = 0; i < cube_count; i++) {
-        float scale = (rand() % 6 + 1) / 20.0f;
-        cubeTrans[i] = {
-                Vec3((rand() % 201 - 100) / 50.0f, (rand() % 201 - 100) / 50.0f, (rand() % 201 - 100) / 50.0f),
-                Vec3(rand() / 100.0f, rand() / 100.0f, rand() / 100.0f),
-                Vec3(scale, scale, scale)
-        };
-        cubeMat[i] = rand() % 3;
-    }
-
-    ModelTransform lightTrans = {
-            Vec3(0.f, 0.f, 0.f),    // position
-            Vec3(0.f, 0.f, 0.f),    // rotation
-            Vec3(0.1f, 0.1f, 0.1f)};    // scale
+    Vec3 lightPos = Vec3(1.2f, 1.0f, 1.5f);
 
     unsigned int box_texture;
     glGenTextures(1, &box_texture);
@@ -248,18 +181,17 @@ int main() {
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void *) (8 * sizeof(float)));
     glEnableVertexAttribArray(3);
 
-    Shader *shader = new Shader("res/shader/vShader.glsl", "res/shader/fShader.glsl");
-    Shader *light_shader = new Shader("res/shader/lCube.vert", "res/shader/lCube.frag");
+    /* Shader */
+    Shader myShader("res/shader/vShader.glsl",
+                    "res/shader/fShader.glsl");
+    myShader.use();
+    Shader lightCubeShader("res/Shader/lCube.vert", "res/Shader/lCube.frag");
 
-    float dt = 0.0f;
+    stbi_set_flip_vertically_on_load(true);
+    Model myBackPack("res/models/backpack/backpack.obj");
+
+    float dt;
     float lastFrame = 0.0f;
-
-
-    PointLight light1 = {Vec3(0.0f, 0.0f, 0.0f),
-                         Vec3(0.4f, 0.4f, 0.4f),
-                         Vec3(1.0f, 1.0f, 1.0f),
-                         Vec3(3.0f, 3.0f, 3.0f),
-                         0.9f, 0.1f, 0.09f};
 
     sf::Clock clock;
     while (window.isOpen()) {
@@ -268,63 +200,52 @@ int main() {
         lastFrame = currentTime;
         processInput(window, dt);
 
-        lightTrans.position = light1.position;
+        float radius = 5.0f;
+        float camX = std::sin(currentTime) * radius;
+        float camZ = std::cos(currentTime) * radius;
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        Mat4x4 p = camera.GetProjectionMatrix();
-        Mat4x4 v = camera.GetViewMatrix();
-        Mat4x4 pv = p * v;
+        myShader.use();
 
-        Mat4x4 model = Mat4x4(1.f);
+        lightPos = Vec3(camX, camZ, 0.0f);
+        myShader.set3Float("light.position", camera.Position);
+        myShader.set3Float("light.direction", camera.Front);
+        myShader.set3Float("light.ambient", Vec3(0.2f));
+        myShader.set3Float("light.diffuse", Vec3(0.4f));
+        myShader.set3Float("light.specular", Vec3(0.5f));
+        myShader.set3Float("viewPos", camera.Position);
 
-        for (int i = 0; i < cube_count; i++) {
-            model = Mat4x4(1.0f);
+        /* Coordinates */
+        // Projection
+        projection = camera.GetProjectionMatrix();
+        myShader.setMat4("projection", projection);
 
-            model = model.translate(cubeTrans[i].position);
-            model = model.rotate(radians(cubeTrans[i].rotation.x), Vec3(1.f, 0.f, 0.f));
-            model = model.rotate(radians(cubeTrans[i].rotation.y), Vec3(0.f, 1.f, 0.f));
-            model = model.rotate(radians(cubeTrans[i].rotation.z), Vec3(0.f, 0.f, 1.f));
-            model = model.scale(cubeTrans[i].scale);
+        // View
+        view = Mat4x4(1.0f);
+        view = camera.GetViewMatrix();
+        myShader.setMat4("view", view);
 
-            shader->use();
-            shader->setMat4("pv", pv);
-            shader->setMat4("model", model);
-            shader->setBool("wireframeMode", wireframeMode);
-            shader->set3Float("viewPos", camera.Position);
-
-            shader->set3Float("light.position", light1.position);
-            shader->set3Float("light.ambient", light1.ambient);
-            shader->set3Float("light.diffuse", light1.diffuse);
-            shader->set3Float("light.specular", light1.specular);
-            shader->setFloat("light.constant", light1.constant);
-            shader->setFloat("light.linear", light1.linear);
-            shader->setFloat("light.quadratic", light1.quadratic);
-
-            shader->set3Float("material.ambient", cubeMaterials[cubeMat[i]].ambient);
-            shader->set3Float("material.diffuse", cubeMaterials[cubeMat[i]].diffuse);
-            shader->set3Float("material.specular", cubeMaterials[cubeMat[i]].specular);
-            shader->setFloat("material.shininess", cubeMaterials[cubeMat[i]].shininess);
-
-
-            glBindTexture(GL_TEXTURE_2D, box_texture);
-            glBindVertexArray(VAO_polygon);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-
-        // LIGHT
+        // Model
         model = Mat4x4(1.0f);
-        model = model.translate(lightTrans.position);
-        model = model.scale(lightTrans.scale);
+        myShader.setMat4("model", model);
 
-        light_shader->use();
-        light_shader->setMat4("pv", pv);
-        light_shader->setMat4("model", model);
-        light_shader->set3Float("lightColor", light1.specular);
+        // Draw your model
+        myBackPack.Draw(myShader);
+
+        // Second Object
+        lightCubeShader.use();
+        lightCubeShader.setMat4("projection", projection);
+        lightCubeShader.setMat4("view", view);
+        model = Mat4x4(1.0f);
+        model = model.translate(lightPos);
+        lightCubeShader.setMat4("model", model);
 
         glBindVertexArray(VAO_polygon);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        myBackPack.Draw(myShader);
 
         window.display();
 
@@ -347,8 +268,6 @@ int main() {
             }
         }
     }
-    delete shader;
-    delete light_shader;
     window.close();
     return 0;
 }
