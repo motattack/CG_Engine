@@ -45,46 +45,30 @@ int main() {
         // First Object
         myShader.use();
 
-        // Directional Light
-        myShader.set3Float("dirLight.direction", Vec3(dir_direction[0], dir_direction[1], dir_direction[2]));
-        myShader.set3Float("dirLight.ambient", Vec3(dir_ambient[0], dir_ambient[1], dir_ambient[2]));
-        myShader.set3Float("dirLight.diffuse", Vec3(dir_diffuse[0], dir_ambient[1], dir_ambient[2]));
-        myShader.set3Float("dirLight.specular", Vec3(dir_specular[0], dir_ambient[1], dir_ambient[2]));
+        DirLight dir(dir_direction, dir_ambient, dir_diffuse, dir_specular);
+        dir.render(myShader, 0);
+
+        PointLight point(pointLightPositions[0], point_constant, point_linear, point_quadratic, point_ambient,
+                         point_diffuse, point_specular);
 
         // Point Lights
         for (int i = 0; i < 4; i++) {
-            myShader.set3Float("pointLights[" + std::to_string(i) + "].position",
-                               pointLightPositions[i] * xValue);
-            myShader.set3Float("pointLights[" + std::to_string(i) + "].ambient",
-                               Vec3(point_ambient[0], point_ambient[1], point_ambient[2]));
-            myShader.set3Float("pointLights[" + std::to_string(i) + "].diffuse",
-                               Vec3(point_diffuse[0], point_diffuse[1], point_diffuse[2]));
-            myShader.set3Float("pointLights[" + std::to_string(i) + "].specular",
-                               Vec3(point_specular[0], point_specular[1], point_specular[2]));
-            myShader.setFloat("pointLights[" + std::to_string(i) + "].constant", point_constant);
-            myShader.setFloat("pointLights[" + std::to_string(i) + "].linear", point_linear);
-            myShader.setFloat("pointLights[" + std::to_string(i) + "].quadratic", point_quadratic);
+            point.position = pointLightPositions[i] * xValue;
+            point.render(myShader, i);
         }
+//
 
-        // Spotlight
-        myShader.set3Float("spotLight.position", scene.camera.Position);
-        myShader.set3Float("spotLight.direction", scene.camera.Front);
-        myShader.set3Float("viewPos", scene.camera.Position);
-        myShader.set3Float("spotLight.ambient", Vec3(spot_ambient[0], spot_ambient[1], spot_ambient[2]));
-        myShader.set3Float("spotLight.diffuse", Vec3(spot_diffuse[0], spot_diffuse[1], spot_diffuse[2]));
-        myShader.set3Float("spotLight.specular", Vec3(spot_specular[0], spot_specular[1], spot_specular[2]));
-        myShader.setFloat("spotLight.constant", spot_constant);
-        myShader.setFloat("spotLight.linear", spot_linear);
-        myShader.setFloat("spotLight.quadratic", spot_quadratic);
+        SpotLight spot(scene.camera.Position, scene.camera.Front, 0.0f, 0.0f, spot_constant,
+                       spot_linear, spot_quadratic, spot_ambient, spot_diffuse, spot_specular, scene.camera.Position);
 
         if (scene.getTorch()) {
-            myShader.setFloat("spotLight.cutOff", cos(radians(spot_cutOff)));
-            myShader.setFloat("spotLight.outerCutOff", cos(radians(spot_outerCutOff)));
+            spot.cutOff = cos(radians(spot_cutOff));
+            spot.outerCutOff = cos(radians(spot_outerCutOff));
         } else {
-            myShader.setFloat("spotLight.cutOff", cos(radians(0.0f)));
-            myShader.setFloat("spotLight.outerCutOff", cos(radians(0.0f)));
-
+            spot.cutOff = cos(radians(0.0f));
+            spot.outerCutOff = cos(radians(0.0f));
         }
+        spot.render(myShader, 0);
 
         // Material
         myShader.setFloat("material.shininess", 64.0f);

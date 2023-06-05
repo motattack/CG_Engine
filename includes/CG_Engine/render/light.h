@@ -3,80 +3,96 @@
 
 #include <CG_Engine/render/shader.h>
 
-struct DirLight {
+class Light {
+protected:
+    Vec3 ambient;
+    Vec3 diffuse;
+    Vec3 specular;
+
+public:
+    Light(const Vec3 &ambientColor, const Vec3 &diffuseColor, const Vec3 &specularColor)
+            : ambient(ambientColor), diffuse(diffuseColor), specular(specularColor) {}
+
+    virtual void render(Shader &shader, int idx) const = 0;
+};
+
+struct DirLight : public Light {
     Vec3 direction;
 
-    Vec4 ambient;
-    Vec4 diffuse;
-    Vec4 specular;
+    DirLight(const Vec3 &lightDirection, const Vec3 &ambientColor, const Vec3 &diffuseColor, const Vec3 &specularColor)
+            : Light(ambientColor, diffuseColor, specularColor), direction(lightDirection) {}
 
-    void render(const Shader& shader) const {
+    void render(Shader &shader, int /*idx*/) const override {
         shader.set3Float("dirLight.direction", direction);
-        shader.set4Float("dirLight.ambient", ambient);
-        shader.set4Float("dirLight.diffuse", diffuse);
-        shader.set4Float("dirLight.specular", specular);
+        shader.set3Float("dirLight.ambient", ambient);
+        shader.set3Float("dirLight.diffuse", diffuse);
+        shader.set3Float("dirLight.specular", specular);
     }
 };
 
-struct PointLight {
+struct PointLight : public Light {
     Vec3 position;
 
     // attenuation constants
-    float k0;
-    float k1;
-    float k2;
+    float constant;
+    float linear;
+    float quadratic;
 
-    Vec4 ambient;
-    Vec4 diffuse;
-    Vec4 specular;
+    PointLight(const Vec3 &lightPosition, float attConstant, float attLinear, float attQuadratic,
+               const Vec3 &ambientColor, const Vec3 &diffuseColor, const Vec3 &specularColor)
+            : Light(ambientColor, diffuseColor, specularColor), position(lightPosition),
+              constant(attConstant), linear(attLinear), quadratic(attQuadratic) {}
 
-    void render(Shader shader, int idx) const {
+    void render(Shader &shader, int idx) const override {
         std::string name = "pointLights[" + std::to_string(idx) + "]";
         shader.set3Float(name + ".position", position);
-
-        shader.setFloat(name + ".k0", k0);
-        shader.setFloat(name + ".k1", k1);
-        shader.setFloat(name + ".k2", k2);
-
-        shader.set4Float(name + ".ambient", ambient);
-        shader.set4Float(name + ".diffuse", diffuse);
-        shader.set4Float(name + ".specular", specular);
+        shader.set3Float(name + ".ambient", ambient);
+        shader.set3Float(name + ".diffuse", diffuse);
+        shader.set3Float(name + ".specular", specular);
+        shader.setFloat(name + ".constant", constant);
+        shader.setFloat(name + ".linear", linear);
+        shader.setFloat(name + ".quadratic", quadratic);
     }
 };
 
-struct SpotLight {
+struct SpotLight : public Light {
     Vec3 position;
     Vec3 direction;
+
+    Vec3 viewPos;
 
     float cutOff;
     float outerCutOff;
 
     // attenuation constants
-    float k0;
-    float k1;
-    float k2;
+    float constant;
+    float linear;
+    float quadratic;
 
-    Vec4 ambient;
-    Vec4 diffuse;
-    Vec4 specular;
+    SpotLight(const Vec3 &lightPosition, const Vec3 &lightDirection, float innerAngle, float outerAngle,
+              float attConstant, float attLinear, float attQuadratic,
+              const Vec3 &ambientColor, const Vec3 &diffuseColor, const Vec3 &specularColor, const Vec3 &viewPos)
+            : Light(ambientColor, diffuseColor, specularColor), position(lightPosition), direction(lightDirection),
+              cutOff(std::cos(radians(innerAngle))), outerCutOff(std::cos(radians(outerAngle))),
+              constant(attConstant), linear(attLinear), quadratic(attQuadratic), viewPos(viewPos) {}
 
-    void render(Shader shader, int idx) const {
-        std::string name = "spotLights[" + std::to_string(idx) + "]";
+    void render(Shader &shader, int idx) const override {
+        std::string name = "spotLight";
         shader.set3Float(name + ".position", position);
+        shader.set3Float(name + ".ambient", ambient);
+        shader.set3Float(name + ".diffuse", diffuse);
+        shader.set3Float(name + ".specular", specular);
         shader.set3Float(name + ".direction", direction);
+
+        shader.set3Float("viewPos", viewPos);
+
+        shader.setFloat(name + ".constant", constant);
+        shader.setFloat(name + ".linear", linear);
+        shader.setFloat(name + ".quadratic", quadratic);
 
         shader.setFloat(name + ".cutOff", cutOff);
         shader.setFloat(name + ".outerCutOff", outerCutOff);
-
-        shader.setFloat(name + ".k0", k0);
-        shader.setFloat(name + ".k1", k1);
-        shader.setFloat(name + ".k2", k2);
-
-        shader.set4Float(name + ".ambient", ambient);
-        shader.set4Float(name + ".diffuse", diffuse);
-        shader.set4Float(name + ".specular", specular);
     }
 };
-
 
 #endif //CG_ENGINE_LIGHT_H
