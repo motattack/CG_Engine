@@ -26,8 +26,9 @@ unsigned int TextureFromFile(const char *path, const string &directory);
 
 class Model {
 public:
+    Model() = default;
 
-    Model(const char *path) {
+    explicit Model(const char *path) {
         this->loadModel(path);
     }
 
@@ -40,7 +41,6 @@ private:
 
     // Model Data
     vector<Texture> textures_loaded;
-    vector<Mesh> meshes;
     string directory;
 
     void loadModel(const string &path) {
@@ -162,6 +162,8 @@ private:
         return textures;
     }
 
+protected:
+    vector<Mesh> meshes;
 };
 
 unsigned int TextureFromFile(const char *path, const string &directory) {

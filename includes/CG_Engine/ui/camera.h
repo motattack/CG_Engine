@@ -71,11 +71,11 @@ public:
         UpdateCameraVectors();
     };
 
-    Mat4x4 GetViewMatrix() {
+    Mat4x4 GetViewMatrix() const {
         return Mat4x4::lookAt(Position, Position + Front, Up);
     };
 
-    Mat4x4 GetProjectionMatrix() {
+    Mat4x4 GetProjectionMatrix() const {
         return Mat4x4::perspective(radians(Fov), AspectRatio, zNear, zFar);
     };
 

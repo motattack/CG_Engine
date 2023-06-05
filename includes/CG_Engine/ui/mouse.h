@@ -110,7 +110,7 @@ float Mouse::delta = 0;
 
 bool Mouse::firstMouse = true;
 
-bool Mouse::buttons[4] = {0};
-bool Mouse::buttonsChanged[4] = {0};
+bool Mouse::buttons[4] = {false};
+bool Mouse::buttonsChanged[4] = {false};
 
 #endif //CG_ENGINE_MOUSE_H

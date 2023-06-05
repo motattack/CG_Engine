@@ -19,13 +19,13 @@ private:
         if (type != "PROGRAM") {
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
             if (!success) {
-                glGetShaderInfoLog(shader, 512, NULL, infoLog);
+                glGetShaderInfoLog(shader, 512, nullptr, infoLog);
                 std::cout << "ERROR:SHADER::" << type << std::endl << infoLog << std::endl;
             }
         } else {
             glGetProgramiv(shader, GL_LINK_STATUS, &success);
             if (!success) {
-                glGetProgramInfoLog(shader, 512, NULL, infoLog);
+                glGetProgramInfoLog(shader, 512, nullptr, infoLog);
                 std::cout << "ERROR::LINKING::" << type << std::endl << infoLog << std::endl;
             }
         }
@@ -66,13 +66,13 @@ public:
 
         unsigned int vertex;
         vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, 1, &vShaderCode, NULL);
+        glShaderSource(vertex, 1, &vShaderCode, nullptr);
         glCompileShader(vertex);
         checkCompileErrors(vertex, "VERTEX");
 
         unsigned int fragment;
         fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment, 1, &fShaderCode, NULL);
+        glShaderSource(fragment, 1, &fShaderCode, nullptr);
         glCompileShader(fragment);
         checkCompileErrors(fragment, "FRAGMENT");
 

@@ -10,7 +10,7 @@ struct DirLight {
     Vec4 diffuse;
     Vec4 specular;
 
-    void render(Shader shader) const {
+    void render(const Shader& shader) const {
         shader.set3Float("dirLight.direction", direction);
         shader.set4Float("dirLight.ambient", ambient);
         shader.set4Float("dirLight.diffuse", diffuse);
