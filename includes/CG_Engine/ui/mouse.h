@@ -3,7 +3,7 @@
 
 class Mouse {
 public:
-    static void cursorPosCallback(double _x, double _y) {
+    static void cursorPosCallback(float _x, float _y) {
         x = _x;
         y = _y;
 
@@ -31,32 +31,32 @@ public:
         buttonsChanged[button] = action != sf::Event::MouseButtonReleased;
     };
 
-    static void mouseWheelCallback(double _delta) {
+    static void mouseWheelCallback(float _delta) {
         delta = _delta;
     };
 
-    static double getMouseX() {
+    static float getMouseX() {
         return x;
     };
 
-    static double getMouseY() {
+    static float getMouseY() {
         return y;
     };
 
-    static double getDX() {
-        double _dx = dx;
+    static float getDX() {
+        float _dx = dx;
         dx = 0;
         return _dx;
     };
 
-    static double getDY() {
-        double _dy = dy;
+    static float getDY() {
+        float _dy = dy;
         dy = 0;
         return _dy;
     };
 
-    static double getScrollDY() {
-        double _delta = delta;
+    static float getScrollDY() {
+        float _delta = delta;
         delta = 0;
         return _delta;
     };
@@ -80,16 +80,16 @@ public:
     };
 
 private:
-    static double x;
-    static double y;
+    static float x;
+    static float y;
 
-    static double lastX;
-    static double lastY;
+    static float lastX;
+    static float lastY;
 
-    static double dx;
-    static double dy;
+    static float dx;
+    static float dy;
 
-    static double delta;
+    static float delta;
 
     static bool firstMouse;
 
@@ -97,16 +97,16 @@ private:
     static bool buttonsChanged[];
 };
 
-double Mouse::x = 0;
-double Mouse::y = 0;
+float Mouse::x = 0;
+float Mouse::y = 0;
 
-double Mouse::lastX = 0;
-double Mouse::lastY = 0;
+float Mouse::lastX = 0;
+float Mouse::lastY = 0;
 
-double Mouse::dx = 0;
-double Mouse::dy = 0;
+float Mouse::dx = 0;
+float Mouse::dy = 0;
 
-double Mouse::delta = 0;
+float Mouse::delta = 0;
 
 bool Mouse::firstMouse = true;
 

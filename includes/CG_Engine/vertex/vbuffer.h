@@ -1,9 +1,7 @@
 #ifndef CG_ENGINE_VBUFFER_H
 #define CG_ENGINE_VBUFFER_H
 
-#include <GL/glew.h>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
+#include <CG_Engine/vertex/memory.h>
 
 template<typename T>
 class vBuffer {

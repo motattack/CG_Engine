@@ -2,7 +2,6 @@
 #define CG_ENGINE_MESH_H
 
 #include <string>
-#include <utility>
 #include <vector>
 
 #include <CG_Engine/render/shader.h>

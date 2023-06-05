@@ -41,7 +41,7 @@ private:
     static bool keysChanged[];
 };
 
-bool Keyboard::keys[sf::Keyboard::KeyCount] = {0};
-bool Keyboard::keysChanged[sf::Keyboard::KeyCount] = {0};
+bool Keyboard::keys[sf::Keyboard::KeyCount] = {false};
+bool Keyboard::keysChanged[sf::Keyboard::KeyCount] = {false};
 
 #endif //CG_ENGINE_KEYBOARD_H

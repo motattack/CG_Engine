@@ -1,9 +1,7 @@
 #ifndef CG_ENGINE_VARRAY_H
 #define CG_ENGINE_VARRAY_H
 
-#include <GL/glew.h>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
+#include <CG_Engine/vertex/memory.h>
 
 class vArray {
 private:
@@ -14,7 +12,8 @@ public:
         bind();
     };
 
-    static void attrPointer(GLuint ind, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer) {
+    static void
+    attrPointer(GLuint ind, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer) {
         glVertexAttribPointer(ind, size, type, normalized, stride, pointer);
         glEnableVertexAttribArray(ind);
     };
