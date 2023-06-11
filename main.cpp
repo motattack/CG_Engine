@@ -30,10 +30,11 @@ int main() {
 
     Cube superCube, lightCube;
 
-    scene.manager.addObject(Object(superCube));
-    scene.manager.addObject(Object(superCube));
+    scene.manager.baseAddModel(superCube, "Cube");
 
     Model myBackPack("res/models/backpack/backpack.obj");
+
+    scene.manager.baseAddModel(myBackPack, "backPack");
 
     float dt, lastFrame = 0.0f;
 
@@ -90,15 +91,7 @@ int main() {
         myShader.setMat4("view", view);
 
         // Manager objects
-
         scene.manager.renderObjects(myShader);
-
-        // backPack
-        model = Mat4x4(1.0f);
-        model = model.translate(Vec3(3.f));
-        myShader.setMat4("model", model);
-
-        myBackPack.Draw(myShader);
 
         // Second Object
         lightCubeShader.use();
@@ -122,6 +115,7 @@ int main() {
 
         ImGui::SFML::Update(scene.window, deltaClock.restart());
         ObjectManager(scene.manager);
+        ModelsManager(scene.manager);
         ImGui::SFML::Render(scene.window);
         glEnable(GL_DEPTH_TEST);
 

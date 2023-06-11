@@ -13,9 +13,13 @@ public:
     Vec3 pos;
     Vec3 rotation;
     float scale = 1.f;
+    std::string name = "Object";
 
     Object(const Model &objModel, Light *objLight = nullptr)
             : model(objModel), light(objLight) {}
+
+    Object(const Model &objModel, std::string name, Light *objLight = nullptr)
+            : model(objModel), name(std::move(name)), light(objLight) {}
 
     void render(Shader &shader, int lightIndex) {
         model.Draw(shader);  // Render the model
@@ -29,9 +33,13 @@ class Manager {
 private:
     std::vector<Object> objects;
     int numLightsUsed;  // Number of lights used
-
+    std::vector<Object> base;
 public:
     Manager() : numLightsUsed(0) {}
+
+    Object &getBaseByID(int id) {
+        return base[id];
+    }
 
     Object &getByID(int id) {
         return objects[id];
@@ -45,6 +53,14 @@ public:
 
         objects.push_back(obj);
         numLightsUsed++;
+    }
+
+    void baseAddObject(const Object &obj) {
+        base.push_back(obj);
+    }
+
+    void baseAddModel(const Model &model, const std::string name) {
+        base.emplace_back(Object(model, name));
     }
 
     void renderObjects(Shader &shader) {
@@ -61,19 +77,31 @@ public:
         }
     }
 
+    unsigned long long last() const {
+        return numLightsUsed;
+    }
+
     unsigned long long size() const {
         return objects.size();
     }
 
+    unsigned long long bSize() const {
+        return base.size();
+    }
+
     const char **getName() const {
-        std::vector<std::string> names;
-        for (int i = 0; i < size(); i++) {
-            names.emplace_back("Object" + std::to_string(i));
+        const char **charPtrArray = new const char *[size()];
+        for (std::size_t i = 0; i < size(); i++) {
+            charPtrArray[i] = objects[i].name.c_str();
         }
 
-        const char **charPtrArray = new const char *[names.size()];
-        for (std::size_t i = 0; i < names.size(); i++) {
-            charPtrArray[i] = names[i].c_str();
+        return charPtrArray;
+    }
+
+    const char **getBaseName() const {
+        const char **charPtrArray = new const char *[base.size()];
+        for (std::size_t i = 0; i < base.size(); i++) {
+            charPtrArray[i] = base[i].name.c_str();
         }
 
         return charPtrArray;

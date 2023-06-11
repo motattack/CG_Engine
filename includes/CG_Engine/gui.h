@@ -63,11 +63,33 @@ void light_editor(Scene &scene) {
     ImGui::End();
 }
 
+void ModelsManager(Manager &manager) {
+    static int selectedModel = -1;
+
+    ImGui::Begin("Models");
+
+    const char **listbox_items = manager.getBaseName();
+
+    ImGui::ListBox("Base", &selectedModel, listbox_items, manager.bSize());
+
+    if (selectedModel >= 0 && selectedModel < manager.bSize()) {
+        static char str[128] = "Sample Text";
+        ImGui::InputText("Name", str, IM_ARRAYSIZE(str));
+        if (ImGui::Button("Add Model")) {
+            Object newObject = manager.getBaseByID(selectedModel);
+            newObject.name = str;
+            manager.addObject(newObject);
+        }
+    }
+
+    ImGui::End();
+}
+
 void ObjectManager(Manager &manager) {
     static int selectedInstance = -1;
 
     // Draw a list of instances
-    ImGui::Begin("Rigid Body Editor");
+    ImGui::Begin("Layout");
 
     const char **listbox_items = manager.getName();
 
