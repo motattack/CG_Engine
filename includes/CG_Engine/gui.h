@@ -17,7 +17,7 @@ static float point_constant = 1.0f;
 static float point_linear = 0.09f;
 static float point_quadratic = 0.032f;
 
-// Spot Light
+// Spotlight
 static Vec3 spot_ambient = {0.2f, 0.2f, 0.2f};
 static Vec3 spot_diffuse = {1.0f, 1.0f, 1.0f};
 static Vec3 spot_specular = {1.0f, 1.0f, 1.0f};
@@ -27,11 +27,7 @@ static float spot_quadratic = 0.032f;
 static float spot_cutOff = 12.5f;
 static float spot_outerCutOff = 18.5f;
 
-static float cubeMapPos[3] = {0.0f, 0.0f, 0.0f};
-
-void light_editor(Scene &scene, sf::Clock dt) {
-    ImGui::SFML::Update(scene.window, dt.restart());
-
+void light_editor(Scene &scene) {
     float FPS = ImGui::GetIO().Framerate;
     ImGui::Begin("Hello, world!");
     ImGui::Text("FPS = %f", FPS);
@@ -43,7 +39,6 @@ void light_editor(Scene &scene, sf::Clock dt) {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
     ImGui::PopStyleColor();
 
-    ImGui::SliderFloat3("Map Position", cubeMapPos, -10.0f, 10.0f);
     ImGui::Text("Directional Light");
     ImGui::SliderFloat3("Directional Direction", &dir_direction[0], -2.0f, 2.0f);
     ImGui::SliderFloat3("Directional Ambient", &dir_ambient[0], 0.0f, 1.0f);
@@ -66,10 +61,38 @@ void light_editor(Scene &scene, sf::Clock dt) {
     ImGui::SliderFloat("Spot CutOff", &spot_cutOff, 0.0f, 100.0f);
     ImGui::SliderFloat("Spot OuterCutOff", &spot_outerCutOff, 0.0f, 100.0f);
     ImGui::End();
+}
 
-    ImGui::SFML::Render(scene.window);
+void ObjectManager(Manager &manager) {
+    static int selectedInstance = -1;
 
-    glEnable(GL_DEPTH_TEST);
+    // Draw a list of instances
+    ImGui::Begin("Rigid Body Editor");
+
+    const char **listbox_items = manager.getName();
+
+    ImGui::ListBox("Instances", &selectedInstance, listbox_items, manager.size());
+
+    ImGui::End();
+
+    if (selectedInstance >= 0 && selectedInstance < manager.size()) {
+        Object &instance = manager.getByID(selectedInstance);
+
+        ImGui::Begin("Instance Properties");
+        if (ImGui::CollapsingHeader("Translate")) {
+            ImGui::InputFloat("X", &instance.pos.x, 0.05f, 1.0f);
+            ImGui::InputFloat("Y", &instance.pos.y, 0.05f, 1.0f);
+            ImGui::InputFloat("Z", &instance.pos.z, 0.05f, 1.0f);
+        }
+        if (ImGui::CollapsingHeader("Rotate")) {
+            ImGui::SliderFloat3("angles", &instance.rotation.x, -180.0f, 180.0f);
+        }
+        if (ImGui::CollapsingHeader("Scale")) {
+            ImGui::InputFloat("Factor", &instance.scale, 0.05f, 1.0f);
+        }
+
+        ImGui::End();
+    }
 }
 
 #endif //CG_ENGINE_GUI_H

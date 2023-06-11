@@ -17,6 +17,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
+#include "objectManager.h"
 
 class Scene {
 public:
@@ -175,6 +176,8 @@ public:
 
     sf::RenderWindow window;
     Camera camera;
+
+    Manager manager{};
 protected:
 
     sf::ContextSettings settings{24, 8, 0, 3, 3, sf::ContextSettings::Default};
