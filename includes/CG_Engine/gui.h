@@ -6,7 +6,7 @@
 static Vec3 dir_direction = {-0.2f, -1.0f, -0.5f};
 static Vec3 dir_ambient = {0.2f, 0.2f, 0.2f};
 static Vec3 dir_diffuse = {0.4f, 0.4f, 0.4f};
-static Vec3 dir_specular = {0.6f, 0.6f, 0.6f};
+static Vec3 dir_specular = {0.5f, 0.5f, 0.5f};
 
 // Point Light
 //static float point_position

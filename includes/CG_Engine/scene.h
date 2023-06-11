@@ -56,8 +56,8 @@ public:
         }
 
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
-        glFrontFace(GL_CCW);
+//        glEnable(GL_CULL_FACE);
+//        glFrontFace(GL_CCW);
         setPolygonMode();
 
         stbi_set_flip_vertically_on_load(true);

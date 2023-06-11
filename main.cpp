@@ -23,6 +23,9 @@ int main() {
 
     /* Shader */
     Shader myShader("res/shader/vShader.glsl", "res/shader/fShader.glsl");
+    myShader.use();
+    myShader.setInt("material.diffuse", 0);
+    myShader.setInt("material.specular", 1);
     Shader lightCubeShader("res/Shader/lCube.vert", "res/Shader/lCube.frag");
 
     Cube superCube, lightCube;
@@ -45,8 +48,10 @@ int main() {
         // First Object
         myShader.use();
 
-        DirLight dir(dir_direction, dir_ambient, dir_diffuse, dir_specular);
+        DirLight dir = DirLight(dir_direction, dir_ambient, dir_diffuse, dir_specular);
         dir.render(myShader, 0);
+
+//        std::cout << dir_diffuse[0] << dir_diffuse[1] << std::endl;
 
         PointLight point(pointLightPositions[0], point_constant, point_linear, point_quadratic, point_ambient,
                          point_diffuse, point_specular);
@@ -68,10 +73,9 @@ int main() {
             spot.cutOff = cos(radians(0.0f));
             spot.outerCutOff = cos(radians(0.0f));
         }
-        spot.render(myShader, 0);
-
         // Material
         myShader.setFloat("material.shininess", 64.0f);
+        spot.render(myShader, 0);
 
         /* Coordinates */
         // Projection
@@ -118,6 +122,8 @@ int main() {
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);
         lightCubeShader.setMat4("view", view);
+        lightCubeShader.set3Float("light.ambient", Vec3(point_ambient));
+        lightCubeShader.set3Float("light.diffuse", Vec3(point_diffuse));
 
 
         for (auto pointLightPosition: pointLightPositions) {
