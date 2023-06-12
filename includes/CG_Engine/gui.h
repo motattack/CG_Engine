@@ -65,8 +65,19 @@ void light_editor(Scene &scene) {
 
 void ModelsManager(Manager &manager) {
     static int selectedModel = -1;
+    static bool my_tool_active = true;
 
-    ImGui::Begin("Models");
+    ImGui::Begin("Models", &my_tool_active, ImGuiWindowFlags_MenuBar);
+
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
+            if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Do stuff */ }
+            if (ImGui::MenuItem("Close", "Ctrl+W")) { my_tool_active = false; }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
+    }
 
     const char **listbox_items = manager.getBaseName();
 

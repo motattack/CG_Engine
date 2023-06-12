@@ -114,8 +114,8 @@ int main() {
         //light_editor(scene, deltaClock);
 
         ImGui::SFML::Update(scene.window, deltaClock.restart());
-        ObjectManager(scene.manager);
         ModelsManager(scene.manager);
+        ObjectManager(scene.manager);
         ImGui::SFML::Render(scene.window);
         glEnable(GL_DEPTH_TEST);
 
