@@ -65,19 +65,20 @@ void light_editor(Scene &scene) {
 
 void ModelsManager(Manager &manager) {
     static int selectedModel = -1;
-    static bool my_tool_active = true;
+    ImGui::Begin("Models");
 
-    ImGui::Begin("Models", &my_tool_active, ImGuiWindowFlags_MenuBar);
-
-    if (ImGui::BeginMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
-            if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Do stuff */ }
-            if (ImGui::MenuItem("Close", "Ctrl+W")) { my_tool_active = false; }
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenuBar();
-    }
+//    static bool my_tool_active = true;
+//    ImGui::Begin("Models", &my_tool_active, ImGuiWindowFlags_MenuBar);
+//
+//    if (ImGui::BeginMenuBar()) {
+//        if (ImGui::BeginMenu("File")) {
+//            if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
+//            if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Do stuff */ }
+//            if (ImGui::MenuItem("Close", "Ctrl+W")) { my_tool_active = false; }
+//            ImGui::EndMenu();
+//        }
+//        ImGui::EndMenuBar();
+//    }
 
     const char **listbox_items = manager.getBaseName();
 
@@ -96,11 +97,13 @@ void ModelsManager(Manager &manager) {
     ImGui::End();
 }
 
+static int selectedInstance = -1;
+
 void ObjectManager(Manager &manager) {
-    static int selectedInstance = -1;
+
 
     // Draw a list of instances
-    ImGui::Begin("Layout");
+    ImGui::Begin("Layers");
 
     const char **listbox_items = manager.getName();
 
@@ -122,6 +125,32 @@ void ObjectManager(Manager &manager) {
         }
         if (ImGui::CollapsingHeader("Scale")) {
             ImGui::InputFloat("Factor", &instance.scale, 0.05f, 1.0f);
+        }
+
+        ImGui::End();
+    }
+}
+
+static int selectedType = -1;
+
+void WidgetMaterial(Manager &manager) {
+    const char *list_types[] = {"texture_diffuse", "texture_specular"};
+    static char str[128] = "res/textures/box.png";
+
+    if (selectedInstance >= 0 && selectedInstance < manager.size()) {
+        ImGui::Begin("Material");
+        if (ImGui::CollapsingHeader("Path to texture")) {
+
+            ImGui::ListBox("Type", &selectedType, list_types, 2);
+
+            if (selectedType >= 0) {
+                ImGui::InputText("Path", str, IM_ARRAYSIZE(str));
+
+                if (ImGui::Button("Change texture")) {
+                    Object &curObject = manager.getByID(selectedInstance);
+                    curObject.changeTexture(str, list_types[selectedType]);
+                }
+            }
         }
 
         ImGui::End();

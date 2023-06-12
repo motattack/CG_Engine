@@ -116,7 +116,9 @@ int main() {
         ImGui::SFML::Update(scene.window, deltaClock.restart());
         ModelsManager(scene.manager);
         ObjectManager(scene.manager);
+        WidgetMaterial(scene.manager);
         ImGui::SFML::Render(scene.window);
+
         glEnable(GL_DEPTH_TEST);
 
         scene.newFrame();

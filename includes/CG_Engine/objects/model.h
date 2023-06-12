@@ -37,10 +37,11 @@ public:
             mesh.Draw(shader);
     }
 
-private:
-
-    // Model Data
     vector<Texture> textures_loaded;
+    vector<Mesh> meshes;
+private:
+    // Model Data
+
     string directory;
 
     void loadModel(const string &path) {
@@ -162,13 +163,12 @@ private:
         return textures;
     }
 
-protected:
-    vector<Mesh> meshes;
 };
 
 unsigned int TextureFromFile(const char *path, const string &directory) {
     string fileName = string(path);
-    fileName = directory + '/' + fileName;
+    if (!directory.empty())
+        fileName = directory + '/' + fileName;
 
     unsigned int textureID;
     glGenTextures(1, &textureID);

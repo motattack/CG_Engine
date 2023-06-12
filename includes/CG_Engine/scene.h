@@ -19,6 +19,7 @@
 #include "stb_image.h"
 #include "objectManager.h"
 
+
 class Scene {
 public:
     Scene() = default;
@@ -38,6 +39,117 @@ public:
         bg[3] = a;
     };
 
+    std::unordered_map<std::string, ImGuiCol_> colorMap = {
+            {"Text",                  ImGuiCol_Text},
+            {"TextDisabled",          ImGuiCol_TextDisabled},
+            {"WindowBg",              ImGuiCol_WindowBg},
+            {"TextDisabled",          ImGuiCol_TextDisabled},
+            {"WindowBg",              ImGuiCol_WindowBg},
+            {"ChildBg",               ImGuiCol_ChildBg},
+            {"PopupBg",               ImGuiCol_PopupBg},
+            {"Border",                ImGuiCol_Border},
+            {"BorderShadow",          ImGuiCol_BorderShadow},
+            {"FrameBg",               ImGuiCol_FrameBg},
+            {"FrameBgHovered",        ImGuiCol_FrameBgHovered},
+            {"FrameBgActive",         ImGuiCol_FrameBgActive},
+            {"TitleBg",               ImGuiCol_TitleBg},
+            {"TitleBgActive",         ImGuiCol_TitleBgActive},
+            {"TitleBgCollapsed",      ImGuiCol_TitleBgCollapsed},
+            {"MenuBarBg",             ImGuiCol_MenuBarBg},
+            {"ScrollbarBg",           ImGuiCol_ScrollbarBg},
+            {"ScrollbarGrab",         ImGuiCol_ScrollbarGrab},
+            {"ScrollbarGrabHovered",  ImGuiCol_ScrollbarGrabHovered},
+            {"ScrollbarGrabActive",   ImGuiCol_ScrollbarGrabActive},
+            {"CheckMark",             ImGuiCol_CheckMark},
+            {"SliderGrab",            ImGuiCol_SliderGrab},
+            {"SliderGrabActive",      ImGuiCol_SliderGrabActive},
+            {"Button",                ImGuiCol_Button},
+            {"ButtonHovered",         ImGuiCol_ButtonHovered},
+            {"ButtonActive",          ImGuiCol_ButtonActive},
+            {"Header",                ImGuiCol_Header},
+            {"HeaderHovered",         ImGuiCol_HeaderHovered},
+            {"HeaderActive",          ImGuiCol_HeaderActive},
+            {"Separator",             ImGuiCol_Separator},
+            {"SeparatorHovered",      ImGuiCol_SeparatorHovered},
+            {"SeparatorActive",       ImGuiCol_SeparatorActive},
+            {"ResizeGrip",            ImGuiCol_ResizeGrip},
+            {"ResizeGripHovered",     ImGuiCol_ResizeGripHovered},
+            {"ResizeGripActive",      ImGuiCol_ResizeGripActive},
+            {"Tab",                   ImGuiCol_Tab},
+            {"TabHovered",            ImGuiCol_TabHovered},
+            {"TabActive",             ImGuiCol_TabActive},
+            {"TabUnfocused",          ImGuiCol_TabUnfocused},
+            {"TabUnfocusedActive",    ImGuiCol_TabUnfocusedActive},
+            {"DockingPreview",        ImGuiCol_DockingPreview},
+            {"DockingEmptyBg",        ImGuiCol_DockingEmptyBg},
+            {"PlotLines",             ImGuiCol_PlotLines},
+            {"PlotLinesHovered",      ImGuiCol_PlotLinesHovered},
+            {"PlotHistogram",         ImGuiCol_PlotHistogram},
+            {"PlotHistogramHovered",  ImGuiCol_PlotHistogramHovered},
+            {"TableHeaderBg",         ImGuiCol_TableHeaderBg},
+            {"TableBorderStrong",     ImGuiCol_TableBorderStrong},
+            {"TableBorderLight",      ImGuiCol_TableBorderLight},
+            {"TableRowBg",            ImGuiCol_TableRowBg},
+            {"TableRowBgAlt",         ImGuiCol_TableRowBgAlt},
+            {"TextSelectedBg",        ImGuiCol_TextSelectedBg},
+            {"DragDropTarget",        ImGuiCol_DragDropTarget},
+            {"NavHighlight",          ImGuiCol_NavHighlight},
+            {"NavWindowingHighlight", ImGuiCol_NavWindowingHighlight},
+            {"NavWindowingDimBg",     ImGuiCol_NavWindowingDimBg},
+            {"ModalWindowDimBg",      ImGuiCol_ModalWindowDimBg},
+            {"COUNT",                 ImGuiCol_COUNT}
+    };
+
+    ImVec4 HexToImVec4(const std::string &hexColor) {
+        ImVec4 color;
+        unsigned int hexValue;
+        std::stringstream ss;
+        ss << std::hex << hexColor.substr(1);  // Exclude the "#" character
+        ss >> hexValue;
+        color.x = static_cast<float>((hexValue >> 16) & 0xFF) / 255.0f;
+        color.y = static_cast<float>((hexValue >> 8) & 0xFF) / 255.0f;
+        color.z = static_cast<float>(hexValue & 0xFF) / 255.0f;
+        color.w = 1.0f;
+        std::cout << color.x << ", " << color.y << ", " << color.z << ", " << color.w << std::endl;
+        return color;
+    }
+
+    void loadImguiStyleFromFile(const std::string &filename) {
+        std::ifstream file(filename);
+        if (!file.is_open()) {
+            std::cout << "error";
+            return;
+        }
+
+        std::string line;
+        ImGuiStyle &style = ImGui::GetStyle();
+        ImVec4 *colors = style.Colors;
+
+        while (std::getline(file, line)) {
+            std::istringstream iss(line);
+            std::string colorName, hexValue;
+            if (iss >> colorName >> hexValue) {
+                auto it = colorMap.find(colorName);
+                if (it != colorMap.end()) {
+                    colors[it->second] = HexToImVec4(hexValue);
+                }
+            }
+        }
+
+        file.close();
+
+        style.ChildRounding = 4.0f;
+        style.FrameBorderSize = 1.0f;
+        style.FrameRounding = 2.0f;
+        style.GrabMinSize = 7.0f;
+        style.PopupRounding = 2.0f;
+        style.ScrollbarRounding = 12.0f;
+        style.ScrollbarSize = 13.0f;
+        style.TabBorderSize = 1.0f;
+        style.TabRounding = 0.0f;
+        style.WindowRounding = 4.0f;
+    }
+
     bool init() {
         window.create(sf::VideoMode(scrWidth, scrHeight), title, sf::Style::Titlebar | sf::Style::Close,
                       settings);
@@ -48,6 +160,9 @@ public:
 
         ImGui::SFML::Init(window, true);
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+        //setImguiStyle();
+        loadImguiStyleFromFile("res/gui.txt");
 
         glewExperimental = GL_TRUE;
 

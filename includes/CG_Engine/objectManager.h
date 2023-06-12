@@ -21,6 +21,17 @@ public:
     Object(const Model &objModel, std::string name, Light *objLight = nullptr)
             : model(objModel), name(std::move(name)), light(objLight) {}
 
+    void changeTexture(const std::string& texturePath, const char *type){
+        for(auto &mesh: model.meshes){
+            for(auto &texture : mesh.textures){
+                if (texture.type == type) {
+                    texture.id = TextureFromFile(texturePath.c_str(), "");
+                    return;
+                }
+            }
+        }
+    }
+
     void render(Shader &shader, int lightIndex) {
         model.Draw(shader);  // Render the model
         if (light != nullptr) {
@@ -37,7 +48,7 @@ private:
 public:
     Manager() : numLightsUsed(0) {}
 
-    Object &getBaseByID(int id) {
+    Object getBaseByID(int id) const {
         return base[id];
     }
 
@@ -45,7 +56,7 @@ public:
         return objects[id];
     }
 
-    void addObject(const Object &obj) {
+    void addObject(Object obj) {
         if (numLightsUsed >= 30) {
             std::cout << "Maximum number of lights reached. Cannot add more objects with lights." << std::endl;
             return;
