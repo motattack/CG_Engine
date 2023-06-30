@@ -110,7 +110,7 @@ public:
         color.y = static_cast<float>((hexValue >> 8) & 0xFF) / 255.0f;
         color.z = static_cast<float>(hexValue & 0xFF) / 255.0f;
         color.w = 1.0f;
-        std::cout << color.x << ", " << color.y << ", " << color.z << ", " << color.w << std::endl;
+//        std::cout << color.x << ", " << color.y << ", " << color.z << ", " << color.w << std::endl;
         return color;
     }
 
@@ -159,6 +159,8 @@ public:
         window.setActive(true);
 
         ImGui::SFML::Init(window, true);
+
+
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
         //setImguiStyle();
@@ -210,48 +212,52 @@ public:
     }
 
     void processInput(float dt) {
-        if (Keyboard::key(sf::Keyboard::W)) {
-            camera.Move(CameraDirection::FORWARD, dt);
-        }
-        if (Keyboard::key(sf::Keyboard::S)) {
-            camera.Move(CameraDirection::BACKWARD, dt);
-        }
-        if (Keyboard::key(sf::Keyboard::D)) {
-            camera.Move(CameraDirection::RIGHT, dt);
-        }
-        if (Keyboard::key(sf::Keyboard::A)) {
-            camera.Move(CameraDirection::LEFT, dt);
-        }
-        if (Keyboard::key(sf::Keyboard::Space)) {
-            camera.Move(CameraDirection::UP, dt);
-        }
-        if (Keyboard::key(sf::Keyboard::LShift)) {
-            camera.Move(CameraDirection::DOWN, dt);
-        }
+        if (not freeMouseMode) {
+            ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 
-        if (Keyboard::key(sf::Keyboard::Left)) {
-            camera.Rotate(-dt * 360.f, 0);
+            if (Keyboard::key(sf::Keyboard::W)) {
+                camera.Move(CameraDirection::FORWARD, dt);
+            }
+            if (Keyboard::key(sf::Keyboard::S)) {
+                camera.Move(CameraDirection::BACKWARD, dt);
+            }
+            if (Keyboard::key(sf::Keyboard::D)) {
+                camera.Move(CameraDirection::RIGHT, dt);
+            }
+            if (Keyboard::key(sf::Keyboard::A)) {
+                camera.Move(CameraDirection::LEFT, dt);
+            }
+            if (Keyboard::key(sf::Keyboard::Space)) {
+                camera.Move(CameraDirection::UP, dt);
+            }
+            if (Keyboard::key(sf::Keyboard::LShift)) {
+                camera.Move(CameraDirection::DOWN, dt);
+            }
+
+            if (Keyboard::key(sf::Keyboard::Left)) {
+                camera.Rotate(-dt * 360.f, 0);
+            }
+
+            if (Keyboard::key(sf::Keyboard::Right)) {
+                camera.Rotate(dt * 360.f, 0);
+            }
+
+            if (Keyboard::key(sf::Keyboard::Up)) {
+                camera.Rotate(0, dt * 360.f);
+            }
+
+            if (Keyboard::key(sf::Keyboard::Down)) {
+                camera.Rotate(0, -dt * 360.f);
+            }
+
+            if (Keyboard::keyWentUp(sf::Keyboard::L)) {
+                torch = !torch;
+            }
+
+            camera.Rotate(Mouse::getDX(), Mouse::getDY());
+
+            camera.ChangeFOV(Mouse::getScrollDY());
         }
-
-        if (Keyboard::key(sf::Keyboard::Right)) {
-            camera.Rotate(dt * 360.f, 0);
-        }
-
-        if (Keyboard::key(sf::Keyboard::Up)) {
-            camera.Rotate(0, dt * 360.f);
-        }
-
-        if (Keyboard::key(sf::Keyboard::Down)) {
-            camera.Rotate(0, -dt * 360.f);
-        }
-
-        if (Keyboard::keyWentUp(sf::Keyboard::L)) {
-            torch = !torch;
-        }
-
-        camera.Rotate(Mouse::getDX(), Mouse::getDY());
-
-        camera.ChangeFOV(Mouse::getScrollDY());
 
         if (Keyboard::key(sf::Keyboard::Escape)) {
             setShouldClose();
@@ -260,6 +266,10 @@ public:
         if (Keyboard::keyWentUp(sf::Keyboard::E)) {
             wireframeMode = !wireframeMode;
             setPolygonMode();
+        }
+
+        if (Keyboard::keyWentUp(sf::Keyboard::M)) {
+            freeMouseMode = !freeMouseMode;
         }
     }
 
@@ -270,7 +280,7 @@ public:
     void PollEvents() {
         sf::Event event{};
         while (pollEvent(event)) {
-            ImGui::SFML::ProcessEvent(event);
+            ImGui::SFML::ProcessEvent(window, event);
             Keyboard::keyCallback(event);
             switch (event.type) {
                 case sf::Event::Closed:
@@ -302,6 +312,7 @@ protected:
     unsigned int scrHeight = 600;
     bool torch = false;
     bool wireframeMode = false;
+    bool freeMouseMode = true;
 
     float bg[4]{}; // background color
 };

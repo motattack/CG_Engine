@@ -21,11 +21,13 @@ public:
     Object(const Model &objModel, std::string name, Light *objLight = nullptr)
             : model(objModel), name(std::move(name)), light(objLight) {}
 
-    void changeTexture(const std::string& texturePath, const char *type){
-        for(auto &mesh: model.meshes){
-            for(auto &texture : mesh.textures){
+    void changeTexture(const std::string &texturePath, const char *type) {
+        for (auto &mesh: model.meshes) {
+            for (auto &texture: mesh.textures) {
                 if (texture.type == type) {
-                    texture.id = TextureFromFile(texturePath.c_str(), "");
+                    unsigned int id = TextureFromFile(texturePath.c_str(), "");
+                    if (id != FAIL_LOAD_TEXTURE)
+                        texture.id = id;
                     return;
                 }
             }

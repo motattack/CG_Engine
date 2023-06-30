@@ -3,9 +3,9 @@
 
 #include <CG_Engine/objects/model.h>
 
-int noVertices = 36;
+int noVerticesCube = 36;
 
-float vertices[] = {
+float verticesCube[] = {
         // position                 normal              texCoord
         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
         0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
@@ -65,12 +65,12 @@ public:
         texture.type = "texture_specular";
         textures.push_back(texture);
 
-        std::vector<unsigned int> indices(noVertices);
-        for (unsigned int i = 0; i < noVertices; i++) {
+        std::vector<unsigned int> indices(noVerticesCube);
+        for (unsigned int i = 0; i < noVerticesCube; i++) {
             indices[i] = i;
         }
 
-        Mesh cubeMesh(Vertex::genList(vertices, noVertices), indices, textures);
+        Mesh cubeMesh(Vertex::genList(verticesCube, noVerticesCube), indices, textures);
         meshes.push_back(cubeMesh);
     }
 

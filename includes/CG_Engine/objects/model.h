@@ -1,6 +1,8 @@
 #ifndef CG_ENGINE_MODEL_H
 #define CG_ENGINE_MODEL_H
 
+const unsigned int FAIL_LOAD_TEXTURE = 3347;
+
 #include <CG_Engine/objects/mesh.h>
 
 #include <assimp/Importer.hpp>
@@ -196,6 +198,8 @@ unsigned int TextureFromFile(const char *path, const string &directory) {
         glGenerateMipmap(GL_TEXTURE_2D);
     } else {
         std::cout << "Failed to load texture\n";
+        std::cout << "Path:" << fileName << std::endl;
+        return FAIL_LOAD_TEXTURE;
     }
 
     stbi_image_free(data);

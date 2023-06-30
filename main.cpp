@@ -1,6 +1,7 @@
 #include <iostream>
 #include <CG_Engine/objects/model.h>
 #include <CG_Engine/models/cube.h>
+#include <CG_Engine/models/plane.h>
 #include <CG_Engine/scene.h>
 #include <CG_Engine/gui.h>
 
@@ -29,12 +30,17 @@ int main() {
     Shader lightCubeShader("res/Shader/lCube.vert", "res/Shader/lCube.frag");
 
     Cube superCube, lightCube;
-
     scene.manager.baseAddModel(superCube, "Cube");
 
-    Model myBackPack("res/models/backpack/backpack.obj");
+    Plane plane;
+    scene.manager.baseAddModel(plane, "Plane");
 
-    scene.manager.baseAddModel(myBackPack, "backPack");
+    Model myBackPack("res/models/backpack/backpack.obj");
+    scene.manager.baseAddModel(myBackPack, "Backpack");
+
+    Model sphere("res/models/sphere/untitled.obj");
+    scene.manager.baseAddModel(sphere, "Sphere");
+
 
     float dt, lastFrame = 0.0f;
 
@@ -111,9 +117,9 @@ int main() {
         }
         vArray::unbind();
 
-        //light_editor(scene, deltaClock);
-
         ImGui::SFML::Update(scene.window, deltaClock.restart());
+        ImGui::ShowDemoWindow();
+        light_editor(scene);
         ModelsManager(scene.manager);
         ObjectManager(scene.manager);
         WidgetMaterial(scene.manager);

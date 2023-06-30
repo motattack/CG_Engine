@@ -43,7 +43,7 @@ PlotLines #777777
 PlotLinesHovered #ff6300
 PlotHistogram #959595
 PlotHistogramHovered #ff6300
-TextSelectedBg #ffffff
+TextSelectedBg #757575
 DragDropTarget #ff6300
 NavHighlight #ff6300
 NavWindowingHighlight #ff6300

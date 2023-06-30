@@ -122,9 +122,16 @@ void ObjectManager(Manager &manager) {
         }
         if (ImGui::CollapsingHeader("Rotate")) {
             ImGui::SliderFloat3("angles", &instance.rotation.x, -180.0f, 180.0f);
+            if (ImGui::Button("Reset Rotate")) {
+                instance.rotation = Vec3(0.f, 0.f, 0.f);
+            }
         }
+
         if (ImGui::CollapsingHeader("Scale")) {
             ImGui::InputFloat("Factor", &instance.scale, 0.05f, 1.0f);
+            if (ImGui::Button("Reset Scale")) {
+                instance.scale = 1.f;
+            }
         }
 
         ImGui::End();
