@@ -3,7 +3,6 @@
 
 #include <cmath>
 #include <stdexcept>
-#include <cmath>
 #include <array>
 #include <vector>
 #include <cassert>
@@ -13,6 +12,8 @@
 #include <CG_Engine/math/mat2x2.h>
 #include <CG_Engine/math/mat3x3.h>
 #include <CG_Engine/math/mat4x4.h>
+
+
 
 float radians(float degrees) {
     return degrees * static_cast<float>(M_PI) / 180.0f;

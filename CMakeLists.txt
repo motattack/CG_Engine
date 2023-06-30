@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.25)
 
 set(ENGINE_PROJECT_NAME CG_Engine)
 project(${ENGINE_PROJECT_NAME})
+set(CMAKE_CXX_STANDARD 20)
+SET(GCC_COVERAGE_COMPILE_FLAGS "-static-libgcc -static-libstdc++")
+add_link_options(-static-libgcc -static-libstdc++)
 
 # Set the path to the GLEW library and include directory
 set(GLEW_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/external/glew-2.1.0/include)
@@ -57,7 +60,7 @@ add_executable(${ENGINE_PROJECT_NAME}
 #        )
 
 # Link GLEW and SFML to the engine core library
-target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE assimp glew opengl32 sfml-graphics sfml-system sfml-window)
+target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE glew opengl32 sfml-graphics sfml-system sfml-window assimp)
 
 # Add the engine core include directories
 target_include_directories(${ENGINE_PROJECT_NAME} PUBLIC includes)

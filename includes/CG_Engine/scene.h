@@ -19,6 +19,8 @@
 #include "stb_image.h"
 #include "objectManager.h"
 
+#include <unordered_map>
+
 
 class Scene {
 public:
