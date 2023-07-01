@@ -14,6 +14,24 @@ Vec3 pointLightPositions[] = {
         Vec3(0.0f, 0.0f, -3.0f)
 };
 
+//vector<std::string> faces{
+//        "res/textures/skybox/tron/right.png",
+//        "res/textures/skybox/tron/left.png",
+//        "res/textures/skybox/tron/top.png",
+//        "res/textures/skybox/tron/bottom.png",
+//        "res/textures/skybox/tron/front.png",
+//        "res/textures/skybox/tron/back.png"
+//};
+
+//vector<std::string> faces{
+//        "res/textures/skybox/cave/right.png",
+//        "res/textures/skybox/cave/left.png",
+//        "res/textures/skybox/cave/top.png",
+//        "res/textures/skybox/cave/bottom.png",
+//        "res/textures/skybox/cave/front.png",
+//        "res/textures/skybox/cave/back.png"
+//};
+
 vector<std::string> faces{
         "res/textures/skybox/earth/right.png",
         "res/textures/skybox/earth/left.png",
