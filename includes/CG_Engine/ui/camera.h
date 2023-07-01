@@ -75,6 +75,15 @@ public:
         return Mat4x4::lookAt(Position, Position + Front, Up);
     };
 
+    Mat4x4 GetViewMatrixClear() const {
+        Mat4x4 result = Mat4x4::lookAt(Position, Position + Front, Up);
+        for (int i = 0; i < 4; i++) {
+            result[3][i] = result[i][3] = 0;
+        }
+        result[3][3] = 1;
+        return result;
+    };
+
     Mat4x4 GetProjectionMatrix() const {
         return Mat4x4::perspective(radians(Fov), AspectRatio, zNear, zFar);
     };

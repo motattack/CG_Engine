@@ -180,7 +180,7 @@ public:
 //        glFrontFace(GL_CCW);
         setPolygonMode();
 
-        stbi_set_flip_vertically_on_load(true);
+        //stbi_set_flip_vertically_on_load(true);
 
         return true;
     };

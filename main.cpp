@@ -14,6 +14,54 @@ Vec3 pointLightPositions[] = {
         Vec3(0.0f, 0.0f, -3.0f)
 };
 
+vector<std::string> faces{
+        "res/textures/skybox/earth/right.png",
+        "res/textures/skybox/earth/left.png",
+        "res/textures/skybox/earth/top.png",
+        "res/textures/skybox/earth/bottom.png",
+        "res/textures/skybox/earth/front.png",
+        "res/textures/skybox/earth/back.png"
+};
+
+//vector<std::string> faces{
+//        "res/textures/skybox/sea/right.jpg",
+//        "res/textures/skybox/sea/left.jpg",
+//        "res/textures/skybox/sea/top.jpg",
+//        "res/textures/skybox/sea/bottom.jpg",
+//        "res/textures/skybox/sea/front.jpg",
+//        "res/textures/skybox/sea/back.jpg"
+//};
+
+
+unsigned int loadCubemap(vector<std::string> faces) {
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrChannels;
+    for (unsigned int i = 0; i < faces.size(); i++) {
+        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                         0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+            );
+            stbi_image_free(data);
+        } else {
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
+}
+
+
+
 int main() {
     Scene scene = Scene("CL_Engine", 1280, 750);
 
@@ -24,6 +72,8 @@ int main() {
 
     /* Shader */
     Shader myShader("res/shader/vShader.glsl", "res/shader/fShader.glsl");
+    Shader skyboxShader("res/shader/sbox.vert", "res/shader/sbox.frag");
+    skyboxShader.use();
     myShader.use();
     myShader.setInt("material.diffuse", 0);
     myShader.setInt("material.specular", 1);
@@ -35,11 +85,63 @@ int main() {
     Plane plane;
     scene.manager.baseAddModel(plane, "Plane");
 
-    Model myBackPack("res/models/backpack/backpack.obj");
-    scene.manager.baseAddModel(myBackPack, "Backpack");
+    Model Extinguisher("res/models/amc/scene.gltf");
+    scene.manager.baseAddModel(Extinguisher, "Extinguisher");
 
     Model sphere("res/models/sphere/untitled.obj");
     scene.manager.baseAddModel(sphere, "Sphere");
+
+    float skyboxVertices[] = {
+// positions
+            -1.0f,  1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+
+            -1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+
+            -1.0f, -1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+
+            -1.0f,  1.0f, -1.0f,
+            1.0f,  1.0f, -1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f, -1.0f,
+
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+            1.0f, -1.0f,  1.0f
+    };
+
+    vArray VAO_SKYBOX;
+
+    vBuffer VBO(skyboxVertices, sizeof(skyboxVertices));
+    vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) nullptr);
+
+    unsigned int cubemapTexture = loadCubemap(faces);
 
 
     float dt, lastFrame = 0.0f;
@@ -55,6 +157,19 @@ int main() {
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // skybox
+
+        glDepthMask(GL_FALSE);
+        skyboxShader.use();
+        projection = scene.camera.GetProjectionMatrix();
+        skyboxShader.setMat4("projection", projection);
+        view = scene.camera.GetViewMatrixClear();
+        skyboxShader.setMat4("view", view);
+        VAO_SKYBOX.bind();
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDepthMask(GL_TRUE);
 
         // First Object
         myShader.use();

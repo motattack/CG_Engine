@@ -7,9 +7,9 @@ class Mat3x3 {
 public:
     Mat3x3() = default;
 
-    explicit Mat3x3(float number) : matrix{{number, 0.f,      0.f},
-                                           {0.f,      number, 0.f},
-                                           {0.f,      0.f,      number}} {};
+    explicit Mat3x3(float number) : matrix{{number, 0.f,    0.f},
+                                           {0.f,    number, 0.f},
+                                           {0.f,    0.f,    number}} {};
 
 
     Mat3x3(float a, float b, float c,
