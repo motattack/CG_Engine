@@ -2,27 +2,17 @@
 #include <CG_Engine/timer/timer.h>
 #include <CG_Engine/events/events.h>
 #include <CG_Engine/ecs/base/types.h>
-
-struct Component {
-public:
-    virtual ~Component(){};
-};
-
-class TestComp1 : public Component {
-
-};
-
-class TestComp2 : public Component {
-
-};
+#include "CG_Engine/ecs/base/EntityManager.h"
 
 int main() {
-    auto typeID1 = CompType<TestComp1>();
-    auto typeID2 = CompType<TestComp1>();
+    EntityManager mgr;
+    auto id = mgr.addNewEntity();
+    auto id2 = mgr.addNewEntity();
+    auto id3 = mgr.addNewEntity();
 
-    auto typeID3 = CompType<TestComp2>();
-
-    std::cout << typeID1 << typeID2 << typeID3;
+    std::cout << id << std::endl;
+    std::cout << id2 << std::endl;
+    std::cout << id3 << std::endl;
 
     core.init();
     timer.init();
