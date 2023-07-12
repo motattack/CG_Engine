@@ -13,7 +13,7 @@ public:
 
     virtual ~BaseComponent() {};
 
-    const EntityId GetId() {
+    EntityId getId() const {
         return entityId;
     }
 };

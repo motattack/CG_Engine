@@ -17,24 +17,31 @@ public:
         entities.insert(entity);
     }
 
-    const EntitySignature GetSignature() {
+    const Signature GetSignature() {
         return signature;
     }
 
     template<class T>
-    void addComponentSighature() {
+    void addComponentSignature() {
         signature.insert(CompType<T>());
     }
 
     virtual void start() {};
 
-    virtual void update() {};
+    virtual void update() {
+        for (auto i: entities) {
+            std::cout << i << "     ";
+        }
+        std::cout << std::endl;
+    };
+
+    virtual void render() {};
 
     virtual void destroy() {};
 protected:
     friend class EntityManager;
 
-    EntitySignature signature;
+    Signature signature;
     std::set<EntityId> entities;
 
 };
