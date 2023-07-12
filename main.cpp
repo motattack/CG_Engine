@@ -50,43 +50,14 @@ vector<std::string> faces{
 //        "res/textures/skybox/sea/back.jpg"
 //};
 
-
-unsigned int loadCubemap(vector<std::string> faces) {
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-
-    int width, height, nrChannels;
-    for (unsigned int i = 0; i < faces.size(); i++) {
-        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
-        if (data) {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                         0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
-            );
-            stbi_image_free(data);
-        } else {
-            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
-            stbi_image_free(data);
-        }
-    }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-    return textureID;
-}
-
-
-
 int main() {
-    Scene scene = Scene("CL_Engine", 1280, 750);
+    Scene scene = Scene("CL_Engine", 960, 540);
 
     if (!scene.init()) {
         std::cout << "Could not open window" << std::endl;
         return -1;
     }
+
 
     /* Shader */
     Shader myShader("res/shader/vShader.glsl", "res/shader/fShader.glsl");
@@ -98,60 +69,62 @@ int main() {
     Shader lightCubeShader("res/Shader/lCube.vert", "res/Shader/lCube.frag");
 
     Cube superCube, lightCube;
-    scene.manager.baseAddModel(superCube, "Cube");
+    scene.manager.baseAddModel(superCube, "Cube", TextureFromFile("res/gui/box.png", ""));
 
     Plane plane;
-    scene.manager.baseAddModel(plane, "Plane");
+    scene.manager.baseAddModel(plane, "Plane", TextureFromFile("res/gui/plane.png", ""));
 
     Model Extinguisher("res/models/amc/scene.gltf");
-    scene.manager.baseAddModel(Extinguisher, "Extinguisher");
+    scene.manager.baseAddModel(Extinguisher, "Extinguisher", TextureFromFile("res/gui/extinguisher.png", ""));
 
     Model sphere("res/models/sphere/untitled.obj");
-    scene.manager.baseAddModel(sphere, "Sphere");
+    scene.manager.baseAddModel(sphere, "Sphere", TextureFromFile("res/gui/sphere.png", ""));
+
+    Model tree("res/models/tree/untitled.fbx");
+    scene.manager.baseAddModel(tree, "tree", TextureFromFile("res/gui/sphere.png", ""));
 
     float skyboxVertices[] = {
-// positions
-            -1.0f,  1.0f, -1.0f,
+            -1.0f, 1.0f, -1.0f,
             -1.0f, -1.0f, -1.0f,
             1.0f, -1.0f, -1.0f,
             1.0f, -1.0f, -1.0f,
-            1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
+            1.0f, 1.0f, -1.0f,
+            -1.0f, 1.0f, -1.0f,
 
-            -1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f, 1.0f,
             -1.0f, -1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f,  1.0f,
-            -1.0f, -1.0f,  1.0f,
+            -1.0f, 1.0f, -1.0f,
+            -1.0f, 1.0f, -1.0f,
+            -1.0f, 1.0f, 1.0f,
+            -1.0f, -1.0f, 1.0f,
 
             1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f, -1.0f,
+            1.0f, -1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, -1.0f,
             1.0f, -1.0f, -1.0f,
 
-            -1.0f, -1.0f,  1.0f,
-            -1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f, -1.0f,  1.0f,
-            -1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f,
+            -1.0f, -1.0f, 1.0f,
 
-            -1.0f,  1.0f, -1.0f,
-            1.0f,  1.0f, -1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            -1.0f,  1.0f,  1.0f,
-            -1.0f,  1.0f, -1.0f,
+            -1.0f, 1.0f, -1.0f,
+            1.0f, 1.0f, -1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f, -1.0f,
 
             -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f, 1.0f,
             1.0f, -1.0f, -1.0f,
             1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f,  1.0f,
-            1.0f, -1.0f,  1.0f
+            -1.0f, -1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f
     };
 
     vArray VAO_SKYBOX;
@@ -159,7 +132,7 @@ int main() {
     vBuffer VBO(skyboxVertices, sizeof(skyboxVertices));
     vArray::attrPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) nullptr);
 
-    unsigned int cubemapTexture = loadCubemap(faces);
+    unsigned int cubeMapTexture = loadCubeMap(faces);
 
 
     float dt, lastFrame = 0.0f;
@@ -185,7 +158,7 @@ int main() {
         view = scene.camera.GetViewMatrixClear();
         skyboxShader.setMat4("view", view);
         VAO_SKYBOX.bind();
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTexture);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glDepthMask(GL_TRUE);
 
@@ -253,12 +226,14 @@ int main() {
         ImGui::SFML::Update(scene.window, deltaClock.restart());
         ImGui::ShowDemoWindow();
         light_editor(scene);
-        ModelsManager(scene.manager);
+        ToolbarUIV(scene.manager);
         ObjectManager(scene.manager);
         WidgetMaterial(scene.manager);
         ImGui::SFML::Render(scene.window);
 
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         scene.newFrame();
 

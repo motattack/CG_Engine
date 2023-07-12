@@ -103,8 +103,8 @@ public:
 //    };
 
     void Rotate(float xoffset, float yoffset) {
-        xoffset *= Sensitivity;
-        yoffset *= Sensitivity;
+        xoffset *= Sensitivity * MovementSpeed;
+        yoffset *= Sensitivity * MovementSpeed;
 
         Yaw += xoffset;
         Pitch += yoffset;

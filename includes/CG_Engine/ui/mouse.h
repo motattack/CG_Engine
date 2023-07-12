@@ -3,9 +3,20 @@
 
 class Mouse {
 public:
+    static void keyCallback(sf::Event &event) {
+        if (event.type == sf::Event::MouseButtonPressed) {
+            Mouse::buttons[event.key.code] = true;
+            Mouse::buttonsChanged[event.key.code] = true;
+        } else if (event.type == sf::Event::MouseButtonReleased) {
+            Mouse::buttons[event.key.code] = false;
+            Mouse::buttonsChanged[event.key.code] = true;
+        }
+    }
+
     static void cursorPosCallback(float _x, float _y) {
         x = _x;
         y = _y;
+//        std::cout << x << ":" << y << std::endl;
 
         if (firstMouse) {
             lastX = x;
@@ -17,18 +28,6 @@ public:
         dy = lastY - y; // y coordinates are inverted
         lastX = x;
         lastY = y;
-    };
-
-    static void mouseButtonCallback(int button, int action) {
-        if (action != sf::Event::MouseButtonReleased) {
-            if (!buttons[button]) {
-                buttons[button] = true;
-            }
-        }
-        else {
-            buttons[button] = false;
-        }
-        buttonsChanged[button] = action != sf::Event::MouseButtonReleased;
     };
 
     static void mouseWheelCallback(float _delta) {

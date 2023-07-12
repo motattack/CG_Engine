@@ -14,12 +14,16 @@ public:
     Vec3 rotation;
     float scale = 1.f;
     std::string name = "Object";
+    unsigned int icon;
 
     Object(const Model &objModel, Light *objLight = nullptr)
             : model(objModel), light(objLight) {}
 
     Object(const Model &objModel, std::string name, Light *objLight = nullptr)
             : model(objModel), name(std::move(name)), light(objLight) {}
+
+    Object(const Model &objModel, std::string name, unsigned int icon, Light *objLight = nullptr)
+            : model(objModel), name(std::move(name)), light(objLight), icon(icon) {}
 
     void changeTexture(const std::string &texturePath, const char *type) {
         for (auto &mesh: model.meshes) {
@@ -68,12 +72,27 @@ public:
         numLightsUsed++;
     }
 
+    void remove(int id) {
+        if (id >= 0 && id < objects.size()) {
+            objects.erase(objects.begin() + id);
+            numLightsUsed--;
+        }
+    }
+
     void baseAddObject(const Object &obj) {
         base.push_back(obj);
     }
 
-    void baseAddModel(const Model &model, const std::string name) {
-        base.emplace_back(Object(model, name));
+    void baseAddModel(const Model &model, const std::string name, unsigned int icon = 0) {
+        base.emplace_back(Object(model, name, icon));
+    }
+
+    std::vector<unsigned int> getIcons() {
+        std::vector<unsigned int> icons;
+        for (const auto &obj: base) {
+            icons.push_back(obj.icon);
+        }
+        return icons;
     }
 
     void renderObjects(Shader &shader) {

@@ -176,6 +176,7 @@ public:
         }
 
         glEnable(GL_DEPTH_TEST);
+
 //        glEnable(GL_CULL_FACE);
 //        glFrontFace(GL_CCW);
         setPolygonMode();
@@ -215,7 +216,7 @@ public:
 
     void processInput(float dt) {
         if (not freeMouseMode) {
-            ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+//            ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 
             if (Keyboard::key(sf::Keyboard::W)) {
                 camera.Move(CameraDirection::FORWARD, dt);
@@ -256,10 +257,11 @@ public:
                 torch = !torch;
             }
 
-            camera.Rotate(Mouse::getDX(), Mouse::getDY());
-
-            camera.ChangeFOV(Mouse::getScrollDY());
+            float x = Mouse::getDX(), y = Mouse::getDY();
+            camera.Rotate(x, y);
         }
+
+        camera.ChangeFOV(Mouse::getScrollDY());
 
         if (Keyboard::key(sf::Keyboard::Escape)) {
             setShouldClose();
@@ -273,6 +275,12 @@ public:
         if (Keyboard::keyWentUp(sf::Keyboard::M)) {
             freeMouseMode = !freeMouseMode;
         }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
+            camera.MovementSpeed = 5;
+        } else {
+            camera.MovementSpeed = SPEED;
+        }
     }
 
     bool getTorch() const {
@@ -284,6 +292,7 @@ public:
         while (pollEvent(event)) {
             ImGui::SFML::ProcessEvent(window, event);
             Keyboard::keyCallback(event);
+            Mouse::keyCallback(event);
             switch (event.type) {
                 case sf::Event::Closed:
                     cleanup();

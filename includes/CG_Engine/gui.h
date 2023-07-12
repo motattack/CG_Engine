@@ -63,38 +63,62 @@ void light_editor(Scene &scene) {
     ImGui::End();
 }
 
-void ModelsManager(Manager &manager) {
-    static int selectedModel = -1;
-    ImGui::Begin("Models");
+void ToolbarUI() {
+    ImGuiViewport *viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y));
+    ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, 20));
+    ImGui::SetNextWindowViewport(viewport->ID);
 
-//    static bool my_tool_active = true;
-//    ImGui::Begin("Models", &my_tool_active, ImGuiWindowFlags_MenuBar);
-//
-//    if (ImGui::BeginMenuBar()) {
-//        if (ImGui::BeginMenu("File")) {
-//            if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
-//            if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Do stuff */ }
-//            if (ImGui::MenuItem("Close", "Ctrl+W")) { my_tool_active = false; }
-//            ImGui::EndMenu();
-//        }
-//        ImGui::EndMenuBar();
-//    }
+    ImGuiWindowFlags window_flags = 0
+                                    | ImGuiWindowFlags_NoDocking
+                                    | ImGuiWindowFlags_NoTitleBar
+                                    | ImGuiWindowFlags_NoResize
+                                    | ImGuiWindowFlags_NoMove
+                                    | ImGuiWindowFlags_NoScrollbar
+                                    | ImGuiWindowFlags_NoSavedSettings;
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+    ImGui::Begin("TOOLBAR", nullptr, window_flags);
+    ImGui::PopStyleVar();
 
-    const char **listbox_items = manager.getBaseName();
+    ImGui::Button("Toolbar goes here", ImVec2(0, 18));
 
-    ImGui::ListBox("Base", &selectedModel, listbox_items, manager.bSize());
+    ImGui::End();
+}
 
-    if (selectedModel >= 0 && selectedModel < manager.bSize()) {
-        static char str[128] = "Sample Text";
-        ImGui::InputText("Name", str, IM_ARRAYSIZE(str));
-        if (ImGui::Button("Add Model")) {
-            Object newObject = manager.getBaseByID(selectedModel);
-            newObject.name = str;
+void ToolbarUIV(Manager &manager) {
+    ImGuiViewport *viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y));
+    ImGui::SetNextWindowSize(ImVec2(56, viewport->Size.y));
+    ImGui::SetNextWindowViewport(viewport->ID);
+
+    ImGuiWindowFlags window_flags = 0
+                                    | ImGuiWindowFlags_NoDocking
+                                    | ImGuiWindowFlags_NoTitleBar
+                                    | ImGuiWindowFlags_NoResize
+                                    | ImGuiWindowFlags_NoMove
+                                    | ImGuiWindowFlags_NoScrollbar
+                                    | ImGuiWindowFlags_NoSavedSettings;
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+    ImGui::Begin("TOOLBAR", nullptr, window_flags);
+    ImGui::PopStyleVar();
+
+    int id = 0;
+    for (const auto &icon: manager.getIcons()) {
+        if (ImGui::ImageButton((void *) (intptr_t) icon, ImVec2(32, 32))) {
+            Object newObject = manager.getBaseByID(id);
             manager.addObject(newObject);
         }
+        ImGui::Separator();
+        id++;
     }
 
     ImGui::End();
+}
+
+std::string Input(const std::string &title) {
+    static char str[128];
+    ImGui::InputText(title.c_str(), str, IM_ARRAYSIZE(str));
+    return std::string(str);
 }
 
 static int selectedInstance = -1;
@@ -102,12 +126,22 @@ static int selectedInstance = -1;
 void ObjectManager(Manager &manager) {
 
 
-    // Draw a list of instances
     ImGui::Begin("Layers");
 
     const char **listbox_items = manager.getName();
 
     ImGui::ListBox("Instances", &selectedInstance, listbox_items, manager.size());
+
+    if (selectedInstance >= 0 && selectedInstance < manager.size()) {
+        if (ImGui::Button("Remove")) {
+            manager.remove(selectedInstance);
+        }
+
+        std::string name = Input("Name");
+        if (ImGui::Button("Rename")) {
+            manager.getByID(selectedInstance).name = name;
+        }
+    }
 
     ImGui::End();
 
