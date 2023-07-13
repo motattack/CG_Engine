@@ -6,8 +6,6 @@
 #include <CG_Engine/timer.h>
 #include <sstream>
 #include <fstream>
-#include "CG_Engine/math/common.h"
-#include "CG_Engine/engine.h"
 
 std::unordered_map<std::string, ImGuiCol_> colorMap = {
         {"Text",                  ImGuiCol_Text},

@@ -1,6 +1,8 @@
 #ifndef CG_ENGINE_EVENTS_H
 #define CG_ENGINE_EVENTS_H
 
+#include <imgui.h>
+#include <imgui-SFML.h>
 #include <CG_Engine/engine.h>
 
 class Events {

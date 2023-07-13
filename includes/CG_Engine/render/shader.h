@@ -36,6 +36,8 @@ public:
         return programID;
     };
 
+    Shader() = default;
+
     Shader(const char *vertexPath, const char *fragmentPath) {
         const char *vShaderCode, *fShaderCode;
 

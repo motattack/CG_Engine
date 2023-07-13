@@ -1,7 +1,7 @@
 #ifndef CG_ENGINE_CAMERA_H
 #define CG_ENGINE_CAMERA_H
 
-#include <CG_Engine/ecs/base/baseComponent.h>
+#include <CG_Engine/base/baseComponent.h>
 #include <CG_Engine/math/common.h>
 
 const float YAW = 90.0f; // лево-право

@@ -5,7 +5,6 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <iostream>
 #include <GL/glew.h>
-#include <CG_Engine/ui/gui.h>
 #include <CG_Engine/timer.h>
 #include <CG_Engine/base/entityManager.h>
 
@@ -20,23 +19,7 @@ private:
     int width, height;
     sf::RenderWindow window;
 
-    Engine() : isRun(true), width(SCREEN_WIDTH), height(SCREEN_HEIGHT) {
-        window.create(sf::VideoMode(width, height), "CG_Engine", sf::Style::Titlebar | sf::Style::Close,
-                      settings);
-        window.setFramerateLimit(75);
-        window.setVerticalSyncEnabled(true);
-        window.setActive(true);
-
-        ImGui::SFML::Init(window, true);
-
-        glewExperimental = GL_TRUE;
-
-        if (GLEW_OK != glewInit()) {
-            throw std::runtime_error("Error:: glew not init =(");
-        }
-
-        glEnable(GL_DEPTH_TEST);
-    };
+    Engine();
 public:
     EntityManager Manager;
 
@@ -53,22 +36,11 @@ public:
         return reference;
     };
 
-    void init() {
-        timer.init();
-        gui.init();
-    };
+    void init();
 
-    void update() {
-        timer.tick();
-        sf::Time dt = sf::seconds(timer.deltaTime());
+    void initEntity();
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        gui.display(window);
-
-        window.display();
-    };
+    void update();
 
     void exit() {
         isRun = false;

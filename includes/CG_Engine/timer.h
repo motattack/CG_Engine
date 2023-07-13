@@ -1,3 +1,4 @@
+#pragma once
 #ifndef CG_ENGINE_TIMER_H
 #define CG_ENGINE_TIMER_H
 

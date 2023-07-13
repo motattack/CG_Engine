@@ -2,7 +2,7 @@
 #define CG_ENGINE_TRANSFORM_H
 
 #include <CG_Engine/render/shader.h>
-#include <CG_Engine/ecs/base/baseComponent.h>
+#include <CG_Engine/base/baseComponent.h>
 #include <CG_Engine/math/common.h>
 
 struct Transform : public BaseComponent {
