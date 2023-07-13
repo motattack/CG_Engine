@@ -21,7 +21,7 @@ public:
         return signature;
     }
 
-    template<class T>
+    template<typename T>
     void addComponentSignature() {
         signature.insert(CompType<T>());
     }

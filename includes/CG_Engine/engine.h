@@ -20,6 +20,7 @@ private:
     sf::RenderWindow window;
 
     Engine();
+    void initEntity();
 public:
     EntityManager Manager;
 
@@ -38,7 +39,7 @@ public:
 
     void init();
 
-    void initEntity();
+
 
     void update();
 

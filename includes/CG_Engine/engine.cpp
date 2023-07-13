@@ -1,9 +1,19 @@
 #include "engine.h"
 #include <CG_Engine/systems/common.h>
 #include <CG_Engine/ui/gui.h>
+#include <CG_Engine/components/camera.h>
+#include <CG_Engine/components/transform.h>
+#include <CG_Engine/base/Entity.h>
 
 void Engine::initEntity() {
     Manager.registerSystem<CameraSystem>();
+    EntityId cameraEntity = Manager.addNewEntity();
+    Manager.addComponent<Camera>(cameraEntity);
+    Camera& camera = Manager.getComponent<Camera>(cameraEntity);
+
+    // Move these assignments after adding the Camera component
+    camera.Sensitivity = 0;
+    camera.Zoom = 0;
 }
 
 void Engine::update() {
@@ -12,6 +22,8 @@ void Engine::update() {
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    Manager.update();
 
     gui.display(window);
 

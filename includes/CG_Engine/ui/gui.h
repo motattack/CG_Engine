@@ -133,6 +133,8 @@ public:
             components();
         }
 
+        ImGui::End();
+
 
         ImGui::SFML::Render(window);
     }

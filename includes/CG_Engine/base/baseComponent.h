@@ -13,7 +13,7 @@ public:
 
     virtual ~BaseComponent() {};
 
-    EntityId getId() const {
+    [[nodiscard]] EntityId getId() const {
         return entityId;
     }
 };

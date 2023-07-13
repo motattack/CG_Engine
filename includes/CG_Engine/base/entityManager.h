@@ -69,7 +69,7 @@ public:
         if (entity >= MAX_ENTITY_COUNT) {
             throw std::logic_error("Error:: EntityId is out of range");
         }
-        if (entitiesSignatures[entity]->size() >= MAX_COMPONENT_COUNT) {
+        if (getEntitySignature(entity)->size() >= MAX_COMPONENT_COUNT) {
             throw std::logic_error("Component count limit");
         }
 
@@ -85,7 +85,7 @@ public:
         if (entity >= MAX_ENTITY_COUNT) {
             throw std::logic_error("Error:: EntityId is out of range");
         }
-        if (entitiesSignatures[entity]->size() >= MAX_COMPONENT_COUNT) {
+        if (getEntitySignature(entity)->size() >= MAX_COMPONENT_COUNT) {
             throw std::logic_error("Component count limit");
         }
 
@@ -102,7 +102,7 @@ public:
         }
 
         const ComponentTypeId compType = CompType<T>();
-        entitiesSignatures.at(entity)->erase(compType);
+        getEntitySignature(entity)->erase(compType);
         getCompList<T>()->insert(entity);
         updateEntityTargetSystems(entity);
     }
@@ -143,7 +143,7 @@ public:
     template<typename T>
     void unRegisterSystem() {
         const SystemTypeId systemType = SystemType<T>();
-        if (registeredSystems.count(systemType) != 0) {
+        if (registeredSystems.count(systemType) == 0) {
             throw std::runtime_error("System not register");
         }
         registeredSystems.erase(systemType);

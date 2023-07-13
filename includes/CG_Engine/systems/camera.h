@@ -10,10 +10,23 @@ class CameraSystem : public BaseSystem {
 
 public:
     void start() override {
-        addComponentSignature<Transform>();
         addComponentSignature<Camera>();
         float width = core.videoWidth();
+        float height = core.videoHeight();
+
+        glViewport(0, 0, width, height);
         std::cout << width;
+    }
+
+    void update() override {
+        for (auto entity: entities) {
+            auto &camera = Manager.getComponent<Camera>(entity);
+            OnZoom(camera);
+        }
+    }
+
+    void OnZoom(Camera &camera) {
+        std::cout << camera.Zoom << std::endl;
     }
 
 private:

@@ -1,7 +1,7 @@
 #ifndef CG_ENGINE_ENTITY_H
 #define CG_ENGINE_ENTITY_H
 
-#include <CG_Engine/ecs/base/entityManager.h>
+#include <CG_Engine/base/entityManager.h>
 
 class Entity {
 private:

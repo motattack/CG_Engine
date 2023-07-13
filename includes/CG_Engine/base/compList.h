@@ -22,14 +22,14 @@ public:
 
     void insert(const T &component) {
         auto comp = std::find_if(data.begin(), data.end(), [&](const T &c) { return c.getId() == component.getId(); });
-        if (comp != data.end()) {
+        if (comp == data.end()) {
             data.push_back(component);
         }
     }
 
     T &get(const EntityId entity) {
         auto comp = std::find_if(data.begin(), data.end(), [&](const T &c) { return c.getId() == entity; });
-        if (comp != data.end()) {
+        if (comp == data.end()) {
             throw std::runtime_error("Error:: Get non-existing component");
         }
         return *comp;
