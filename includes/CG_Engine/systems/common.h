@@ -1,0 +1,6 @@
+#ifndef CG_ENGINE_COMMON_H
+#define CG_ENGINE_COMMON_H
+
+
+
+#endif //CG_ENGINE_COMMON_H
