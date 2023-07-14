@@ -9,6 +9,7 @@ void Engine::initEntity() {
     Manager.registerSystem<CameraSystem>();
     EntityId cameraEntity = Manager.addNewEntity();
     Manager.addComponent<Camera>(cameraEntity);
+    Manager.addComponent<Transform>(cameraEntity);
     Camera &camera = Manager.getComponent<Camera>(cameraEntity);
 
     camera.Sensitivity = 0;

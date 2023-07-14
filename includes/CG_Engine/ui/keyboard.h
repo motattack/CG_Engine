@@ -4,15 +4,14 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 
+
 class Keyboard {
 public:
-    static void keyCallback(sf::Event & event)
-    {
+    static void keyCallback(sf::Event &event) {
         if (event.type == sf::Event::KeyPressed) {
             Keyboard::keys[event.key.code] = true;
             Keyboard::keysChanged[event.key.code] = true;
-        }
-        else if (event.type == sf::Event::KeyReleased) {
+        } else if (event.type == sf::Event::KeyReleased) {
             Keyboard::keys[event.key.code] = false;
             Keyboard::keysChanged[event.key.code] = true;
         }

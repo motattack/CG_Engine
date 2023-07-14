@@ -21,6 +21,7 @@ const unsigned int FAIL_LOAD_TEXTURE = 3347;
 #include <sstream>
 #include <iostream>
 #include <map>
+#include "CG_Engine/math/common.h"
 
 using namespace std;
 
