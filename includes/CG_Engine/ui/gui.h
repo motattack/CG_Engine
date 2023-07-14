@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <imgui-SFML.h>
 #include <CG_Engine/timer.h>
+#include <CG_Engine/engine.h>
 #include <sstream>
 #include <fstream>
 
@@ -122,10 +123,10 @@ public:
         loadImguiStyleFromFile("res/gui.txt");
     }
 
-    void display(sf::RenderWindow &window) {
+    void display() {
         sf::Time dt = sf::seconds(timer.deltaTime());
 
-        ImGui::SFML::Update(window, dt);
+        ImGui::SFML::Update(core.getWindow(), dt);
 
         {
             ImGui::ShowDemoWindow();
@@ -134,7 +135,7 @@ public:
         }
 
 
-        ImGui::SFML::Render(window);
+        ImGui::SFML::Render(core.getWindow());
     }
 
     void space() {

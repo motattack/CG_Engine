@@ -25,7 +25,7 @@ void Engine::update() {
 
     Manager.update();
 
-    gui.display(window);
+    gui.display();
 
     window.display();
 }
