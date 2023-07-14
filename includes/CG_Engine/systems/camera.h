@@ -6,6 +6,7 @@
 #include <CG_Engine/components/camera.h>
 #include <CG_Engine/engine.h>
 #include <CG_Engine/ui/input.h>
+#include <CG_Engine/render/shader.h>
 
 class CameraSystem : public BaseSystem {
 
@@ -29,7 +30,7 @@ public:
             auto &camera = Manager.getComponent<Camera>(entity);
             auto &transform = Manager.getComponent<Transform>(entity);
             onZoom(camera);
-            std::cout << camera.Zoom << std::endl;
+//            std::cout << camera.Zoom << std::endl;
 
             shader.use();
             shader.set3Float("model", transform.Position);

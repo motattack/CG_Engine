@@ -7,6 +7,8 @@
 
 void Engine::initEntity() {
     Manager.registerSystem<CameraSystem>();
+    Manager.registerSystem<KeyMotionSystem>();
+
     EntityId cameraEntity = Manager.addNewEntity();
     Manager.addComponent<Camera>(cameraEntity);
     Manager.addComponent<Transform>(cameraEntity);
@@ -40,7 +42,7 @@ void Engine::init() {
 }
 
 Engine::Engine() : isRun(true), width(SCREEN_WIDTH), height(SCREEN_HEIGHT) {
-    window.create(sf::VideoMode(width, height), "CG_Engine", sf::Style::Titlebar | sf::Style::Close,
+    window.create(sf::VideoMode(width, height), "CG_Engine", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize,
                   settings);
     window.setFramerateLimit(75);
     window.setVerticalSyncEnabled(true);

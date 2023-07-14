@@ -27,6 +27,21 @@ public:
             ImGui::SFML::ProcessEvent(core.getWindow(), event);
             if (event.type == sf::Event::Closed)
                 core.exit();
+            if (event.type == sf::Event::MouseButtonPressed)
+                MouseButtonCallback(event.mouseButton.button, true);
+            if (event.type == sf::Event::MouseButtonReleased)
+                MouseButtonCallback(event.mouseButton.button, false);
+            if (event.type == sf::Event::KeyPressed)
+                KeyboardCallback(event.key.code, true);
+            if (event.type == sf::Event::KeyReleased)
+                KeyboardCallback(event.key.code, false);
+            if (event.type == sf::Event::Resized) {
+                sf::Vector2u size = core.getWindow().getSize();
+                WindowResizedCallback(size.x, size.y);
+            }
+            if (event.type == sf::Event::Closed) {
+                window_close_callback(core.getWindow());
+            }
         }
     };
 
