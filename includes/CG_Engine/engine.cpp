@@ -1,9 +1,9 @@
-#include "engine.h"
+#include <CG_Engine/engine.h>
 #include <CG_Engine/systems/common.h>
 #include <CG_Engine/ui/gui.h>
 #include <CG_Engine/components/camera.h>
 #include <CG_Engine/components/transform.h>
-#include <CG_Engine/base/Entity.h>
+#include <CG_Engine/events.h>
 
 void Engine::initEntity() {
     Manager.registerSystem<CameraSystem>();
@@ -11,12 +11,12 @@ void Engine::initEntity() {
     Manager.addComponent<Camera>(cameraEntity);
     Camera& camera = Manager.getComponent<Camera>(cameraEntity);
 
-    // Move these assignments after adding the Camera component
     camera.Sensitivity = 0;
     camera.Zoom = 0;
 }
 
 void Engine::update() {
+    event.poll();
     timer.tick();
     sf::Time dt = sf::seconds(timer.deltaTime());
 
@@ -31,6 +31,7 @@ void Engine::update() {
 }
 
 void Engine::init() {
+    event.init();
     timer.init();
     gui.init();
     initEntity();

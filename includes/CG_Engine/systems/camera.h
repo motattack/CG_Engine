@@ -15,7 +15,7 @@ public:
         float height = core.videoHeight();
 
         glViewport(0, 0, width, height);
-        std::cout << width;
+        std::cout << width << "x" << height << std::endl;
     }
 
     void update() override {
@@ -26,7 +26,7 @@ public:
     }
 
     void OnZoom(Camera &camera) {
-        std::cout << camera.Zoom << std::endl;
+//        std::cout << camera.Zoom << std::endl;
     }
 
 private:
