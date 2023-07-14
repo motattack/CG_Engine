@@ -3,7 +3,6 @@
 
 #include <CG_Engine/render/shader.h>
 #include <CG_Engine/base/baseComponent.h>
-#include <CG_Engine/math/common.h>
 
 struct Transform : public BaseComponent {
 public:

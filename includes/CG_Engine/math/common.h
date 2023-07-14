@@ -14,9 +14,8 @@
 #include <CG_Engine/math/mat4x4.h>
 
 
-
-float radians(float degrees) {
-    return degrees * static_cast<float>(M_PI) / 180.0f;
-}
+    static float radians(float degrees) {
+        return degrees * static_cast<float>(M_PI) / 180.0f;
+    }
 
 #endif //CG_ENGINE_COMMON_H

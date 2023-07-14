@@ -2,7 +2,7 @@
 #define CG_ENGINE_CAMERA_H
 
 #include <CG_Engine/base/baseComponent.h>
-#include <CG_Engine/math/common.h>
+//#include <CG_Engine/math/common.h>
 
 const float YAW = -90.0f;
 const float ZOOM = 45.0f;

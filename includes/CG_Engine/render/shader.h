@@ -6,7 +6,6 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <CG_Engine/math/common.h>
 #include "assimp/color4.h"
 
 class Shader {

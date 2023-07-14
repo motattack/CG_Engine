@@ -7,6 +7,7 @@
 #include <GL/glew.h>
 #include <CG_Engine/timer.h>
 #include <CG_Engine/base/entityManager.h>
+#include <CG_Engine/math/common.h>
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
@@ -20,8 +21,14 @@ private:
     sf::RenderWindow window;
 
     Engine();
+
     void initEntity();
+
 public:
+    float zoom;
+    Mat4x4 view;
+    Mat4x4 projection;
+    Vec3 mainCameraPosition;
     EntityManager Manager;
 
     Engine(const Engine &) = delete;
@@ -38,7 +45,6 @@ public:
     };
 
     void init();
-
 
 
     void update();
@@ -66,5 +72,10 @@ public:
 
 static Engine &core = Engine::Ref();
 static EntityManager &Manager = core.Manager;
+
+static float &zoom = core.zoom;
+static Mat4x4 &view = core.view;
+static Mat4x4 &projection = core.projection;
+static Vec3 &mainCameraPosition = core.mainCameraPosition;
 
 #endif
