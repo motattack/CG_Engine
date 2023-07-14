@@ -26,7 +26,7 @@ public:
     }
 
     void OnZoom(Camera &camera) {
-//        std::cout << camera.Zoom << std::endl;
+        std::cout << camera.Zoom << std::endl;
     }
 
 private:

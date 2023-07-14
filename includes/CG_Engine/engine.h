@@ -12,6 +12,10 @@
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 const sf::ContextSettings settings{24, 8, 0, 3, 3, sf::ContextSettings::Default};
+enum class Mode {
+    EDIT = 0,
+    GAME = 1
+};
 
 
 class Engine {
@@ -29,6 +33,7 @@ public:
     Mat4x4 view;
     Mat4x4 projection;
     Vec3 mainCameraPosition;
+    Mode mode;
     EntityManager Manager;
 
     Engine(const Engine &) = delete;

@@ -134,6 +134,13 @@ public:
             components();
         }
 
+        static bool mode;
+
+        ImGui::Begin("off imgui");
+        ImGui::Checkbox("off", &mode);
+        core.mode = static_cast<Mode>(mode);
+        ImGui::End();
+
 
         ImGui::SFML::Render(core.getWindow());
     }

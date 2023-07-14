@@ -9,7 +9,7 @@ void Engine::initEntity() {
     Manager.registerSystem<CameraSystem>();
     EntityId cameraEntity = Manager.addNewEntity();
     Manager.addComponent<Camera>(cameraEntity);
-    Camera& camera = Manager.getComponent<Camera>(cameraEntity);
+    Camera &camera = Manager.getComponent<Camera>(cameraEntity);
 
     camera.Sensitivity = 0;
     camera.Zoom = 0;
@@ -25,7 +25,8 @@ void Engine::update() {
 
     Manager.update();
 
-    gui.display();
+    if (mode == Mode::EDIT)
+        gui.display();
 
     window.display();
 }
