@@ -35,6 +35,12 @@ public:
                 KeyboardCallback(event.key.code, true);
             if (event.type == sf::Event::KeyReleased)
                 KeyboardCallback(event.key.code, false);
+            if (event.type == sf::Event::MouseMoved) {
+                MouseMoveCallback(event.mouseMove.x, event.mouseMove.y);
+            }
+            if (event.type == sf::Event::MouseWheelMoved) {
+                MouseScrollCallback(event.mouseWheel.delta, event.mouseWheel.delta);
+            }
             if (event.type == sf::Event::Resized) {
                 sf::Vector2u size = core.getWindow().getSize();
                 WindowResizedCallback(size.x, size.y);

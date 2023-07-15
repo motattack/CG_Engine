@@ -30,7 +30,7 @@ public:
             auto &camera = Manager.getComponent<Camera>(entity);
             auto &transform = Manager.getComponent<Transform>(entity);
             onZoom(camera);
-//            std::cout << camera.Zoom << std::endl;
+            std::cout << camera.Zoom << std::endl;
 
             shader.use();
             shader.set3Float("model", transform.Position);
@@ -75,7 +75,7 @@ public:
     void onZoom(Camera &camera) {
         auto &event = Input::Event();
         if (event.isMouseScrolling()) {
-            camera.Zoom -= event.mouseScrollOffset().y * camera.ScrollStep;
+            camera.Zoom += event.mouseScrollOffset().y * camera.ScrollStep;
             camera.Zoom = (camera.Zoom <= 1.0f) ? 1.0f : camera.Zoom;
             camera.Zoom = (camera.Zoom >= ZOOM) ? ZOOM : camera.Zoom;
         }

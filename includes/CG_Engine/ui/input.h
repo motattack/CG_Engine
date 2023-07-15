@@ -96,6 +96,14 @@ static void MouseButtonCallback(int button, bool pressed) {
     Input::Event().SetMouseButton(button, pressed);
 }
 
+static void MouseScrollCallback(double sx, double sy) {
+    Input::Event().mouseScroll(sx, sy);
+}
+
+static void MouseMoveCallback(double mx, double my) {
+    Input::Event().mouseMotion(mx, my);
+}
+
 static void KeyboardCallback(sf::Keyboard::Key key, bool pressed) {
     auto &event = Input::Event();
 
