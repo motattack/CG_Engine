@@ -45,8 +45,8 @@ public:
     }
 
     void drawArrays(Shader &shader, GLenum mode = GL_TRIANGLES) {
-        material.SetUniform(shader);
-        shader.bind();
+//        material.SetUniform(shader);
+//        shader.bind();
         vao.drawArrays(mode);
     }
 

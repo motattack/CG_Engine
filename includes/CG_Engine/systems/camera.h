@@ -27,13 +27,17 @@ public:
             camera.Position = transform.Position;
             camera.Yaw = transform.Rotation.x;
             camera.Pitch = transform.Rotation.y;
-            camera.Up = camera.Up * transform.Rotation;
+
             event(camera);
-            transform.Rotation = camera.Position;
+            transform.Position = camera.Position;
             transform.Rotation.x = camera.Yaw;
             transform.Rotation.y = camera.Pitch;
 
 //            std::cout << camera.Yaw << std::endl;
+
+            shader.bind();
+            shader.setMat4("projection", camera.GetProjectionMatrix());
+            shader.setMat4("view", camera.GetViewMatrix());
 
             skyboxShader.bind();
             skyboxShader.setMat4("projection", camera.GetProjectionMatrix());
@@ -41,9 +45,7 @@ public:
             glBindTexture(GL_TEXTURE_CUBE_MAP, Resource.cubeMap("SKYBOX"));
             Resource.getMesh("CUBE").drawArrays(skyboxShader);
 
-            shader.bind();
-            shader.setMat4("projection", camera.GetProjectionMatrix());
-            shader.setMat4("view", camera.GetViewMatrix());
+
         }
     }
 
@@ -74,7 +76,7 @@ public:
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            camera.Rotate(timer.deltaTime() * 360.f, 0);
+            camera.Rotate(-timer.deltaTime() * 360.f, 0);
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
