@@ -13,12 +13,12 @@ public:
 
     Vec3 Position = Vec3(0.0f);
     Vec3 Rotation = Vec3(0.0f);
-    Vec3 Scale = Vec3(1.0f);
+    float Scale = 1.0f;
 
-    Transform(const Vec3 &translate, const Vec3 &scale, const Vec3 &rotation) :
+    Transform(const Vec3 &translate, const float scale, const float rotation) :
             Position(translate), Scale(scale), Rotation(rotation) {}
 
-    Transform(const Vec3 &translate, const Vec3 &scale) :
+    Transform(const Vec3 &translate, const float scale) :
             Position(translate), Scale(scale) {}
 
     Transform(const Vec3 &translate) :
@@ -30,7 +30,7 @@ public:
         model = model.rotate(radians(Rotation.x), Vec3(1, 0, 0));
         model = model.rotate(radians(Rotation.y), Vec3(0, 1, 0));
         model = model.rotate(radians(Rotation.z), Vec3(0, 0, 1));
-        model = model.scale(Scale);
+        model = model.scale(Vec3(Scale));
         return model;
     }
 

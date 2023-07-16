@@ -8,6 +8,9 @@
 #include <sstream>
 #include <fstream>
 #include "CG_Engine/components/name.h"
+#include "CG_Engine/components/transform.h"
+
+static int selectedEntityIndex = 0;
 
 std::unordered_map<std::string, ImGuiCol_> colorMap = {
         {"Text",                  ImGuiCol_Text},
@@ -134,6 +137,7 @@ public:
             space();
             components();
             entityList();
+            transform();
         }
 
 //        ImGui::Begin("Tool");
@@ -145,6 +149,8 @@ public:
 
         ImGui::SFML::Render(core.Window());
     }
+
+
 
     void entityList(){
         // Prepare a list of entity names and IDs
@@ -166,7 +172,7 @@ public:
         }
 
         // ImGui code to create a combo box
-        static int selectedEntityIndex = 0; // To store the selected entity index
+         // To store the selected entity index
         if (ImGui::BeginCombo("Entities", entityNamesArr[selectedEntityIndex])) {
             for (int i = 0; i < entityNames.size(); ++i) {
                 bool isSelected = (selectedEntityIndex == i);
@@ -199,6 +205,32 @@ public:
 
         // Clean up C-style array
         delete[] entityNamesArr;
+    }
+
+    void transform(){
+        auto &instance = Manager.getComponent<Transform>(selectedEntityIndex);
+
+        ImGui::Begin("Instance Properties");
+        if (ImGui::CollapsingHeader("Translate")) {
+            ImGui::InputFloat("X", &instance.Position.x, 0.05f, 1.0f);
+            ImGui::InputFloat("Y", &instance.Position.y, 0.05f, 1.0f);
+            ImGui::InputFloat("Z", &instance.Position.z, 0.05f, 1.0f);
+        }
+        if (ImGui::CollapsingHeader("Rotate")) {
+            ImGui::SliderFloat3("angles", &instance.Rotation.x, -180.0f, 180.0f);
+            if (ImGui::Button("Reset Rotate")) {
+                instance.Rotation = Vec3(0.f, 0.f, 0.f);
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Scale")) {
+            ImGui::InputFloat("Factor", &instance.Scale, 0.05f, 1.0f);
+            if (ImGui::Button("Reset Scale")) {
+                instance.Scale = 1.f;
+            }
+        }
+
+        ImGui::End();
     }
 
     void space() {

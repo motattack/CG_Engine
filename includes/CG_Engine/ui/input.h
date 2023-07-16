@@ -80,11 +80,23 @@ public:
     void mouseMotion(double mx, double my) {
         onMouseMotion = false;
         if (mousePrevPos.x != mx || mousePrevPos.y != my) {
-            mouseMotionOff.x = (mx - mousePrevPos.x);
-            mouseMotionOff.y = (my - mousePrevPos.y);
+            mouseMotionOff.x = mx - mousePrevPos.x;
+            mouseMotionOff.y = my - mousePrevPos.y;
             mousePrevPos = Vec2(mx, my);
             onMouseMotion = true;
         }
+    };
+
+    float getDX() {
+        float dx = mouseMotionOff.x;
+        mouseMotionOff.x = 0;
+        return dx;
+    };
+
+    float getDY() {
+        float dy = mouseMotionOff.y;
+        mouseMotionOff.y = 0;
+        return dy;
     };
 };
 

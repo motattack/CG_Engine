@@ -8,6 +8,7 @@
 #include "CG_Engine/systems/common.h"
 #include "CG_Engine/source.h"
 #include "CG_Engine/components/name.h"
+#include "CG_Engine/systems/meshSystem.h"
 
 
 void Engine::update() {
@@ -16,6 +17,7 @@ void Engine::update() {
     sf::Time dt = sf::seconds(timer.deltaTime());
 
     Manager.update();
+    Manager.render();
     gui.display();
 
     window.display();
@@ -23,6 +25,20 @@ void Engine::update() {
 
 void Engine::init() {
     Resource.init();
+
+    Manager.registerCompList<Camera>();
+    Manager.registerCompList<Transform>();
+    Manager.registerCompList<EntityName>();
+    Manager.registerCompList<MeshRenderer>();
+
+    Registrar<Camera>("Camera");
+    Registrar<MeshRenderer>("MeshRenderer");
+
+    Manager.addSystem<MeshRendererSystem>();
+    EntityId meshEntity = Manager.addNewEntity();
+    Manager.addComponent<MeshRenderer>(meshEntity, "CUBE");
+    Manager.addComponent<Transform>(meshEntity);
+    Manager.addComponent<EntityName>(meshEntity, "CUBE 1");
 
     Manager.addSystem<CameraSystem>();
     EntityId cameraEntity = Manager.addNewEntity();
