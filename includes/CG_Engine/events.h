@@ -5,6 +5,7 @@
 #include <imgui-SFML.h>
 #include <CG_Engine/engine.h>
 
+
 class Events {
 private:
     Events() {};
@@ -23,8 +24,8 @@ public:
 
     void poll() {
         sf::Event event{};
-        while (core.getWindow().pollEvent(event)) {
-            ImGui::SFML::ProcessEvent(core.getWindow(), event);
+        while (core.Window().pollEvent(event)) {
+            ImGui::SFML::ProcessEvent(core.Window(), event);
             if (event.type == sf::Event::Closed)
                 core.exit();
             if (event.type == sf::Event::MouseButtonPressed)
@@ -42,11 +43,11 @@ public:
                 MouseScrollCallback(event.mouseWheel.delta, event.mouseWheel.delta);
             }
             if (event.type == sf::Event::Resized) {
-                sf::Vector2u size = core.getWindow().getSize();
+                sf::Vector2u size = core.Window().getSize();
                 WindowResizedCallback(size.x, size.y);
             }
             if (event.type == sf::Event::Closed) {
-                window_close_callback(core.getWindow());
+                window_close_callback(core.Window());
             }
         }
     };

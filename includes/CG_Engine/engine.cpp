@@ -1,48 +1,42 @@
 #include <CG_Engine/engine.h>
-#include <CG_Engine/systems/common.h>
 #include <CG_Engine/ui/gui.h>
 #include <CG_Engine/components/camera.h>
-#include <CG_Engine/components/transform.h>
+#include <CG_Engine/ui/input.h>
 #include <CG_Engine/events.h>
+#include <CG_Engine/base/Entity.h>
+#include "CG_Engine/components/transform.h"
+#include "CG_Engine/systems/common.h"
+#include "CG_Engine/source.h"
 
-void Engine::initEntity() {
-    Manager.registerSystem<CameraSystem>();
-    Manager.registerSystem<KeyMotionSystem>();
-
-    EntityId cameraEntity = Manager.addNewEntity();
-    Manager.addComponent<Camera>(cameraEntity);
-    Manager.addComponent<Transform>(cameraEntity);
-    Camera &camera = Manager.getComponent<Camera>(cameraEntity);
-
-    camera.Sensitivity = 0;
-    camera.Zoom = 0;
-}
 
 void Engine::update() {
     event.poll();
     timer.tick();
     sf::Time dt = sf::seconds(timer.deltaTime());
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     Manager.update();
-
-    if (mode == Mode::EDIT)
-        gui.display();
+    gui.display();
 
     window.display();
 }
 
 void Engine::init() {
-    event.init();
-    timer.init();
+    Resource.init();
+
+    Manager.addSystem<CameraSystem>();
+    EntityId cameraEntity = Manager.addNewEntity();
+    Manager.addComponent<Camera>(cameraEntity); // Example camera position and rotation
+    Manager.addComponent<Transform>(cameraEntity);
+
+    Manager.start();
+
     gui.init();
-    initEntity();
 }
 
-Engine::Engine() : isRun(true), width(SCREEN_WIDTH), height(SCREEN_HEIGHT) {
-    window.create(sf::VideoMode(width, height), "CG_Engine", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize,
+Engine::Engine() : isRun(true), isGame(false), viewSize(0) {
+    viewSize = Vec2(SCREEN_WIDTH, SCREEN_HEIGHT);
+    window.create(sf::VideoMode(viewSize.x, viewSize.y), "CG_Engine",
+                  sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize,
                   settings);
     window.setFramerateLimit(75);
     window.setVerticalSyncEnabled(true);
@@ -57,4 +51,28 @@ Engine::Engine() : isRun(true), width(SCREEN_WIDTH), height(SCREEN_HEIGHT) {
     }
 
     glEnable(GL_DEPTH_TEST);
+
+    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+}
+
+Engine::~Engine() {
+    window.close();
+}
+
+void Engine::render() {
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Engine::startGame() {
+    Manager.deactivateEditorSystems();
+    Manager.activateRuntimeSystems();
+    isGame = true;
 };
+
+
+void Engine::stopGame() {
+    isGame = false;
+    Manager.deactivateRuntimeSystems();
+    Manager.activateEditorSystems();
+}

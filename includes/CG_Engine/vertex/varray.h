@@ -1,5 +1,5 @@
-#ifndef CG_ENGINE_VARRAY_H
-#define CG_ENGINE_VARRAY_H
+#ifndef CG_ENGINE_VARRAY_LIB_H
+#define CG_ENGINE_VARRAY_LIB_H
 
 #include <CG_Engine/vertex/memory.h>
 
@@ -31,4 +31,4 @@ public:
     };
 };
 
-#endif //CG_ENGINE_VARRAY_H
+#endif //CG_ENGINE_VARRAY_LIB_H

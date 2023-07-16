@@ -5,16 +5,17 @@
 
 class BaseComponent {
 private:
+    EntityId entityID = -1;
+
     friend class EntityManager;
 
-    EntityId entityId;
 public:
-    BaseComponent() : entityId() {};
+    BaseComponent() = default;
 
-    virtual ~BaseComponent() {};
+    ~BaseComponent() = default;
 
-    [[nodiscard]] EntityId getId() const {
-        return entityId;
+    EntityId getId() const {
+        return entityID;
     }
 };
 

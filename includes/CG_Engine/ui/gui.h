@@ -126,7 +126,7 @@ public:
     void display() {
         sf::Time dt = sf::seconds(timer.deltaTime());
 
-        ImGui::SFML::Update(core.getWindow(), dt);
+        ImGui::SFML::Update(core.Window(), dt);
 
         {
             ImGui::ShowDemoWindow();
@@ -134,14 +134,14 @@ public:
             components();
         }
 
-        ImGui::Begin("Tool");
-        if (ImGui::Button("Play")) {
-            core.mode = Mode::GAME;
-        }
-        ImGui::End();
+//        ImGui::Begin("Tool");
+//        if (ImGui::Button("Play")) {
+//            core.mode = Mode::GAME;
+//        }
+//        ImGui::End();
 
 
-        ImGui::SFML::Render(core.getWindow());
+        ImGui::SFML::Render(core.Window());
     }
 
     void space() {

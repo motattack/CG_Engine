@@ -11,89 +11,34 @@
 class Shader {
 private:
     unsigned int programID;
-
-    void checkCompileErrors(unsigned int shader, const std::string &type) {
-        int success;
-        char infoLog[512];
-        if (type != "PROGRAM") {
-            glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-            if (!success) {
-                glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-                std::cout << "ERROR:SHADER::" << type << std::endl << infoLog << std::endl;
-            }
-        } else {
-            glGetProgramiv(shader, GL_LINK_STATUS, &success);
-            if (!success) {
-                glGetProgramInfoLog(shader, 512, nullptr, infoLog);
-                std::cout << "ERROR::LINKING::" << type << std::endl << infoLog << std::endl;
-            }
-        }
-    };
-
 public:
-    unsigned int ID() const {
+    unsigned int program() const {
         return programID;
     };
 
-    Shader() = default;
+    Shader() : programID(0) {}
 
-    Shader(const char *vertexPath, const char *fragmentPath) {
-        const char *vShaderCode, *fShaderCode;
-
-        std::string vTmpStr, fTmpStr;
-
-        std::ifstream vShaderFile, fShaderFile;
-        vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-        try {
-            std::stringstream vShaderStream;
-            vShaderFile.open(vertexPath);
-            vShaderStream << vShaderFile.rdbuf();
-            vShaderFile.close();
-            vTmpStr = vShaderStream.str();
-            vShaderCode = vTmpStr.c_str();
-
-            std::stringstream fShaderStream;
-            fShaderFile.open(fragmentPath);
-            fShaderStream << fShaderFile.rdbuf();
-            fShaderFile.close();
-            fTmpStr = fShaderStream.str();
-            fShaderCode = fTmpStr.c_str();
-        }
-        catch (std::ifstream::failure &e) {
-            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << std::endl;
-        }
-
-        unsigned int vertex;
-        vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, 1, &vShaderCode, nullptr);
-        glCompileShader(vertex);
-        checkCompileErrors(vertex, "VERTEX");
-
-        unsigned int fragment;
-        fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment, 1, &fShaderCode, nullptr);
-        glCompileShader(fragment);
-        checkCompileErrors(fragment, "FRAGMENT");
-
-        programID = glCreateProgram();
-        glAttachShader(programID, vertex);
-        glAttachShader(programID, fragment);
-        glLinkProgram(programID);
-        checkCompileErrors(programID, "PROGRAM");
-
-        glDeleteShader(vertex);
-        glDeleteShader(fragment);
-    };
+    Shader(const GLuint id) : programID(id) {}
 
     ~Shader() {
         glDeleteProgram(programID);
     };
 
-    void use() const {
+    void bind() const {
         glUseProgram(programID);
     };
+
+    void unBind() {
+        glUseProgram(0);
+    }
+
+    Shader &operator=(Shader &&other) {
+        if (this != &other) {
+            // Move assignment implementation to transfer resources efficiently
+            std::swap(programID, other.programID);
+        }
+        return *this;
+    }
 
     void setBool(const std::string &name, bool value) const {
         glUniform1i(glGetUniformLocation(programID, name.c_str()), (int) value);
@@ -111,7 +56,7 @@ public:
         glUniform3f(glGetUniformLocation(programID, name.c_str()), v1, v2, v3);
     }
 
-    void set3Float(const std::string &name, Vec3 v) const {
+    void setV3Float(const std::string &name, Vec3 v) const {
         glUniform3f(glGetUniformLocation(programID, name.c_str()), v.x, v.y, v.z);
     }
 
@@ -133,6 +78,18 @@ public:
 
     void setMat4(const std::string &name, Mat4x4 val) const {
         glUniformMatrix4fv(glGetUniformLocation(programID, name.c_str()), 1, GL_FALSE, &val[0][0]);
+    }
+
+    void setCube(const GLchar *uName, GLuint cube, GLint unit = 0) {
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cube);
+        glUniform1i(glGetUniformLocation(programID, uName), unit);
+    }
+
+    void SetSample2D(const GLchar* uName, GLuint tex2d, GLint unit = 0) {
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_2D, tex2d);
+        glUniform1i(glGetUniformLocation(programID, uName), unit);
     }
 };
 

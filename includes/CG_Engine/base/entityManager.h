@@ -1,9 +1,12 @@
 #ifndef CG_ENGINE_ENTITYMANAGER_H
 #define CG_ENGINE_ENTITYMANAGER_H
 
-#include <CG_Engine/base/baseComponent.h>
-#include <CG_Engine/base/baseSystem.h>
+#include <CG_Engine/base/types.h>
 #include <CG_Engine/base/compList.h>
+#include <CG_Engine/base/baseSystem.h>
+#include <CG_Engine/base/baseComponent.h>
+#include <CG_Engine/base/compFactory.h>
+
 #include <map>
 #include <queue>
 #include <memory>
@@ -11,199 +14,276 @@
 class EntityManager {
 private:
     EntityId entityCount;
+    std::set<EntityId> activeEntities;
     std::queue<EntityId> availableEntities;
-    std::map<EntityId, std::shared_ptr<Signature>> entitiesSignatures;
-    std::map<SystemTypeId, std::shared_ptr<BaseSystem>> registeredSystems;
-    std::map<ComponentTypeId, std::shared_ptr<ICompList>> componentsArrays;
 
+    std::set<std::shared_ptr<BaseSystem>> systems;
+    std::set<std::shared_ptr<BaseSystem>> activeSystems;
+    std::set<std::shared_ptr<BaseSystem>> editorSystems;
+    std::set<std::shared_ptr<BaseSystem>> runtimeSystems;
+
+    std::set<std::shared_ptr<ICompList>> componentArrays;
+    std::unordered_map<EntityId, Signature> entitySignatures;
 public:
-    EntityManager() : entityCount(0) {
-        for (EntityId entity = 0; entity < MAX_ENTITY_COUNT; entity++) {
-            availableEntities.push(entity);
+    ~EntityManager() = default;
+
+    EntityManager(const EntityManager &) = delete;
+
+    EntityManager &operator=(const EntityManager &) = delete;
+
+    static EntityManager &Ref() {
+        static EntityManager reference;
+        return reference;
+    }
+
+    void start() {
+        for (auto &system: activeSystems) {
+            system->start();
         }
     }
 
-    ~EntityManager() {
-
-    }
-
     void update() {
-        for (auto &system: registeredSystems) {
-            system.second->update();
+        for (auto &system: activeSystems) {
+            system->update();
         }
     }
 
     void render() {
-        for (auto &system: registeredSystems) {
-            system.second->render();
+        for (auto &system: activeSystems) {
+            system->render();
         }
     }
 
+    void activateRuntimeSystems() {
+        for (auto &system: runtimeSystems) {
+            system->start();
+            activeSystems.insert(system);
+        }
+    }
+
+    void activateEditorSystems() {
+        for (auto &system: editorSystems) {
+            system->start();
+            activeSystems.insert(system);
+        }
+    }
+
+    void deactivateRuntimeSystems() {
+        for (auto &system: runtimeSystems) {
+            system->stop();
+            activeSystems.erase(system);
+        }
+    }
+
+    void deactivateEditorSystems() {
+        for (auto &system: editorSystems) {
+            system->stop();
+            activeSystems.erase(system);
+        }
+    }
+
+    const std::set<EntityId> &ActiveEntities() const {
+        return activeEntities;
+    }
+
     EntityId addNewEntity() {
-        const EntityId entity = availableEntities.front();
-        addEntitySignature(entity);
+        if (entityCount >= MAX_ENTITY_COUNT)
+            std::cout << "Entity count limit reached!" << std::endl;
+
+        EntityId entity = availableEntities.front();
+        activeEntities.insert(entity);
         availableEntities.pop();
         entityCount++;
         return entity;
     }
 
     void destroyEntity(const EntityId entity) {
-        if (entity >= MAX_ENTITY_COUNT) {
-            throw std::logic_error("Error: Id is out of range!");
-        }
-        entitiesSignatures.erase(entity);
+        if (entity >= MAX_ENTITY_COUNT)
+            std::cout << "EntityID our of range!" << std::endl;
 
-        for (auto &array: componentsArrays) {
-            array.second->erase(entity);
-        }
+        entitySignatures.erase(entity);
+        for (auto &array: componentArrays)
+            array->erase(entity);
 
-        for (auto &system: registeredSystems) {
-            system.second->removeEntity(entity);
-        }
-        entityCount--;
+        updateEntityTargetSystems(entity);
+        entityCount = (entityCount > 0) ? entityCount-- : 0;
         availableEntities.push(entity);
+        activeEntities.erase(entity);
     }
 
     template<typename T, typename... Args>
     void addComponent(const EntityId entity, Args &&... args) {
-        if (entity >= MAX_ENTITY_COUNT) {
-            throw std::logic_error("Error:: EntityId is out of range");
-        }
-        if (getEntitySignature(entity)->size() >= MAX_COMPONENT_COUNT) {
-            throw std::logic_error("Component count limit");
-        }
+        if (entity >= MAX_ENTITY_COUNT)
+            std::cout << "EntityID out of range" << std::endl;
+        if (entitySignatures[entity].size() >= MAX_COMP_COUNT)
+            std::cout << "Component count limit reached!" << std::endl;
+        if (!isCompListRegistered<T>())
+            registerCompList<T>();
 
         T component(std::forward<Args>(args)...);
-        component.entityId = entity;
-        getEntitySignature(entity)->insert(CompType<T>());
-        getCompList<T>()->insert(component);
+        component.entityID = entity;
+        entitySignatures[entity].insert(CompType<T>());
+        getCompList<T>()->insert(&component);
         updateEntityTargetSystems(entity);
     }
 
-    template<typename T, typename... Args>
-    void addComponent(const EntityId entity, T &component) {
-        if (entity >= MAX_ENTITY_COUNT) {
-            throw std::logic_error("Error:: EntityId is out of range");
-        }
-        if (getEntitySignature(entity)->size() >= MAX_COMPONENT_COUNT) {
-            throw std::logic_error("Component count limit");
-        }
+    template<typename T>
+    void addComponent(const EntityId entity, T component) {
+        if (entity >= MAX_ENTITY_COUNT)
+            std::cout << "EntityID out of range" << std::endl;
+        if (entitySignatures[entity].size() >= MAX_COMP_COUNT)
+            std::cout << "Component count limit reached!" << std::endl;
+        if (!isCompListRegistered<T>())
+            registerCompList<T>();
 
-        component.entityId = entity;
-        getEntitySignature(entity)->insert(CompType<T>());
-        getCompList<T>()->insert(component);
+        component.entityID = entity;
+        getCompList<T>()->insert(&component);
+        entitySignatures[entity].insert(CompType<T>());
+        updateEntityTargetSystems(entity);
+    }
+
+    void addComponent(const EntityId entity, const char *typeName) {
+        if (entity >= MAX_ENTITY_COUNT)
+            std::cout << "EntityID out of range" << std::endl;
+        if (entitySignatures[entity].size() >= MAX_COMP_COUNT)
+            std::cout << "Component count limit reached!" << std::endl;
+        const ComponentTypeId compType = CompFactory.getTypeId(typeName);
+        auto it = std::find_if(componentArrays.begin(), componentArrays.end(),
+                               [compType](const auto array) { return compType == array->getDataType(); });
+        if (it == componentArrays.end())
+            std::cout << "Component list not registered" << std::endl;
+
+        auto component = CompFactory.createComponent(typeName);
+        component->entityID = entity;
+        (*it)->insert(component.get());
+        entitySignatures[entity].insert(compType);
         updateEntityTargetSystems(entity);
     }
 
     template<typename T>
     void removeComponent(const EntityId entity) {
-        if (entity >= MAX_ENTITY_COUNT) {
-            throw std::logic_error("Error:: EntityId is out of range");
-        }
+        if (entity >= MAX_ENTITY_COUNT)
+            std::cout << "EntityID out of range" << std::endl;
 
-        const ComponentTypeId compType = CompType<T>();
-        getEntitySignature(entity)->erase(compType);
-        getCompList<T>()->insert(entity);
+        entitySignatures[entity].erase(CompType<T>());
+        getCompList<T>()->Erase(entity);
+        updateEntityTargetSystems(entity);
+    }
+
+    void removeComponent(const EntityId entity, const char *typeName) {
+        if (entity >= MAX_ENTITY_COUNT)
+            std::cout << "EntityID out of range" << std::endl;
+
+        const ComponentTypeId compType = CompFactory.getTypeId(typeName);
+        auto it = std::find_if(componentArrays.begin(), componentArrays.end(),
+                               [compType](const auto array) { return compType == array->getDataType(); });
+        if (it == componentArrays.end())
+            std::cout << "Component list not registered" << std::endl;
+
+        (*it)->erase(entity);
+        entitySignatures[entity].erase(compType);
         updateEntityTargetSystems(entity);
     }
 
     template<typename T>
     T &getComponent(const EntityId entity) {
-        if (entity >= MAX_ENTITY_COUNT) {
-            throw std::logic_error("Error:: EntityId is out of range");
-        }
+        if (entity >= MAX_ENTITY_COUNT)
+            std::cout << "EntityID out of range" << std::endl;
+
         return getCompList<T>()->get(entity);
     }
 
     template<typename T>
     bool hasComponent(const EntityId entity) {
-        if (entity >= MAX_ENTITY_COUNT) {
-            throw std::logic_error("Error:: EntityId is out of range");
-        }
+        if (entity >= MAX_ENTITY_COUNT)
+            std::cout << "EntityID out of range!" << std::endl;
 
-        return (getEntitySignature(entity)->count(CompType<T>()) > 0);
+        return (entitySignatures[entity].count(CompType<T>()) > 0);
     }
 
     template<typename T>
-    void registerSystem() {
-        const SystemTypeId systemType = SystemType<T>();
-        if (registeredSystems.count(systemType) != 0) {
-            throw std::runtime_error("System already register");
-        }
+    void addSystem() {
         auto system = std::make_shared<T>();
-
-        for (EntityId entity = 0; entity < entityCount; entity++) {
-            addEntityToSystem(entity, system.get());
-        }
-
-        system->start();
-        registeredSystems[systemType] = std::move(system);
+        systems.insert(std::move(system));
     }
 
     template<typename T>
-    void unRegisterSystem() {
-        const SystemTypeId systemType = SystemType<T>();
-        if (registeredSystems.count(systemType) == 0) {
-            throw std::runtime_error("System not register");
-        }
-        registeredSystems.erase(systemType);
+    void addRuntimeSystem() {
+        auto system = std::make_shared<T>();
+        runtimeSystems.insert(std::move(system));
+    }
+
+    template<typename T>
+    void addEditorSystem() {
+        auto system = std::make_shared<T>();
+        editorSystems.insert(std::move(system));
+    }
+
+    template<typename T>
+    void registerCompList() {
+        ComponentTypeId compType = CompType<T>();
+        auto it = std::find_if(componentArrays.begin(), componentArrays.end(),
+                               [compType](const auto array) { return compType == array->getDataType(); });
+
+        if (it != componentArrays.end())
+            std::cout << "Component list all ready registered" << std::endl;
+
+        componentArrays.insert(std::move(std::make_shared<CompList<T>>()));
     }
 
 private:
-    template<typename T>
-    void addCompList() {
-        const ComponentTypeId compType = CompType<T>();
-        if (componentsArrays.find(compType) != componentsArrays.end()) {
-            throw std::runtime_error("Component list already register");
+    EntityManager() : entityCount(0), componentArrays({}) {
+        for (EntityId entity = 0; entity < MAX_ENTITY_COUNT; entity++)
+            availableEntities.push(entity);
+    }
+
+    void updateEntityTargetSystems(EntityId entity) {
+        for (auto system: systems)
+            pushEntityToSystem(entity, system);
+
+        for (auto system: editorSystems)
+            pushEntityToSystem(entity, system, false);
+
+        for (auto system: runtimeSystems)
+            pushEntityToSystem(entity, system, false);
+    }
+
+    void pushEntityToSystem(EntityId entity, std::shared_ptr<BaseSystem> &system, bool activateSystem = true) {
+        for (auto &compType: system->getSignature()) {
+            if (entitySignatures[entity].count(compType) == 0) {
+                system->eraseEntity(entity);
+                if (system->isEmpty() && activeSystems.count(system) > 0)
+                    activeSystems.erase(system);
+                return;
+            }
         }
-        componentsArrays[compType] = std::move(std::make_shared<CompList<T>>());
+
+        system->pushEntity(entity);
+        if (activateSystem && activeSystems.count(system) == 0)
+            activeSystems.insert(system);
+    }
+
+    template<typename T>
+    bool isCompListRegistered() {
+        ComponentTypeId compType = CompType<T>();
+        auto it = std::find_if(componentArrays.begin(), componentArrays.end(),
+                               [compType](const auto array) { return compType == array->getDataType(); });
+        return (it != componentArrays.end());
     }
 
     template<typename T>
     std::shared_ptr<CompList<T>> getCompList() {
-        const ComponentTypeId compType = CompType<T>();
-        if (componentsArrays.count(compType) == 0) {
-            addCompList<T>();
-        }
-        return std::static_pointer_cast<CompList<T>>(componentsArrays.at(compType));
-    }
+        ComponentTypeId compType = CompType<T>();
+        auto it = std::find_if(componentArrays.begin(), componentArrays.end(),
+                               [compType](const auto array) { return compType == array->getDataType(); });
 
-    void addEntitySignature(const EntityId entity) {
-        if (entitiesSignatures.find(entity) != entitiesSignatures.end()) {
-            throw std::logic_error("error:: add entity");
-        }
-        entitiesSignatures[entity] = std::move(std::make_shared<Signature>());
-    }
+        if(it == componentArrays.end())
+            std::cout << "Component list not registered" << std::endl;
 
-    std::shared_ptr<Signature> getEntitySignature(const EntityId entity) {
-        if (entitiesSignatures.find(entity) == entitiesSignatures.end()) {
-            throw std::logic_error("error:: add entity");
-        }
-        return entitiesSignatures.at(entity);
-    }
-
-    void updateEntityTargetSystems(const EntityId entity) {
-        for (auto &system: registeredSystems) {
-            addEntityToSystem(entity, system.second.get());
-        }
-    }
-
-    void addEntityToSystem(const EntityId entity, BaseSystem *system) {
-        if (belongToSystem(entity, system->signature)) {
-            system->entities.insert(entity);
-        } else {
-            system->entities.erase(entity);
-        }
-    }
-
-    bool belongToSystem(const EntityId entity, const Signature &system_signature) {
-        for (const auto compType: system_signature) {
-            if (getEntitySignature(entity)->count(compType) == 0) {
-                return false;
-            }
-        }
-        return true;
+        return std::static_pointer_cast<CompList<T>>(*it);
     }
 };
+
+static EntityManager &Manager = EntityManager::Ref();
 
 #endif //CG_ENGINE_ENTITYMANAGER_H

@@ -3,6 +3,7 @@
 
 #include <CG_Engine/base/baseComponent.h>
 #include <CG_Engine/math/common.h>
+#include "CG_Engine/render/shader.h"
 
 class Transform : public BaseComponent {
 public:
@@ -22,6 +23,21 @@ public:
 
     Transform(const Vec3 &translate) :
             Position(translate) {}
+
+    Mat4x4 model() {
+        auto model = Mat4x4(1.0f);
+        model = model.translate(Position);
+        model = model.rotate(radians(Rotation.x), Vec3(1, 0, 0));
+        model = model.rotate(radians(Rotation.y), Vec3(0, 1, 0));
+        model = model.rotate(radians(Rotation.z), Vec3(0, 0, 1));
+        model = model.scale(Scale);
+        return model;
+    }
+
+    void setModelUniform(Shader &shader) {
+        shader.bind();
+        shader.setMat4("model", model());
+    }
 };
 
 #endif //CG_ENGINE_TRANSFORM_H

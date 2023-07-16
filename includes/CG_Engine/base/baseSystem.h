@@ -4,46 +4,36 @@
 #include <CG_Engine/base/types.h>
 
 class BaseSystem {
+protected:
+    Signature signature;
+    std::set<EntityId> entities;
 public:
     BaseSystem() = default;
 
     virtual ~BaseSystem() = default;
 
-    void removeEntity(const EntityId entity) {
-        entities.erase(entity);
-    }
+    const Signature getSignature() const { return signature; }
 
-    void addEntity(const EntityId entity) {
-        entities.insert(entity);
-    }
+    void eraseEntity(const EntityId entity) { entities.erase(entity); }
 
-    Signature getSignature() {
-        return signature;
-    }
+    void pushEntity(const EntityId entity) { entities.insert(entity); }
 
     template<typename T>
-    void addComponentSignature() {
-        signature.insert(CompType<T>());
+    void addComponentSignature() { signature.insert(CompType<T>()); }
+
+    const bool isEmpty() const { return (entities.size() == 0); }
+
+    const bool hasEntity(EntityId entity) const {
+        return (entities.count(entity) > 0);
     }
 
-    virtual void start() {};
+    virtual void stop() {}
 
-    virtual void update() {
-        for (auto i: entities) {
-            std::cout << i << "     ";
-        }
-        std::cout << std::endl;
-    };
+    virtual void start() {}
 
-    virtual void render() {};
+    virtual void render() {}
 
-    virtual void destroy() {};
-protected:
-    friend class EntityManager;
-
-    Signature signature;
-    std::set<EntityId> entities;
-
+    virtual void update() {}
 };
 
 #endif //CG_ENGINE_BASESYSTEM_H

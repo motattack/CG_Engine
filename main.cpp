@@ -4,6 +4,7 @@ int main() {
     core.init();
 
     while (core.run()) {
+        core.render();
         core.update();
     }
 

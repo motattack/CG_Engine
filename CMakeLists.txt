@@ -49,6 +49,16 @@ set(CATCH_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/external/test)
 set(GLM_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/external/glm)
 
 
+#add_executable(${ENGINE_PROJECT_NAME}
+#        saver.cpp
+#        ${IMGUI_SFML_SOURCE_FILES}
+#        )
+
+#add_executable(${ENGINE_PROJECT_NAME}
+#        tester.cpp
+#        ${IMGUI_SFML_SOURCE_FILES}
+#        )
+
 add_executable(${ENGINE_PROJECT_NAME}
         main.cpp
         includes/CG_Engine/engine.cpp

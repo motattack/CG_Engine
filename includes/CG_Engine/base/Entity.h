@@ -6,43 +6,42 @@
 class Entity {
 private:
     EntityId ID;
-    EntityManager *manager;
 public:
-    Entity(const EntityId id, EntityManager *manager) : ID(id), manager(manager) {};
+    Entity() {
+        ID = Manager.addNewEntity();
+    }
 
-    ~Entity() = default;
-
-    EntityId getId() {
+    EntityId getId() const {
         return ID;
     }
 
     template<typename T, typename... Args>
     void addComponent(Args &&... args) {
-        manager->addComponent<T>(ID, std::forward<Args>(args)...);
+        Manager.addComponent<T>(ID, std::forward<Args>(args)...);
     }
 
     template<typename T>
     void addComponent(T &component) {
-        manager->addComponent<T>(ID, component);
+        Manager.addComponent<T>(ID, component);
     }
 
     template<typename T>
     T &getComponent() {
-        return manager->getComponent<T>(ID);
+        return Manager.getComponent<T>(ID);
     }
 
     template<typename T>
     void removeComponent() {
-        manager->removeComponent<T>(ID);
+        Manager.removeComponent<T>(ID);
     }
 
     template<typename T>
-    bool hasComponent() {
-        return manager->hasComponent<T>(ID);
+    inline bool hasComponent() {
+        return Manager.hasComponent<T>(ID);
     }
 
     void destroy() {
-        manager->destroyEntity(ID);
+        Manager.destroyEntity(ID);
     }
 };
 

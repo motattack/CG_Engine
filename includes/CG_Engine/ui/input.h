@@ -109,9 +109,13 @@ static void KeyboardCallback(sf::Keyboard::Key key, bool pressed) {
 
     event.setKey(key, pressed);
 
-    if (event.IsKeyPressed(sf::Keyboard::Space) && core.mode != Mode::EDIT) {
-        core.mode = Mode::EDIT;
+    if (event.IsKeyPressed(sf::Keyboard::Escape)) {
+        core.exit();
     }
+
+//    if (event.IsKeyPressed(sf::Keyboard::Space) && core.mode != Mode::EDIT) {
+//        core.mode = Mode::EDIT;
+//    }
 }
 
 static void window_close_callback(sf::Window &window) {

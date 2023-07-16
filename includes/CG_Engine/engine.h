@@ -9,8 +9,13 @@
 #include <CG_Engine/base/entityManager.h>
 #include <CG_Engine/math/common.h>
 
+
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
+
+const int SHADOW_WIDTH = 1024;
+const int SHADOW_HEIGHT = 1024;
+
 const sf::ContextSettings settings{24, 8, 0, 3, 3, sf::ContextSettings::Default};
 enum class Mode {
     EDIT = 0,
@@ -20,67 +25,54 @@ enum class Mode {
 
 class Engine {
 private:
-    bool isRun;
-    int width, height;
-    sf::RenderWindow window;
-
     Engine();
 
-    void initEntity();
+    bool isRun;
+    bool isGame;
+    sf::RenderWindow window;
+
+    Vec2 viewSize;
 
 public:
-    float zoom;
-    Mat4x4 view;
-    Mat4x4 projection;
-    Vec3 mainCameraPosition;
-    Mode mode;
-    EntityManager Manager;
+    ~Engine();
 
     Engine(const Engine &) = delete;
 
     Engine &operator=(const Engine &) = delete;
 
-    ~Engine() {
-        window.close();
-    };
-
     static Engine &Ref() {
         static Engine reference;
         return reference;
-    };
-
-    void init();
-
-
-    void update();
+    }
 
     void exit() {
         isRun = false;
-    };
+        window.close();
+    }
+
+    void update();
+
+    void render();
+
+    void startGame();
+
+    void stopGame();
+
+    void init();
+
+    Vec2 ViewSize() const {
+        return viewSize;
+    }
+
+    sf::RenderWindow &Window() {
+        return window;
+    }
 
     bool run() const {
         return isRun;
     }
-
-    sf::RenderWindow &getWindow() {
-        return window;
-    }
-
-    float videoWidth() {
-        return width;
-    }
-
-    float videoHeight() {
-        return height;
-    }
 };
 
 static Engine &core = Engine::Ref();
-static EntityManager &Manager = core.Manager;
-
-static float &zoom = core.zoom;
-static Mat4x4 &view = core.view;
-static Mat4x4 &projection = core.projection;
-static Vec3 &mainCameraPosition = core.mainCameraPosition;
 
 #endif
