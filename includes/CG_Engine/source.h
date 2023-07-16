@@ -1,13 +1,11 @@
 #ifndef CG_ENGINE_SOURCE_H
 #define CG_ENGINE_SOURCE_H
-#define STB_IMAGE_IMPLEMENTATION
 
 #include <map>
 #include <string>
 #include <vector>
 #include <GL/glew.h>
 #include <stdexcept>
-#include <stb_image.h>
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -22,11 +20,11 @@ const std::string TEXTURE_PATH = "res/textures/";
 
 class Source {
 private:
-    std::map<std::string, GLMesh> meshes;
+    std::map<std::string, Mesh> meshes;
     std::map<std::string, GLuint> shaders;
     std::map<std::string, GLuint> cubemaps;
     std::map<std::string, GLuint> texture2ds;
-    std::map<std::string, std::shared_ptr<Model3D>> models;
+    std::map<std::string, std::shared_ptr<Model>> models;
 
     Source() {};
 
@@ -64,7 +62,7 @@ private:
             oddRow = !oddRow;
         }
 
-        meshes.insert({"SPHERE", GLMesh(vertices.data(), vertices.size(), indices.data(), indices.size())});
+        meshes.insert({"SPHERE", Mesh(vertices, indices)});
     };
 
     std::string loadShaderSource(std::string filename) {
@@ -128,7 +126,7 @@ public:
         loadMeshes();
 
         // models
-        //LoadModel("PACK", "Resource/Models/sphere.obj");
+        loadModel("PACK", "res/models/amc/scene.gltf");
 
         // shaders
         createProgram("MAIN", "vShader.glsl", "fShader.glsl");
@@ -203,7 +201,7 @@ public:
 
     // meshes
     void loadMeshes() {
-        static Vertex cubeVertices[] = {
+        std::vector<Vertex> cubeVertices = {
                 // POSITION					       // NORMALS					 // TEXTURE
                 Vertex(Vec3(-0.5f, -0.5f, -0.5f), Vec3(0.0f, 0.0f, -1.0f), Vec2(0.0f, 0.0f)),
                 Vertex(Vec3(0.5f, -0.5f, -0.5f), Vec3(0.0f, 0.0f, -1.0f), Vec2(1.0f, 0.0f)),
@@ -247,22 +245,26 @@ public:
                 Vertex(Vec3(-0.5f, 0.5f, 0.5f), Vec3(0.0f, 1.0f, 0.0f), Vec2(0.0f, 0.0f)),
                 Vertex(Vec3(-0.5f, 0.5f, -0.5f), Vec3(0.0f, 1.0f, 0.0f), Vec2(0.0f, 1.0f)),
         };
+        std::vector<unsigned int> indices(36);
+        for (unsigned int i = 0; i < 36; i++) {
+            indices[i] = i;
+        }
         createSphere();
-        meshes.insert({"CUBE", GLMesh(cubeVertices, sizeof(cubeVertices))});
+        meshes.insert({"CUBE", Mesh(cubeVertices, indices)});
     };
 
-    GLMesh &getMesh(std::string name) {
+    Mesh &getMesh(std::string name) {
         assert(meshes.find(name) != meshes.end() && "Mesh out of range!");
         return meshes[name];
     }
 
     // models
     void loadModel(std::string name, std::string filename) {
-        models.insert({name, std::make_shared<Model3D>(filename)});
+        models.insert({name, std::make_shared<Model>(filename)});
         std::cout << filename << " loaded!" << std::endl;
     };
 
-    std::shared_ptr<Model3D> getModel(std::string name) {
+    std::shared_ptr<Model> getModel(std::string name) {
         assert(models.find(name) != models.end() && "Model out of range!");
         return models[name];
     }

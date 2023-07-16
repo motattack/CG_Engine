@@ -43,9 +43,7 @@ public:
             skyboxShader.setMat4("projection", camera.GetProjectionMatrix());
             skyboxShader.setMat4("view", camera.GetViewMatrixClear());
             glBindTexture(GL_TEXTURE_CUBE_MAP, Resource.cubeMap("SKYBOX"));
-            Resource.getMesh("CUBE").drawArrays(skyboxShader);
-
-
+            Resource.getMesh("CUBE").Draw(skyboxShader);
         }
     }
 

@@ -9,6 +9,7 @@
 #include "CG_Engine/source.h"
 #include "CG_Engine/components/name.h"
 #include "CG_Engine/systems/meshSystem.h"
+#include "CG_Engine/systems/modelSystem.h"
 
 
 void Engine::update() {
@@ -34,11 +35,21 @@ void Engine::init() {
     Registrar<Camera>("Camera");
     Registrar<MeshRenderer>("MeshRenderer");
 
+    Manager.addSystem<ModelRendererSystem>();
+    EntityId modelEntity = Manager.addNewEntity();
+    Manager.addComponent<ModelRenderer>(modelEntity, "PACK");
+    Manager.addComponent<Transform>(modelEntity);
+    Manager.addComponent<EntityName>(modelEntity, "PACK 1");
+
     Manager.addSystem<MeshRendererSystem>();
     EntityId meshEntity = Manager.addNewEntity();
     Manager.addComponent<MeshRenderer>(meshEntity, "CUBE");
     Manager.addComponent<Transform>(meshEntity);
     Manager.addComponent<EntityName>(meshEntity, "CUBE 1");
+    EntityId meshEntity2 = Manager.addNewEntity();
+    Manager.addComponent<MeshRenderer>(meshEntity2, "SPHERE");
+    Manager.addComponent<Transform>(meshEntity2);
+    Manager.addComponent<EntityName>(meshEntity2, "SPHERE 2");
 
     Manager.addSystem<CameraSystem>();
     EntityId cameraEntity = Manager.addNewEntity();

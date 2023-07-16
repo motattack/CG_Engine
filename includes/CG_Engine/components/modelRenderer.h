@@ -16,7 +16,7 @@ struct ModelRenderer : public BaseComponent {
     }
 
     std::string Name;
-    std::shared_ptr<Model3D> Renderer;
+    std::shared_ptr<Model> Renderer;
 };
 
 #endif //CG_ENGINE_MODELRENDERER_H

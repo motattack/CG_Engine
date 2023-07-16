@@ -19,25 +19,12 @@ public:
     }
 
     void render() override {
-        Mat4x4 model;
         for (auto entity: entities) {
             auto &renderer = Manager.getComponent<MeshRenderer>(entity);
             auto &transform = Manager.getComponent<Transform>(entity);
 
-            shader.bind();
-            model = Mat4x4(1.0f);
-            model = model.translate(transform.Position);
-            model = model.rotate(transform.Rotation.x, Vec3(1, 0, 0));
-            model = model.rotate(transform.Rotation.y, Vec3(0, 1, 0));
-            model = model.rotate(transform.Rotation.z, Vec3(0, 0, 1));
-            model = model.scale(Vec3(transform.Scale));
-            shader.setMat4("model", model);
-
-            if (renderer.Name == "SPHERE")
-                renderer.Mesh.render(shader);
-            else {
-                renderer.Mesh.drawArrays(shader);
-            }
+            transform.setModelUniform(shader);
+            renderer.Mesh.Draw(shader);
         }
     }
 

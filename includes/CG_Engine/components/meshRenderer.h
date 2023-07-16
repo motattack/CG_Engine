@@ -12,7 +12,7 @@ struct MeshRenderer : public BaseComponent {
         Mesh = Resource.getMesh(Name);
     }
 
-    GLMesh Mesh;
+    Mesh Mesh;
     std::string Name;
 };
 
