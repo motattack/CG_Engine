@@ -7,6 +7,7 @@
 #include <CG_Engine/engine.h>
 #include <sstream>
 #include <fstream>
+#include "CG_Engine/components/name.h"
 
 std::unordered_map<std::string, ImGuiCol_> colorMap = {
         {"Text",                  ImGuiCol_Text},
@@ -132,6 +133,7 @@ public:
             ImGui::ShowDemoWindow();
             space();
             components();
+            entityList();
         }
 
 //        ImGui::Begin("Tool");
@@ -142,6 +144,61 @@ public:
 
 
         ImGui::SFML::Render(core.Window());
+    }
+
+    void entityList(){
+        // Prepare a list of entity names and IDs
+        std::vector<std::string> entityNames;
+        std::vector<EntityId> entityIDs; // Assuming you have a way to get the entity IDs
+        int indexToRemove = -1; // To track the index to be removed
+
+        for (auto& entity : Manager.ActiveEntities()) {
+            // Assuming `EntityName` is a string type component
+            auto& name = Manager.getComponent<EntityName>(entity);
+            entityNames.push_back(name.Value);
+            entityIDs.push_back(entity);
+        }
+
+        // Convert the list of entity names to a C-style array for ImGui
+        const char** entityNamesArr = new const char*[entityNames.size()];
+        for (size_t i = 0; i < entityNames.size(); ++i) {
+            entityNamesArr[i] = entityNames[i].c_str();
+        }
+
+        // ImGui code to create a combo box
+        static int selectedEntityIndex = 0; // To store the selected entity index
+        if (ImGui::BeginCombo("Entities", entityNamesArr[selectedEntityIndex])) {
+            for (int i = 0; i < entityNames.size(); ++i) {
+                bool isSelected = (selectedEntityIndex == i);
+                if (ImGui::Selectable(entityNamesArr[i], isSelected)) {
+                    selectedEntityIndex = i;
+                }
+
+                if (isSelected) {
+                    ImGui::SetItemDefaultFocus(); // Set the default selection
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        // ImGui code to add "Delete" button
+        if (selectedEntityIndex != -1) {
+            if (ImGui::Button("Delete")) {
+                indexToRemove = selectedEntityIndex;
+            }
+        }
+
+        // Handle entity removal after ImGui frame ends
+        if (indexToRemove != -1) {
+            std::cout << "Removing entity at index " << indexToRemove << ", ID: " << entityIDs[indexToRemove] << std::endl;
+            // Code here to remove the entity with the ID entityIDs[indexToRemove]
+            // ...
+            // Reset indexToRemove to -1 to avoid accidental removal
+            indexToRemove = -1;
+        }
+
+        // Clean up C-style array
+        delete[] entityNamesArr;
     }
 
     void space() {

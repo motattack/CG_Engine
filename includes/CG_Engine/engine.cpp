@@ -7,6 +7,7 @@
 #include "CG_Engine/components/transform.h"
 #include "CG_Engine/systems/common.h"
 #include "CG_Engine/source.h"
+#include "CG_Engine/components/name.h"
 
 
 void Engine::update() {
@@ -25,8 +26,9 @@ void Engine::init() {
 
     Manager.addSystem<CameraSystem>();
     EntityId cameraEntity = Manager.addNewEntity();
-    Manager.addComponent<Camera>(cameraEntity); // Example camera position and rotation
+    Manager.addComponent<Camera>(cameraEntity);
     Manager.addComponent<Transform>(cameraEntity);
+    Manager.addComponent<EntityName>(cameraEntity, "MainCamera");
 
     Manager.start();
 

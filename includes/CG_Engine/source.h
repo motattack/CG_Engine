@@ -131,7 +131,7 @@ public:
         //LoadModel("PACK", "Resource/Models/sphere.obj");
 
         // shaders
-        createProgram("MESH", "vShader.glsl", "fShader.glsl");
+        createProgram("MAIN", "vShader.glsl", "fShader.glsl");
         createProgram("SKYBOX", "sbox.vert", "sbox.frag");
 
         // skybox cubeMap

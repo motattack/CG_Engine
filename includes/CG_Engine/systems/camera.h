@@ -16,19 +16,17 @@ public:
         addComponentSignature<Camera>();
         addComponentSignature<Transform>();
 
-        shader = Shader(Resource.program("MESH"));
+        shader = Shader(Resource.program("MAIN"));
         skyboxShader = Shader(Resource.program("SKYBOX"));
     }
 
     void update() override {
         for (auto entity: entities) {
-//            std::cout << "Main shader " << shader.program() << std::endl;
-//            std::cout << "skybox shader " << skyboxShader.program() << std::endl;
-
             auto &camera = Manager.getComponent<Camera>(entity);
             auto &transform = Manager.getComponent<Transform>(entity);
             onZoom(camera);
             camera.Position = transform.Position;
+            camera.Right = transform.Rotation;
 
             skyboxShader.bind();
             skyboxShader.setMat4("projection", camera.GetProjectionMatrix());
