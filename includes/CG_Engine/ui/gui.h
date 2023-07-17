@@ -13,6 +13,7 @@
 #include "CG_Engine/objects/model.h"
 #include "CG_Engine/components/modelRenderer.h"
 #include "direct.h"
+#include "CG_Engine/components/meshRenderer.h"
 
 
 static int selectedEntityIndex = 0;
@@ -213,6 +214,15 @@ public:
                             Manager.removeComponent<ModelRenderer>(selectedEntityIndex);
                         }
                         break;
+                    case 2:
+                        if (ImGui::Button("add")) {
+                            Manager.addComponent<MeshRenderer>(selectedEntityIndex);
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("remove")) {
+                            Manager.removeComponent<MeshRenderer>(selectedEntityIndex);
+                        }
+                        break;
                 }
             }
         ImGui::End();
@@ -304,6 +314,7 @@ public:
                 camera();
                 transform();
                 model();
+                mesh();
             }
             ImGui::End();
         }
@@ -364,12 +375,47 @@ public:
 
             if (ImGui::CollapsingHeader("Model")) {
                 ImGui::Text("Model: # %d %s", instance.getId(), instance.Name.c_str());
+                static char filePath[256] = ""; // Store the file path here
+                ImGui::InputText("File Path", filePath, sizeof(filePath));
+                if (ImGui::Button("Set")) {
+                    std::cout << filePath << std::endl;
+                    instance.Renderer = Resource.getModel("SPHERE");
+                }
+
+                modelLoader();
+            }
+        }
+    }
+
+    void modelLoader(){
+        ImGui::Begin("Load new model");
+        static char name[256] = "";
+        ImGui::InputText("Model name", name, sizeof(name));
+
+        static char path[256] = "";
+        ImGui::InputText("Model path", path, sizeof(path));
+
+        if (ImGui::Button("Load")) {
+            std::cout << name << std::endl;
+            std::cout << path << std::endl;
+//            instance.Renderer = Resource.getModel("SPHERE");
+        }
+
+        ImGui::End();
+    }
+
+    void mesh() {
+        if (Manager.hasComponent<MeshRenderer>(selectedEntityIndex)) {
+            auto &instance = Manager.getComponent<MeshRenderer>(selectedEntityIndex);
+
+            if (ImGui::CollapsingHeader("Mesh")) {
+                ImGui::Text("Mesh: # %d %s", instance.getId(), instance.Name.c_str());
             }
             static char filePath[256] = ""; // Store the file path here
             ImGui::InputText("File Path", filePath, sizeof(filePath));
             if (ImGui::Button("Load")) {
                 std::cout << filePath << std::endl;
-                instance.Renderer = Resource.getModel("SPHERE");
+                instance.Mesh = Resource.getMesh("CUBE");
             }
         }
     }
