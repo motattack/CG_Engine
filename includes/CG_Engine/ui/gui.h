@@ -137,6 +137,7 @@ public:
             space();
             components();
             entityList();
+            remove();
             transform();
         }
 
@@ -151,86 +152,67 @@ public:
     }
 
 
-
-    void entityList(){
-        // Prepare a list of entity names and IDs
-        std::vector<std::string> entityNames;
-        std::vector<EntityId> entityIDs; // Assuming you have a way to get the entity IDs
-        int indexToRemove = -1; // To track the index to be removed
-
-        for (auto& entity : Manager.ActiveEntities()) {
-            // Assuming `EntityName` is a string type component
-            auto& name = Manager.getComponent<EntityName>(entity);
-            entityNames.push_back(name.Value);
-            entityIDs.push_back(entity);
-        }
-
-        // Convert the list of entity names to a C-style array for ImGui
-        const char** entityNamesArr = new const char*[entityNames.size()];
-        for (size_t i = 0; i < entityNames.size(); ++i) {
-            entityNamesArr[i] = entityNames[i].c_str();
-        }
-
-        // ImGui code to create a combo box
-         // To store the selected entity index
-        if (ImGui::BeginCombo("Entities", entityNamesArr[selectedEntityIndex])) {
-            for (int i = 0; i < entityNames.size(); ++i) {
-                bool isSelected = (selectedEntityIndex == i);
-                if (ImGui::Selectable(entityNamesArr[i], isSelected)) {
-                    selectedEntityIndex = i;
-                }
-
-                if (isSelected) {
-                    ImGui::SetItemDefaultFocus(); // Set the default selection
-                }
+    void entityList() {
+        float INVALID_ENTITY_ID = -1;
+        if (ImGui::BeginCombo("Active Entities", nullptr)) {
+            for (const auto &entity: Manager.ActiveEntities()) {
+                // Assuming `EntityName` is a string type component
+                auto &name = Manager.getComponent<EntityName>(entity);
+                std::string entityLabel = name.Value + " (ID: " + std::to_string(name.getId()) + ")";
+                bool isSelected = (selectedEntityIndex == entity);
+                if (ImGui::Selectable(entityLabel.c_str(), isSelected))
+                    selectedEntityIndex = entity;
+                if (isSelected)
+                    ImGui::SetItemDefaultFocus(); // Set the current selection as default focus
             }
             ImGui::EndCombo();
         }
 
-        // ImGui code to add "Delete" button
-        if (selectedEntityIndex != -1) {
-            if (ImGui::Button("Delete")) {
-                indexToRemove = selectedEntityIndex;
-            }
+        // Display the name and ID of the selected entity
+        if (selectedEntityIndex != INVALID_ENTITY_ID) {
+            auto &name = Manager.getComponent<EntityName>(selectedEntityIndex);
+            ImGui::Text("Selected Entity:");
+            ImGui::Text("Name: %s", name.Value.c_str());
+            ImGui::Text("ID: %d", name.getId());
         }
-
-        // Handle entity removal after ImGui frame ends
-        if (indexToRemove != -1) {
-            std::cout << "Removing entity at index " << indexToRemove << ", ID: " << entityIDs[indexToRemove] << std::endl;
-            // Code here to remove the entity with the ID entityIDs[indexToRemove]
-            // ...
-            // Reset indexToRemove to -1 to avoid accidental removal
-            indexToRemove = -1;
-        }
-
-        // Clean up C-style array
-        delete[] entityNamesArr;
     }
 
-    void transform(){
-        auto &instance = Manager.getComponent<Transform>(selectedEntityIndex);
-
-        ImGui::Begin("Instance Properties");
-        if (ImGui::CollapsingHeader("Translate")) {
-            ImGui::InputFloat("X", &instance.Position.x, 0.05f, 1.0f);
-            ImGui::InputFloat("Y", &instance.Position.y, 0.05f, 1.0f);
-            ImGui::InputFloat("Z", &instance.Position.z, 0.05f, 1.0f);
-        }
-        if (ImGui::CollapsingHeader("Rotate")) {
-            ImGui::SliderFloat3("angles", &instance.Rotation.x, -180.0f, 180.0f);
-            if (ImGui::Button("Reset Rotate")) {
-                instance.Rotation = Vec3(0.f, 0.f, 0.f);
+    void remove() {
+        if (selectedEntityIndex != -1) {
+            if (ImGui::Button("Delete")) {
+//                std::cout << selectedEntityIndex;
+                Manager.destroyEntity(selectedEntityIndex);
+                selectedEntityIndex = -1;
             }
         }
+    }
 
-        if (ImGui::CollapsingHeader("Scale")) {
-            ImGui::InputFloat("Factor", &instance.Scale, 0.05f, 1.0f);
-            if (ImGui::Button("Reset Scale")) {
-                instance.Scale = 1.f;
+    void transform() {
+        if (selectedEntityIndex != -1) {
+            auto &instance = Manager.getComponent<Transform>(selectedEntityIndex);
+
+            ImGui::Begin("Instance Properties");
+            if (ImGui::CollapsingHeader("Translate")) {
+                ImGui::InputFloat("X", &instance.Position.x, 0.05f, 1.0f);
+                ImGui::InputFloat("Y", &instance.Position.y, 0.05f, 1.0f);
+                ImGui::InputFloat("Z", &instance.Position.z, 0.05f, 1.0f);
             }
-        }
+            if (ImGui::CollapsingHeader("Rotate")) {
+                ImGui::SliderFloat3("angles", &instance.Rotation.x, -180.0f, 180.0f);
+                if (ImGui::Button("Reset Rotate")) {
+                    instance.Rotation = Vec3(0.f, 0.f, 0.f);
+                }
+            }
 
-        ImGui::End();
+            if (ImGui::CollapsingHeader("Scale")) {
+                ImGui::InputFloat("Factor", &instance.Scale, 0.05f, 1.0f);
+                if (ImGui::Button("Reset Scale")) {
+                    instance.Scale = 1.f;
+                }
+            }
+
+            ImGui::End();
+        }
     }
 
     void space() {
