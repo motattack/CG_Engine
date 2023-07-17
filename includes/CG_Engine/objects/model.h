@@ -29,7 +29,9 @@ unsigned int TextureFromFile(const char *path, const string &directory);
 
 class Model {
 public:
-    Model(std::string path) {
+    Model() = default;
+
+    explicit Model(std::string path) {
         this->loadModel(path.c_str());
     }
 

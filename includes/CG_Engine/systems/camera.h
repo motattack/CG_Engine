@@ -35,15 +35,15 @@ public:
 
 //            std::cout << camera.Yaw << std::endl;
 
-            shader.bind();
-            shader.setMat4("projection", camera.GetProjectionMatrix());
-            shader.setMat4("view", camera.GetViewMatrix());
-
             skyboxShader.bind();
             skyboxShader.setMat4("projection", camera.GetProjectionMatrix());
             skyboxShader.setMat4("view", camera.GetViewMatrixClear());
             glBindTexture(GL_TEXTURE_CUBE_MAP, Resource.cubeMap("SKYBOX"));
             Resource.getMesh("CUBE").Draw(skyboxShader);
+
+            shader.bind();
+            shader.setMat4("projection", camera.GetProjectionMatrix());
+            shader.setMat4("view", camera.GetViewMatrix());
         }
     }
 

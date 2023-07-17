@@ -23,10 +23,10 @@ struct DirLight : public Light {
             : Light(ambientColor, diffuseColor, specularColor), direction(lightDirection) {}
 
     void render(Shader &shader, int /*idx*/) const override {
-        shader.set3Float("dirLight.direction", direction);
-        shader.set3Float("dirLight.ambient", ambient);
-        shader.set3Float("dirLight.diffuse", diffuse);
-        shader.set3Float("dirLight.specular", specular);
+        shader.setV3Float("dirLight.direction", direction);
+        shader.setV3Float("dirLight.ambient", ambient);
+        shader.setV3Float("dirLight.diffuse", diffuse);
+        shader.setV3Float("dirLight.specular", specular);
     }
 };
 
@@ -45,10 +45,10 @@ struct PointLight : public Light {
 
     void render(Shader &shader, int idx) const override {
         std::string name = "pointLights[" + std::to_string(idx) + "]";
-        shader.set3Float(name + ".position", position);
-        shader.set3Float(name + ".ambient", ambient);
-        shader.set3Float(name + ".diffuse", diffuse);
-        shader.set3Float(name + ".specular", specular);
+        shader.setV3Float(name + ".position", position);
+        shader.setV3Float(name + ".ambient", ambient);
+        shader.setV3Float(name + ".diffuse", diffuse);
+        shader.setV3Float(name + ".specular", specular);
         shader.setFloat(name + ".constant", constant);
         shader.setFloat(name + ".linear", linear);
         shader.setFloat(name + ".quadratic", quadratic);
@@ -78,13 +78,13 @@ struct SpotLight : public Light {
 
     void render(Shader &shader, int idx) const override {
         std::string name = "spotLight";
-        shader.set3Float(name + ".position", position);
-        shader.set3Float(name + ".ambient", ambient);
-        shader.set3Float(name + ".diffuse", diffuse);
-        shader.set3Float(name + ".specular", specular);
-        shader.set3Float(name + ".direction", direction);
+        shader.setV3Float(name + ".position", position);
+        shader.setV3Float(name + ".ambient", ambient);
+        shader.setV3Float(name + ".diffuse", diffuse);
+        shader.setV3Float(name + ".specular", specular);
+        shader.setV3Float(name + ".direction", direction);
 
-        shader.set3Float("viewPos", viewPos);
+        shader.setV3Float("viewPos", viewPos);
 
         shader.setFloat(name + ".constant", constant);
         shader.setFloat(name + ".linear", linear);

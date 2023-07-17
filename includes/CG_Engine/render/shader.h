@@ -8,6 +8,8 @@
 #include <iostream>
 #include "assimp/color4.h"
 
+#include <CG_Engine/math/common.h>
+
 class Shader {
 private:
     unsigned int programID;
@@ -86,7 +88,7 @@ public:
         glUniform1i(glGetUniformLocation(programID, uName), unit);
     }
 
-    void SetSample2D(const GLchar* uName, GLuint tex2d, GLint unit = 0) {
+    void SetSample2D(const GLchar *uName, GLuint tex2d, GLint unit = 0) {
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, tex2d);
         glUniform1i(glGetUniformLocation(programID, uName), unit);

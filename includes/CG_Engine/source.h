@@ -9,6 +9,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 #include <CG_Engine/objects/mesh.h>
 #include <CG_Engine/objects/model.h>

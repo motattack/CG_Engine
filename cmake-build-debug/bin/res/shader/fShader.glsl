@@ -67,8 +67,6 @@ void main() {
     vec3 result = calcDirLight(dirLight, norm, viewDir);
 
     vec4 texColor = texture(material.diffuse, TexCoords);
-    if (texColor.a < 0.1)
-    discard;
 
     // все вершины квадрата
     for (int i = 0; i < 4; i++)
