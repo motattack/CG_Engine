@@ -3,19 +3,36 @@
 
 #include <imgui.h>
 #include <imgui-SFML.h>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <CG_Engine/timer.h>
-#include <CG_Engine/engine.h>
 #include <sstream>
 #include <fstream>
+
+#include <CG_Engine/math/common.h>
+#include <CG_Engine/render/shader.h>
+
+#include <CG_Engine/base/types.h>
+#include <CG_Engine/base/compList.h>
+#include <CG_Engine/base/baseSystem.h>
+#include <CG_Engine/base/baseComponent.h>
+#include <CG_Engine/base/compFactory.h>
+
 #include <CG_Engine/components/name.h>
 #include <CG_Engine/components/transform.h>
 #include <CG_Engine/components/camera.h>
 #include "CG_Engine/components/modelRenderer.h"
-#include "direct.h"
 #include "CG_Engine/components/meshRenderer.h"
 #include "CG_Engine/components/spotLight.h"
 #include "CG_Engine/components/directionalLight.h"
 #include "CG_Engine/components/pointLight.h"
+#include <CG_Engine/components/camera.h>
+#include <CG_Engine/base/entityManager.h>
+
+#include <CG_Engine/base/Entity.h>
+#include <CG_Engine/systems/common.h>
+
+#include <CG_Engine/math/common.h>
 
 
 static int selectedEntityIndex = 0;
@@ -142,11 +159,6 @@ bool ComboButton(const char *label, const char **items, int *current_item, int i
 
 class GUI {
 public:
-    static GUI &Get() {
-        static GUI reference;
-        return reference;
-    }
-
     void init() {
         ImGuiIO &IO = ImGui::GetIO();
         IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -156,32 +168,34 @@ public:
         loadImguiStyleFromFile("res/gui.txt");
     }
 
-    void display() {
+    void display(sf::RenderWindow &window) {
+        vArray::unbind();
+
         sf::Time dt = sf::seconds(timer.deltaTime());
 
-        ImGui::SFML::Update(core.Window(), dt);
-//
-//        {
-        ImGui::ShowDemoWindow();
-        space();
-        components();
-        entityList();
-//            MakeOrDelete();
-//            MyImGuiWindow();
-//        }
-//
-        ImGui::SFML::Render(core.Window());
+        ImGui::SFML::Update(window, dt);
+
+        {
+            ImGui::ShowDemoWindow();
+            space();
+            components();
+            entityList();
+            MakeOrDelete();
+            MyImGuiWindow();
+        }
+
+        ImGui::SFML::Render(window);
     }
 
     void info() {
-        ImGui::Begin("Info");
-        if (selectedEntityIndex != -1) {
-            auto &name = Manager.getComponent<EntityName>(selectedEntityIndex);
-            ImGui::Text("Selected Entity:");
-            ImGui::Text("Name: %s", name.Value.c_str());
-            ImGui::Text("ID: %d", name.getId());
-        }
-        ImGui::End();
+//        ImGui::Begin("Info");
+//        if (selectedEntityIndex != -1) {
+//            auto &name = Manager.getComponent<EntityName>(selectedEntityIndex);
+//            ImGui::Text("Selected Entity:");
+//            ImGui::Text("Name: %s", name.Value.c_str());
+//            ImGui::Text("ID: %d", name.getId());
+//        }
+//        ImGui::End();
     }
 
     void addEntity() {
@@ -472,7 +486,7 @@ public:
 private:
     int selected;
     std::vector<int> objects;
+
 };
 
-static GUI &gui = GUI::Get();
 #endif //CG_ENGINE_GUI_H

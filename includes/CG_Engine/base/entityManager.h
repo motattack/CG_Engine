@@ -1,12 +1,6 @@
 #ifndef CG_ENGINE_ENTITYMANAGER_H
 #define CG_ENGINE_ENTITYMANAGER_H
 
-#include <CG_Engine/base/types.h>
-#include <CG_Engine/base/compList.h>
-#include <CG_Engine/base/baseSystem.h>
-#include <CG_Engine/base/baseComponent.h>
-#include <CG_Engine/base/compFactory.h>
-
 #include <map>
 #include <queue>
 #include <memory>
@@ -18,13 +12,14 @@ private:
     std::queue<EntityId> availableEntities;
 
     std::set<std::shared_ptr<BaseSystem>> systems;
-    std::set<std::shared_ptr<BaseSystem>> activeSystems;
+
     std::set<std::shared_ptr<BaseSystem>> editorSystems;
     std::set<std::shared_ptr<BaseSystem>> runtimeSystems;
 
     std::set<std::shared_ptr<ICompList>> componentArrays;
     std::unordered_map<EntityId, Signature> entitySignatures;
 public:
+    std::set<std::shared_ptr<BaseSystem>> activeSystems;
     ~EntityManager() = default;
 
     EntityManager(const EntityManager &) = delete;
@@ -277,7 +272,7 @@ private:
         auto it = std::find_if(componentArrays.begin(), componentArrays.end(),
                                [compType](const auto array) { return compType == array->getDataType(); });
 
-        if(it == componentArrays.end())
+        if (it == componentArrays.end())
             std::cout << "Component list not registered" << std::endl;
 
         return std::static_pointer_cast<CompList<T>>(*it);

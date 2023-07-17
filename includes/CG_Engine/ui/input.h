@@ -2,11 +2,7 @@
 #define CG_ENGINE_INPUT_H
 
 #include <bitset>
-#include <CG_Engine/math/common.h>
 #include <CG_Engine/engine.h>
-#include <GL/glew.h>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
 
 enum class MouseBtn {
     LEFT = 0, WHEEL = 1, RIGHT = 2, xBUTTON = 3, yBUTTON = 4
@@ -123,9 +119,9 @@ static void KeyboardCallback(sf::Keyboard::Key key, bool pressed) {
 
     event.setKey(key, pressed);
 
-    if (event.IsKeyPressed(sf::Keyboard::Escape)) {
-        core.exit();
-    }
+//    if (event.IsKeyPressed(sf::Keyboard::Escape)) {
+//        core.exit();
+//    }
 
 //    if (event.IsKeyPressed(sf::Keyboard::Space) && core.mode != Mode::EDIT) {
 //        core.mode = Mode::EDIT;

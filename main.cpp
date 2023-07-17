@@ -1,4 +1,5 @@
 #include <CG_Engine/engine.h>
+#include <CG_Engine/ui/input.h>
 #include "CG_Engine/events.h"
 #include "CG_Engine/source.h"
 

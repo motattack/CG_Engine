@@ -1,10 +1,6 @@
 #ifndef CG_ENGINE_TRANSFORM_H
 #define CG_ENGINE_TRANSFORM_H
 
-#include <CG_Engine/base/baseComponent.h>
-#include <CG_Engine/math/common.h>
-#include "CG_Engine/render/shader.h"
-
 class Transform : public BaseComponent {
 public:
     Transform() = default;

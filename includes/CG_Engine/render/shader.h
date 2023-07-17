@@ -8,8 +8,6 @@
 #include <iostream>
 #include "assimp/color4.h"
 
-#include <CG_Engine/math/common.h>
-
 class Shader {
 private:
     unsigned int programID;

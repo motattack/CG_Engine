@@ -50,7 +50,7 @@ set(GLM_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/external/glm)
 
 add_executable(${ENGINE_PROJECT_NAME}
         main.cpp
-        includes/CG_Engine/engine.cpp
+#        includes/CG_Engine/engine.cpp
         ${IMGUI_SFML_SOURCE_FILES}
         )
 
