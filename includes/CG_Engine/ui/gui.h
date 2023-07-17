@@ -374,21 +374,44 @@ public:
             auto &instance = Manager.getComponent<ModelRenderer>(selectedEntityIndex);
 
             if (ImGui::CollapsingHeader("Model")) {
-                ImGui::Text("Model: # %d %s", instance.getId(), instance.Name.c_str());
-                static char filePath[256] = ""; // Store the file path here
-                ImGui::InputText("File Path", filePath, sizeof(filePath));
-                if (ImGui::Button("Set")) {
-                    std::cout << filePath << std::endl;
-                    instance.Renderer = Resource.getModel("SPHERE");
-                }
+                ImGui::Indent();
 
-                modelLoader();
+                if (ImGui::CollapsingHeader("Loaded"))
+                    modelSelector(instance);
+                if (ImGui::CollapsingHeader("Load New"))
+                    modelLoader();
+
+                ImGui::Unindent();
             }
+
         }
     }
 
-    void modelLoader(){
-        ImGui::Begin("Load new model");
+    void modelSelector(auto &instance) {
+        static int selectedModelIndex = -1;
+        int index = 0;
+        for (const auto &modelPair: Resource.getModels()) {
+            const std::string &modelName = modelPair.first;
+            bool isSelected = (index == selectedModelIndex);
+            if (ImGui::Selectable(modelName.c_str(), isSelected))
+                selectedModelIndex = index;
+
+            if (isSelected)
+                ImGui::SetItemDefaultFocus();
+
+            index++;
+        }
+
+        if (selectedModelIndex != -1)
+            if (ImGui::Button("Set")) {
+                auto it = Resource.getModels().begin();
+                std::advance(it, selectedModelIndex);
+                const std::string &selectedModelName = it->first;
+                instance.Renderer = Resource.getModel(selectedModelName);
+            }
+    }
+
+    void modelLoader() {
         static char name[256] = "";
         ImGui::InputText("Model name", name, sizeof(name));
 
@@ -396,12 +419,9 @@ public:
         ImGui::InputText("Model path", path, sizeof(path));
 
         if (ImGui::Button("Load")) {
-            std::cout << name << std::endl;
-            std::cout << path << std::endl;
-//            instance.Renderer = Resource.getModel("SPHERE");
+            std::cout << name << path << std::endl;
+            Resource.loadModel(name, path);
         }
-
-        ImGui::End();
     }
 
     void mesh() {
