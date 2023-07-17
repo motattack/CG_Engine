@@ -22,6 +22,7 @@ void Engine::update() {
     Manager.update();
     Manager.render();
     gui.display();
+    glEnable(GL_DEPTH_TEST);
 
     window.display();
 }
