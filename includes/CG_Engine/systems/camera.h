@@ -5,7 +5,6 @@
 #include <CG_Engine/components/transform.h>
 #include <CG_Engine/components/camera.h>
 #include <CG_Engine/engine.h>
-#include <CG_Engine/ui/input.h>
 #include <CG_Engine/render/shader.h>
 #include <CG_Engine/source.h>
 
@@ -63,11 +62,11 @@ public:
     }
 
     void event(Camera &camera) {
-        auto &event = Input::Event();
-        if (event.isMouseScrolling()) {
-            camera.ChangeFOV(event.mouseScrollOffset().y);
-        }
-        event.resetScrollState();
+//        auto &event = Input::Event();
+//        if (event.isMouseScrolling()) {
+//            camera.ChangeFOV(event.mouseScrollOffset().y);
+//        }
+//        event.resetScrollState();
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
             camera.Move(CameraDirection::FORWARD, timer.deltaTime());
@@ -104,11 +103,11 @@ public:
             camera.Rotate(0, -timer.deltaTime() * 360.f);
         }
 
-        if (event.isMouseMoving()) {
-//            std::cout << event.getDX() << ":" << event.getDY() << std::endl;
-            float x = event.getDX(), y = event.getDY();
-            camera.Rotate(x, y);
-        }
+//        if (event.isMouseMoving()) {
+////            std::cout << event.getDX() << ":" << event.getDY() << std::endl;
+//            float x = event.getDX(), y = event.getDY();
+//            camera.Rotate(x, y);
+//        }
     }
 
 private:

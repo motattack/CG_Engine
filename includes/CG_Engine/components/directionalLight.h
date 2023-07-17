@@ -1,8 +1,6 @@
 #ifndef CG_ENGINE_DIRECTIONALLIGHT_H
 #define CG_ENGINE_DIRECTIONALLIGHT_H
 
-#include <CG_Engine/base/baseComponent.h>
-#include <CG_Engine/math/common.h>
 #include <CG_Engine/render/light.h>
 
 struct DirectionalLight : public BaseComponent {

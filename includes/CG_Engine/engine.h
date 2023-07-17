@@ -64,7 +64,7 @@ public:
         Manager.update();
         Manager.render();
         gui.display(window);
-//        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);
 
         window.display();
     };

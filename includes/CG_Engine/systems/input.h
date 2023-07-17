@@ -3,11 +3,8 @@
 
 #include <CG_Engine/base/baseSystem.h>
 #include <CG_Engine/components/transform.h>
-#include <CG_Engine/components/camera.h>
-#include <CG_Engine/engine.h>
-#include <CG_Engine/timer.h>
-#include <CG_Engine/ui/input.h>
 #include <CG_Engine/components/keyMotion.h>
+
 
 class KeyMotionSystem : public BaseSystem {
 public:
