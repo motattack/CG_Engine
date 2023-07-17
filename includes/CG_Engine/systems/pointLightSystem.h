@@ -24,8 +24,8 @@ public:
             auto &light = Manager.getComponent<PointLighting>(entity);
             auto &transform = Manager.getComponent<Transform>(entity);
             shader.bind();
+            light.light.position = transform.Position;
             for (int i = 0; i < 4; i++) {
-//                light.light.position = pointLightPositions[i] * xValue;
                 light.light.render(shader, i);
             }
         }

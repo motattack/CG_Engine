@@ -35,7 +35,6 @@ public:
     }
 
     void setModelUniform(Shader &shader) {
-        shader.bind();
         shader.setMat4("model", model());
     }
 };

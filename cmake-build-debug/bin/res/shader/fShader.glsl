@@ -71,7 +71,7 @@ void main() {
     // все вершины квадрата
     for (int i = 0; i < 4; i++)
     result += calcPointLight(pointLights[i], norm, fragPos, viewDir);
-//    result += calcSpotLight(spotLight, norm, fragPos, viewDir);
+    result += calcSpotLight(spotLight, norm, fragPos, viewDir);
 
     FragColor = vec4(result, 1.0f);
 }

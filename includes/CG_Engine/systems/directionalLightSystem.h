@@ -23,8 +23,10 @@ public:
         for (auto entity: entities) {
             auto &light = Manager.getComponent<DirectionalLight>(entity);
             auto &transform = Manager.getComponent<Transform>(entity);
+
             shader.bind();
             shader.setFloat("material.shininess", 64.0f);
+            light.light.direction = transform.Position;
             light.light.render(shader, 0);
         }
     }
