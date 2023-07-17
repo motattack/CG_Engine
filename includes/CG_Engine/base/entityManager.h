@@ -166,7 +166,7 @@ public:
             std::cout << "EntityID out of range" << std::endl;
 
         entitySignatures[entity].erase(CompType<T>());
-        getCompList<T>()->Erase(entity);
+        getCompList<T>()->erase(entity);
         updateEntityTargetSystems(entity);
     }
 

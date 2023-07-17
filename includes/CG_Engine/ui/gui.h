@@ -7,8 +7,10 @@
 #include <CG_Engine/engine.h>
 #include <sstream>
 #include <fstream>
-#include "CG_Engine/components/name.h"
-#include "CG_Engine/components/transform.h"
+#include <CG_Engine/components/name.h>
+#include <CG_Engine/components/transform.h>
+#include <CG_Engine/components/camera.h>
+
 
 static int selectedEntityIndex = 0;
 
@@ -111,6 +113,27 @@ void loadImguiStyleFromFile(const std::string &filename) {
     file.close();
 }
 
+// Function to handle button-like combo box
+bool ComboButton(const char *label, const char **items, int *current_item, int items_count) {
+    ImVec2 button_size(150, 30);
+
+    if (ImGui::BeginCombo(label, items[*current_item], 0)) {
+        for (int i = 0; i < items_count; ++i) {
+            bool is_selected = (*current_item == i);
+            if (ImGui::Selectable(items[i], is_selected))
+                *current_item = i;
+
+            if (is_selected)
+                ImGui::SetItemDefaultFocus(); // Set the selected item as the default focus
+        }
+        ImGui::EndCombo();
+    }
+
+    // Check if the combo box is closed, meaning the user clicked on the button part
+    return !ImGui::IsPopupOpen(label);
+}
+
+
 class GUI {
 public:
     static GUI &Get() {
@@ -137,82 +160,85 @@ public:
             space();
             components();
             entityList();
-            remove();
-            transform();
+            MakeOrDelete();
+            MyImGuiWindow();
         }
-
-//        ImGui::Begin("Tool");
-//        if (ImGui::Button("Play")) {
-//            core.mode = Mode::GAME;
-//        }
-//        ImGui::End();
-
 
         ImGui::SFML::Render(core.Window());
     }
 
-
-    void entityList() {
-        float INVALID_ENTITY_ID = -1;
-        if (ImGui::BeginCombo("Active Entities", nullptr)) {
-            for (const auto &entity: Manager.ActiveEntities()) {
-                // Assuming `EntityName` is a string type component
-                auto &name = Manager.getComponent<EntityName>(entity);
-                std::string entityLabel = name.Value + " (ID: " + std::to_string(name.getId()) + ")";
-                bool isSelected = (selectedEntityIndex == entity);
-                if (ImGui::Selectable(entityLabel.c_str(), isSelected))
-                    selectedEntityIndex = entity;
-                if (isSelected)
-                    ImGui::SetItemDefaultFocus(); // Set the current selection as default focus
-            }
-            ImGui::EndCombo();
-        }
-
-        // Display the name and ID of the selected entity
-        if (selectedEntityIndex != INVALID_ENTITY_ID) {
+    void info() {
+        ImGui::Begin("Info");
+        if (selectedEntityIndex != -1) {
             auto &name = Manager.getComponent<EntityName>(selectedEntityIndex);
             ImGui::Text("Selected Entity:");
             ImGui::Text("Name: %s", name.Value.c_str());
             ImGui::Text("ID: %d", name.getId());
         }
+        ImGui::End();
     }
 
-    void remove() {
+    void addEntity() {
+        EntityId newEntity = Manager.addNewEntity();
+        Manager.addComponent<Transform>(newEntity);
+        Manager.addComponent<EntityName>(newEntity, "Empty Entity");
+    }
+
+    void MyImGuiWindow() {
+        ImGui::Begin("Add component");
+        const char *items[] = {"Camera", "Model", "Mesh", "Input"};
+        static int selected_item = 0;
+
+        if (selectedEntityIndex != -1)
+            if (ComboButton("Select", items, &selected_item, IM_ARRAYSIZE(items))) {
+                switch (selected_item) {
+                    case 0: // Option 1
+                        if (ImGui::Button("add")) {
+                            Manager.addComponent<Camera>(selectedEntityIndex);
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("remove")) {
+                            Manager.removeComponent<Camera>(selectedEntityIndex);
+                        }
+                        break;
+                    case 1: // Option 2
+                        break;
+                }
+            }
+        ImGui::End();
+    }
+
+
+    void entityList() {
+        ImGui::Begin("Entity list");
+
+        for (const auto &entity: Manager.ActiveEntities()) {
+            auto &name = Manager.getComponent<EntityName>(entity);
+            std::string entityLabel = name.Value + " (ID: " + std::to_string(name.getId()) + ")";
+            bool isSelected = (selectedEntityIndex == entity);
+            if (ImGui::Selectable(entityLabel.c_str(), isSelected))
+                selectedEntityIndex = entity;
+            if (isSelected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::End();
+
+        info();
+    }
+
+    void MakeOrDelete() {
+        ImGui::Begin("Action", nullptr, ImGuiDockNodeFlags_AutoHideTabBar);
+        if (ImGui::Button("+")) {
+            addEntity();
+        }
         if (selectedEntityIndex != -1) {
-            if (ImGui::Button("Delete")) {
-//                std::cout << selectedEntityIndex;
+            ImGui::SameLine();
+            if (ImGui::Button("-")) {
                 Manager.destroyEntity(selectedEntityIndex);
                 selectedEntityIndex = -1;
             }
         }
-    }
-
-    void transform() {
-        if (selectedEntityIndex != -1) {
-            auto &instance = Manager.getComponent<Transform>(selectedEntityIndex);
-
-            ImGui::Begin("Instance Properties");
-            if (ImGui::CollapsingHeader("Translate")) {
-                ImGui::InputFloat("X", &instance.Position.x, 0.05f, 1.0f);
-                ImGui::InputFloat("Y", &instance.Position.y, 0.05f, 1.0f);
-                ImGui::InputFloat("Z", &instance.Position.z, 0.05f, 1.0f);
-            }
-            if (ImGui::CollapsingHeader("Rotate")) {
-                ImGui::SliderFloat3("angles", &instance.Rotation.x, -180.0f, 180.0f);
-                if (ImGui::Button("Reset Rotate")) {
-                    instance.Rotation = Vec3(0.f, 0.f, 0.f);
-                }
-            }
-
-            if (ImGui::CollapsingHeader("Scale")) {
-                ImGui::InputFloat("Factor", &instance.Scale, 0.05f, 1.0f);
-                if (ImGui::Button("Reset Scale")) {
-                    instance.Scale = 1.f;
-                }
-            }
-
-            ImGui::End();
-        }
+        ImGui::End();
     }
 
     void space() {
@@ -264,22 +290,60 @@ public:
     void components() {
         ImGui::Begin("Components");
         {
-            ImGui::Begin("Toolbar");
-            {
-                if (ImGui::Button("add")) {
-
-                }
-
-                ImGui::SameLine();
-                if (ImGui::Button("remove")) {
-
-                }
-                ImGui::End();
-            }
-
-            if (selected > -1) {
+            if (selectedEntityIndex != -1) {
+                camera();
+                transform();
             }
             ImGui::End();
+        }
+    }
+
+    void transform() {
+        if (Manager.hasComponent<Transform>(selectedEntityIndex)) {
+            auto &instance = Manager.getComponent<Transform>(selectedEntityIndex);
+            if (ImGui::CollapsingHeader("Transform")) {
+                ImGui::Indent();
+
+                if (ImGui::CollapsingHeader("Translation")) {
+                    ImGui::InputFloat("X", &instance.Position.x, 0.05f, 1.0f);
+                    ImGui::InputFloat("Y", &instance.Position.y, 0.05f, 1.0f);
+                    ImGui::InputFloat("Z", &instance.Position.z, 0.05f, 1.0f);
+                }
+                if (ImGui::CollapsingHeader("Rotation")) {
+                    ImGui::SliderFloat3("Angles", &instance.Rotation.x, -180.0f, 180.0f);
+                    if (ImGui::Button("Reset Rotation")) {
+                        instance.Rotation = Vec3(0.f, 0.f, 0.f);
+                    }
+                }
+
+                if (ImGui::CollapsingHeader("Scaling")) {
+                    ImGui::InputFloat("Factor", &instance.Scale, 0.05f, 1.0f);
+                    if (ImGui::Button("Reset Scale")) {
+                        instance.Scale = 1.f;
+                    }
+                }
+                ImGui::Unindent();
+            }
+        }
+    }
+
+    void camera() {
+        if (Manager.hasComponent<Camera>(selectedEntityIndex)) {
+            auto &instance = Manager.getComponent<Camera>(selectedEntityIndex);
+
+            if (ImGui::CollapsingHeader("Camera")) {
+                ImGui::Text("Yaw: %.2f", instance.Yaw);
+                ImGui::SameLine();
+                ImGui::Text("Pitch: %.2f", instance.Pitch);
+
+                ImGui::SliderFloat("Sensitivity", &instance.Sensitivity, 0.1f, 10.0f);
+                ImGui::InputFloat("MovementSpeed", &instance.MovementSpeed, 0.05f, 5.0f);
+
+                ImGui::InputFloat("FOV", &instance.Fov, 1.f, 180.0f);
+                ImGui::InputFloat("zFar", &instance.zFar, 0.05f, 5.0f);
+                ImGui::InputFloat("zNear", &instance.zNear, 0.05f, 5.0f);
+                ImGui::SliderFloat("AspectRatio", &instance.AspectRatio, 4.0f / 3.0f, 21.0f / 9.0f);
+            }
         }
     }
 
