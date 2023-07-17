@@ -132,6 +132,7 @@ public:
         // shaders
         createProgram("MAIN", "vShader.glsl", "fShader.glsl");
         createProgram("SKYBOX", "sbox.vert", "sbox.frag");
+        createProgram("LIGHT", "lCube.vert", "lCube.frag");
 
         // skybox cubeMap
         std::vector<std::string> face_paths;

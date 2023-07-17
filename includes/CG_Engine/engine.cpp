@@ -10,6 +10,8 @@
 #include "CG_Engine/components/name.h"
 #include "CG_Engine/systems/meshSystem.h"
 #include "CG_Engine/systems/modelSystem.h"
+#include "CG_Engine/systems/directionalLightSystem.h"
+#include "CG_Engine/systems/pointLightSystem.h"
 
 
 void Engine::update() {
@@ -34,6 +36,18 @@ void Engine::init() {
 
     Registrar<Camera>("Camera");
     Registrar<MeshRenderer>("MeshRenderer");
+
+    Manager.addSystem<PointLightSystem>();
+    EntityId pointEntity = Manager.addNewEntity();
+    Manager.addComponent<PointLighting>(pointEntity);
+    Manager.addComponent<Transform>(pointEntity);
+    Manager.addComponent<EntityName>(pointEntity, "Point 1");
+
+    Manager.addSystem<DirectionalLightSystem>();
+    EntityId dirEntity = Manager.addNewEntity();
+    Manager.addComponent<DirectionalLight>(dirEntity);
+    Manager.addComponent<Transform>(dirEntity);
+    Manager.addComponent<EntityName>(dirEntity, "Dir 1");
 
     Manager.addSystem<ModelRendererSystem>();
     EntityId modelEntity = Manager.addNewEntity();
