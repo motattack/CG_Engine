@@ -14,6 +14,9 @@
 #include "CG_Engine/components/modelRenderer.h"
 #include "direct.h"
 #include "CG_Engine/components/meshRenderer.h"
+#include "CG_Engine/components/spotLight.h"
+#include "CG_Engine/components/directionalLight.h"
+#include "CG_Engine/components/pointLight.h"
 
 
 static int selectedEntityIndex = 0;
@@ -190,7 +193,7 @@ public:
 
     void MyImGuiWindow() {
         ImGui::Begin("Add component");
-        const char *items[] = {"Camera", "Model", "Mesh", "Input"};
+        const char *items[] = {"Camera", "Model", "Mesh", "Direct", "Spot", "Point"};
         static int selected_item = 0;
 
         if (selectedEntityIndex != -1)
@@ -221,6 +224,33 @@ public:
                         ImGui::SameLine();
                         if (ImGui::Button("remove")) {
                             Manager.removeComponent<MeshRenderer>(selectedEntityIndex);
+                        }
+                        break;
+                    case 3:
+                        if (ImGui::Button("add")) {
+                            Manager.addComponent<DirectionalLight>(selectedEntityIndex);
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("remove")) {
+                            Manager.removeComponent<DirectionalLight>(selectedEntityIndex);
+                        }
+                        break;
+                    case 4:
+                        if (ImGui::Button("add")) {
+                            Manager.addComponent<SpotLighting>(selectedEntityIndex);
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("remove")) {
+                            Manager.removeComponent<SpotLighting>(selectedEntityIndex);
+                        }
+                        break;
+                    case 5:
+                        if (ImGui::Button("add")) {
+                            Manager.addComponent<PointLighting>(selectedEntityIndex);
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("remove")) {
+                            Manager.removeComponent<PointLighting>(selectedEntityIndex);
                         }
                         break;
                 }

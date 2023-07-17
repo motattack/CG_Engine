@@ -26,14 +26,6 @@ void Engine::update() {
 void Engine::init() {
     Resource.init();
 
-    Manager.registerCompList<Camera>();
-    Manager.registerCompList<Transform>();
-    Manager.registerCompList<EntityName>();
-    Manager.registerCompList<MeshRenderer>();
-
-    Registrar<Camera>("Camera");
-    Registrar<MeshRenderer>("MeshRenderer");
-
     Manager.addSystem<SpotLightSystem>();
     Manager.addSystem<PointLightSystem>();
     Manager.addSystem<DirectionalLightSystem>();

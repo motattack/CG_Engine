@@ -12,7 +12,7 @@
 class CameraSystem : public BaseSystem {
 
 public:
-    void start() override {
+    CameraSystem() {
         addComponentSignature<Camera>();
         addComponentSignature<Transform>();
 
@@ -44,6 +44,8 @@ public:
             glDepthMask(GL_TRUE);
 
             shader.bind();
+            shader.setInt("material.diffuse", 0);
+            shader.setInt("material.specular", 1);
             shader.setMat4("projection", camera.GetProjectionMatrix());
             shader.setMat4("view", camera.GetViewMatrix());
         }

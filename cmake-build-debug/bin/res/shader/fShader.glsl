@@ -64,9 +64,9 @@ void main() {
     vec3 norm = normalize(normal);
     vec3 viewDir = normalize(viewPos - fragPos);
 
-    vec3 result = calcDirLight(dirLight, norm, viewDir);
 
-    vec4 texColor = texture(material.diffuse, TexCoords);
+    vec3 result = texture(material.diffuse, TexCoords).rgb;
+    result += calcDirLight(dirLight, norm, viewDir);
 
     // все вершины квадрата
     for (int i = 0; i < 4; i++)
@@ -89,7 +89,7 @@ vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
     vec3 diffuse = light.diffuse * diff_koef * texture(material.diffuse, TexCoords).rgb;
     vec3 specular = light.specular * spec * texture(material.specular, TexCoords).rgb;
 
-    return ambient + diffuse + specular;
+    return max(ambient + diffuse + specular, 0);
 }
 
 vec3 calcPointLight(PointLight light, vec3 norm, vec3 fragpos, vec3 viewDir) {
@@ -111,7 +111,7 @@ vec3 calcPointLight(PointLight light, vec3 norm, vec3 fragpos, vec3 viewDir) {
     diffuse *= attenuation;
     specular *= attenuation;
 
-    return ambient + diffuse + specular;
+    return max(ambient + diffuse + specular, 0);
 }
 
 vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 fragpos, vec3 viewDir) {
@@ -137,5 +137,5 @@ vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 fragpos, vec3 viewDir) {
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
 
-    return ambient + diffuse + specular;
+    return max(ambient + diffuse + specular, 0);
 }

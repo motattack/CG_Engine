@@ -13,6 +13,7 @@
 
 #include <CG_Engine/objects/mesh.h>
 #include <CG_Engine/objects/model.h>
+#include <CG_Engine/timer.h>
 
 const std::string ICON_PATH = "res/gui/";
 const std::string MODEL_PATH = "res/models/";
@@ -262,10 +263,27 @@ public:
     }
 
     // models
-    void loadModel(std::string name, std::string filename) {
-        models.insert({name, std::make_shared<Model>(filename)});
-        std::cout << filename << " loaded!" << std::endl;
+    void loadModel(const std::string name, const std::string filename) {
+        std::string new_name = name;
+        if (!new_name.size()) {
+            new_name = "Sample Text " + std::to_string(models.size());
+        }
+
+        // Check if the model name already exists in the map
+        if (models.find(new_name) != models.end()) {
+            std::cout << "Model with name \"" << new_name << "\" already exists. Skipping load." << std::endl;
+            return;
+        }
+
+        if (Model::validModel(filename)) {
+            models.insert({new_name, std::make_shared<Model>(filename)});
+            std::cout << new_name << filename << " loaded!" << std::endl;
+        }
     };
+
+    std::map<std::string, std::shared_ptr<Model>> &getModels() {
+        return models;
+    }
 
     std::shared_ptr<Model> getModel(std::string name) {
         assert(models.find(name) != models.end() && "Model out of range!");

@@ -11,7 +11,7 @@
 
 class KeyMotionSystem : public BaseSystem {
 public:
-    void start() override {
+    KeyMotionSystem() {
         addComponentSignature<Transform>();
         addComponentSignature<KeyMotion>();
     }

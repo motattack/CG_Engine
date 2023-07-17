@@ -19,7 +19,7 @@ public:
         shader = Shader(Resource.program("MAIN"));
     }
 
-    void update() {
+    void update() override {
         for (auto entity: entities) {
             auto &light = Manager.getComponent<DirectionalLight>(entity);
             auto &transform = Manager.getComponent<Transform>(entity);

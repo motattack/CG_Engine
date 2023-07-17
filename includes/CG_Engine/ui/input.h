@@ -37,7 +37,8 @@ public:
     }
 
     void setKey(int key, bool value) {
-        keyboard[key] = value;
+        if (key != -1)
+            keyboard[key] = value;
     }
 
     const bool IsKeyPressed(int key) {

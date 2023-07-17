@@ -10,6 +10,7 @@ const unsigned int FAIL_LOAD_TEXTURE = 3347;
 #include <assimp/postprocess.h>
 
 #define STB_IMAGE_IMPLEMENTATION
+
 #include <stb_image.h>
 
 #include <cmath>
@@ -44,6 +45,17 @@ public:
     void Draw(Shader &shader) {
         for (auto mesh: meshes)
             mesh.Draw(shader);
+    }
+
+    static bool validModel(const string &path) {
+        Assimp::Importer importer;
+        const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+            cout << "Validate error assimp: " << importer.GetErrorString() << endl;
+            return false;
+        }
+        return true;
     }
 
     vector<Texture> textures_loaded;
