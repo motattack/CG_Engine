@@ -3,6 +3,7 @@
 
 #include <imgui.h>
 #include <imgui-SFML.h>
+#include <CG_Engine/ui/input.h>
 #include <CG_Engine/engine.h>
 
 

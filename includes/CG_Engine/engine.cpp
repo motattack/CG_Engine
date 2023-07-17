@@ -1,44 +1,50 @@
 #include <CG_Engine/engine.h>
 #include <CG_Engine/ui/gui.h>
 #include <CG_Engine/components/camera.h>
-#include <CG_Engine/ui/input.h>
-#include <CG_Engine/events.h>
 #include <CG_Engine/base/Entity.h>
-#include <CG_Engine/components/transform.h>
 #include <CG_Engine/systems/common.h>
-#include <CG_Engine/source.h>
-#include <CG_Engine/components/name.h>
 
 
 void Engine::update() {
-    event.poll();
-    timer.tick();
-    sf::Time dt = sf::seconds(timer.deltaTime());
-
     Manager.update();
     Manager.render();
-    gui.display();
     glEnable(GL_DEPTH_TEST);
 
     window.display();
 }
 
 void Engine::init() {
-    Resource.init();
+    // register component list
+    Manager.registerCompList<Camera>();
+    Manager.registerCompList<Transform>();
+    Manager.registerCompList<SpotLighting>();
+    Manager.registerCompList<EntityName>();
+    Manager.registerCompList<PointLighting>();
+    Manager.registerCompList<MeshRenderer>();
+    Manager.registerCompList<ModelRenderer>();
+    Manager.registerCompList<DirectionalLight>();
 
+    // register component factory
+    Registrar<Camera>("Camera");
+    Registrar<SpotLighting>("Spot Light");
+    Registrar<SpotLighting>("Point Light");
+    Registrar<MeshRenderer>("MeshRenderer");
+    Registrar<ModelRenderer>("ModelRenderer");
+    Registrar<DirectionalLight>("Directional Light");
+    Registrar<EntityName>("EntityName");
+
+    // register systems
     Manager.addSystem<SpotLightSystem>();
     Manager.addSystem<PointLightSystem>();
     Manager.addSystem<DirectionalLightSystem>();
 
-    Manager.addSystem<ModelRendererSystem>();
     Manager.addSystem<MeshRendererSystem>();
+    Manager.addSystem<ModelRendererSystem>();
 
-    Manager.addSystem<CameraSystem>();
-    EntityId cameraEntity = Manager.addNewEntity();
-    Manager.addComponent<Camera>(cameraEntity);
-    Manager.addComponent<Transform>(cameraEntity);
-    Manager.addComponent<EntityName>(cameraEntity, "MainCamera");
+    // runtime systems will be added at runtime
+    Manager.addRuntimeSystem<CameraSystem>();
 
+    Manager.activateEditorSystems();
     Manager.start();
 
     gui.init();
@@ -73,6 +79,12 @@ Engine::~Engine() {
 void Engine::render() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (!isGame) {
+//        gui.display();
+    } else {
+        Manager.render();
+    }
 }
 
 void Engine::startGame() {

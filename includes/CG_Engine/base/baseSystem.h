@@ -1,8 +1,6 @@
 #ifndef CG_ENGINE_BASESYSTEM_H
 #define CG_ENGINE_BASESYSTEM_H
 
-#include <CG_Engine/base/types.h>
-
 class BaseSystem {
 protected:
     Signature signature;

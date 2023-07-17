@@ -10,7 +10,6 @@
 #include <CG_Engine/components/name.h>
 #include <CG_Engine/components/transform.h>
 #include <CG_Engine/components/camera.h>
-#include "CG_Engine/objects/model.h"
 #include "CG_Engine/components/modelRenderer.h"
 #include "direct.h"
 #include "CG_Engine/components/meshRenderer.h"
@@ -161,16 +160,16 @@ public:
         sf::Time dt = sf::seconds(timer.deltaTime());
 
         ImGui::SFML::Update(core.Window(), dt);
-
-        {
-            ImGui::ShowDemoWindow();
-            space();
-            components();
-            entityList();
-            MakeOrDelete();
-            MyImGuiWindow();
-        }
-
+//
+//        {
+        ImGui::ShowDemoWindow();
+        space();
+        components();
+        entityList();
+//            MakeOrDelete();
+//            MyImGuiWindow();
+//        }
+//
         ImGui::SFML::Render(core.Window());
     }
 

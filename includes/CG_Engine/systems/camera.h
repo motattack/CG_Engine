@@ -9,6 +9,13 @@
 #include <CG_Engine/render/shader.h>
 #include <CG_Engine/source.h>
 
+Vec3 pointLightPositions[] = {
+        Vec3( 0.7f,  0.2f,  2.0f),
+        Vec3( 2.3f, -3.3f, -4.0f),
+        Vec3(-4.0f,  2.0f, -12.0f),
+        Vec3( 0.0f,  0.0f, -3.0f)
+};
+
 class CameraSystem : public BaseSystem {
 
 public:
@@ -17,6 +24,9 @@ public:
         addComponentSignature<Transform>();
 
         shader = Shader(Resource.program("MAIN"));
+        shader.bind();
+        shader.setInt("material.diffuse", 0);
+        shader.setInt("material.specular", 1);
         skyboxShader = Shader(Resource.program("SKYBOX"));
     }
 
@@ -44,8 +54,9 @@ public:
             glDepthMask(GL_TRUE);
 
             shader.bind();
-            shader.setInt("material.diffuse", 0);
-            shader.setInt("material.specular", 1);
+            shader.setV3Float("viewPos", camera.Position);
+            shader.setFloat("material.shininess", 32.0f);
+
             shader.setMat4("projection", camera.GetProjectionMatrix());
             shader.setMat4("view", camera.GetViewMatrix());
         }

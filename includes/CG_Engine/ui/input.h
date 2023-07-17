@@ -4,6 +4,7 @@
 #include <bitset>
 #include <CG_Engine/math/common.h>
 #include <CG_Engine/engine.h>
+#include <GL/glew.h>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 

@@ -1,7 +1,6 @@
 #ifndef CG_ENGINE_COMPFACTORY_H
 #define CG_ENGINE_COMPFACTORY_H
 
-#include <CG_Engine/base/baseComponent.h>
 #include <functional>
 #include <map>
 #include <iostream>

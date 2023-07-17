@@ -2,7 +2,7 @@
 #define CG_ENGINE_COMPLIST_H
 
 #include <algorithm>
-#include <CG_Engine/base/types.h>
+#include <iostream>
 
 class ICompList {
 public:

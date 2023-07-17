@@ -26,7 +26,7 @@ const unsigned int FAIL_LOAD_TEXTURE = 3347;
 
 using namespace std;
 
-unsigned int TextureFromFile(const char *path, const string &directory);
+static unsigned int TextureFromFile(const char *path, const string &directory);
 
 class Model {
 public:
@@ -192,7 +192,7 @@ private:
 
 };
 
-unsigned int TextureFromFile(const char *path, const string &directory) {
+static unsigned int TextureFromFile(const char *path, const string &directory) {
     string fileName = string(path);
     if (!directory.empty())
         fileName = directory + '/' + fileName;
@@ -233,7 +233,7 @@ unsigned int TextureFromFile(const char *path, const string &directory) {
     return textureID;
 }
 
-unsigned int loadCubeMap(vector<std::string> faces) {
+static unsigned int loadCubeMap(vector<std::string> faces) {
     unsigned int textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);

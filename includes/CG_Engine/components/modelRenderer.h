@@ -1,7 +1,6 @@
 #ifndef CG_ENGINE_MODELRENDERER_H
 #define CG_ENGINE_MODELRENDERER_H
 
-#include <CG_Engine/base/baseComponent.h>
 #include <CG_Engine/source.h>
 
 struct ModelRenderer : public BaseComponent {
