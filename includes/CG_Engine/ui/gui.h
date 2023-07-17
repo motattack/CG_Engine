@@ -10,6 +10,9 @@
 #include <CG_Engine/components/name.h>
 #include <CG_Engine/components/transform.h>
 #include <CG_Engine/components/camera.h>
+#include "CG_Engine/objects/model.h"
+#include "CG_Engine/components/modelRenderer.h"
+#include "direct.h"
 
 
 static int selectedEntityIndex = 0;
@@ -201,7 +204,14 @@ public:
                             Manager.removeComponent<Camera>(selectedEntityIndex);
                         }
                         break;
-                    case 1: // Option 2
+                    case 1:
+                        if (ImGui::Button("add")) {
+                            Manager.addComponent<ModelRenderer>(selectedEntityIndex);
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("remove")) {
+                            Manager.removeComponent<ModelRenderer>(selectedEntityIndex);
+                        }
                         break;
                 }
             }
@@ -293,6 +303,7 @@ public:
             if (selectedEntityIndex != -1) {
                 camera();
                 transform();
+                model();
             }
             ImGui::End();
         }
@@ -343,6 +354,22 @@ public:
                 ImGui::InputFloat("zFar", &instance.zFar, 0.05f, 5.0f);
                 ImGui::InputFloat("zNear", &instance.zNear, 0.05f, 5.0f);
                 ImGui::SliderFloat("AspectRatio", &instance.AspectRatio, 4.0f / 3.0f, 21.0f / 9.0f);
+            }
+        }
+    }
+
+    void model() {
+        if (Manager.hasComponent<ModelRenderer>(selectedEntityIndex)) {
+            auto &instance = Manager.getComponent<ModelRenderer>(selectedEntityIndex);
+
+            if (ImGui::CollapsingHeader("Model")) {
+                ImGui::Text("Model: # %d %s", instance.getId(), instance.Name.c_str());
+            }
+            static char filePath[256] = ""; // Store the file path here
+            ImGui::InputText("File Path", filePath, sizeof(filePath));
+            if (ImGui::Button("Load")) {
+                std::cout << filePath << std::endl;
+                instance.Renderer = Resource.getModel("SPHERE");
             }
         }
     }

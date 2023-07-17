@@ -128,6 +128,7 @@ public:
 
         // models
         loadModel("PACK", "res/models/amc/scene.gltf");
+        loadModel("SPHERE", "res/models/sphere/untitled.obj");
 
         // shaders
         createProgram("MAIN", "vShader.glsl", "fShader.glsl");
