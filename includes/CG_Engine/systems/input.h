@@ -1,9 +1,7 @@
 #ifndef CG_ENGINE_INPUT_SYSTEM_H
 #define CG_ENGINE_INPUT_SYSTEM_H
 
-#include <CG_Engine/base/baseSystem.h>
-#include <CG_Engine/components/transform.h>
-#include <CG_Engine/components/keyMotion.h>
+#include <CG_Engine/ui/input.h>
 
 
 class KeyMotionSystem : public BaseSystem {
@@ -99,10 +97,10 @@ public:
 
         // Z-AXIS
         if (event.IsKeyPressed(sf::Keyboard::Q)) {
-            transform.Position.z += speed * deltatime;
+            transform.Rotation.x += speed * deltatime;
         }
         if (event.IsKeyPressed(sf::Keyboard::E)) {
-            transform.Position.z -= speed * deltatime;
+            transform.Rotation.x -= speed * deltatime;
         }
     }
 

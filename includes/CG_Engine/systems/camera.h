@@ -62,52 +62,52 @@ public:
     }
 
     void event(Camera &camera) {
-//        auto &event = Input::Event();
-//        if (event.isMouseScrolling()) {
-//            camera.ChangeFOV(event.mouseScrollOffset().y);
+        auto &event = Input::Event();
+        if (event.isMouseScrolling()) {
+            camera.ChangeFOV(event.mouseScrollOffset().y);
+        }
+        event.resetScrollState();
+
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+//            camera.Move(CameraDirection::FORWARD, timer.deltaTime());
 //        }
-//        event.resetScrollState();
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-            camera.Move(CameraDirection::FORWARD, timer.deltaTime());
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-            camera.Move(CameraDirection::BACKWARD, timer.deltaTime());
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            camera.Move(CameraDirection::RIGHT, timer.deltaTime());
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-            camera.Move(CameraDirection::LEFT, timer.deltaTime());
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-            camera.Move(CameraDirection::UP, timer.deltaTime());
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
-            camera.Move(CameraDirection::DOWN, timer.deltaTime());
-        }
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            camera.Rotate(-timer.deltaTime() * 360.f, 0);
-        }
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            camera.Rotate(timer.deltaTime() * 360.f, 0);
-        }
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            camera.Rotate(0, timer.deltaTime() * 360.f);
-        }
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            camera.Rotate(0, -timer.deltaTime() * 360.f);
-        }
-
-//        if (event.isMouseMoving()) {
-////            std::cout << event.getDX() << ":" << event.getDY() << std::endl;
-//            float x = event.getDX(), y = event.getDY();
-//            camera.Rotate(x, y);
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+//            camera.Move(CameraDirection::BACKWARD, timer.deltaTime());
 //        }
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+//            camera.Move(CameraDirection::RIGHT, timer.deltaTime());
+//        }
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+//            camera.Move(CameraDirection::LEFT, timer.deltaTime());
+//        }
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+//            camera.Move(CameraDirection::UP, timer.deltaTime());
+//        }
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+//            camera.Move(CameraDirection::DOWN, timer.deltaTime());
+//        }
+//
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+//            camera.Rotate(-timer.deltaTime() * 360.f, 0);
+//        }
+//
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+//            camera.Rotate(timer.deltaTime() * 360.f, 0);
+//        }
+//
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+//            camera.Rotate(0, timer.deltaTime() * 360.f);
+//        }
+//
+//        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+//            camera.Rotate(0, -timer.deltaTime() * 360.f);
+//        }
+
+        if (event.isMouseMoving()) {
+//            std::cout << event.getDX() << ":" << event.getDY() << std::endl;
+            float x = event.getDX(), y = event.getDY();
+            camera.Rotate(x, y);
+        }
     }
 
 private:

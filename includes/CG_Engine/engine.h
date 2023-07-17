@@ -104,6 +104,7 @@ public:
         Manager.registerCompList<MeshRenderer>();
         Manager.registerCompList<ModelRenderer>();
         Manager.registerCompList<DirectionalLight>();
+        Manager.registerCompList<KeyMotion>();
 
         // register component factory
         Registrar<Camera>("Camera");
@@ -113,11 +114,13 @@ public:
         Registrar<ModelRenderer>("ModelRenderer");
         Registrar<DirectionalLight>("Directional Light");
         Registrar<EntityName>("EntityName");
+        Registrar<KeyMotion>("KeyMotion");
 
         // register systems
         Manager.addSystem<SpotLightSystem>();
         Manager.addSystem<PointLightSystem>();
         Manager.addSystem<DirectionalLightSystem>();
+        Manager.addSystem<KeyMotionSystem>();
 
         Manager.addSystem<MeshRendererSystem>();
         Manager.addSystem<ModelRendererSystem>();

@@ -120,11 +120,11 @@ static void KeyboardCallback(sf::Keyboard::Key key, bool pressed) {
     event.setKey(key, pressed);
 
     if (event.IsKeyPressed(sf::Keyboard::Escape)) {
-        core.exit();
+//        core.exit();
     }
 
     if (event.IsKeyPressed(sf::Keyboard::Space)) {
-        core.stopGame();
+//        core.stopGame();
     }
 }
 

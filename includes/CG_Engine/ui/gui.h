@@ -27,6 +27,7 @@
 #include "CG_Engine/components/directionalLight.h"
 #include "CG_Engine/components/pointLight.h"
 #include <CG_Engine/components/camera.h>
+#include <CG_Engine/components/keyMotion.h>
 #include <CG_Engine/base/entityManager.h>
 
 #include <CG_Engine/base/Entity.h>
@@ -206,7 +207,7 @@ public:
 
     void MyImGuiWindow() {
         ImGui::Begin("Add component");
-        const char *items[] = {"Camera", "Model", "Mesh", "Direct", "Spot", "Point"};
+        const char *items[] = {"Camera", "Model", "Mesh", "Direct", "Spot", "Point", "Input"};
         static int selected_item = 0;
 
         if (selectedEntityIndex != -1)
@@ -264,6 +265,15 @@ public:
                         ImGui::SameLine();
                         if (ImGui::Button("remove")) {
                             Manager.removeComponent<PointLighting>(selectedEntityIndex);
+                        }
+                        break;
+                    case 6:
+                        if (ImGui::Button("add")) {
+                            Manager.addComponent<KeyMotion>(selectedEntityIndex);
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("remove")) {
+                            Manager.removeComponent<KeyMotion>(selectedEntityIndex);
                         }
                         break;
                 }
@@ -358,6 +368,7 @@ public:
                 transform();
                 model();
                 mesh();
+                input();
             }
             ImGui::End();
         }
@@ -464,6 +475,15 @@ public:
         if (ImGui::Button("Load")) {
             std::cout << name << path << std::endl;
             Resource.loadModel(name, path);
+        }
+    }
+
+    void input(){
+        if (Manager.hasComponent<KeyMotion>(selectedEntityIndex)) {
+            auto &instance = Manager.getComponent<KeyMotion>(selectedEntityIndex);
+            if (ImGui::CollapsingHeader("keyMoution")) {
+
+            }
         }
     }
 
