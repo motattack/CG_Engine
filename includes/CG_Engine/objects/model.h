@@ -24,15 +24,13 @@ const unsigned int FAIL_LOAD_TEXTURE = 3347;
 #include <iostream>
 #include <map>
 
-using namespace std;
-
-static unsigned int TextureFromFile(const char *path, const string &directory);
+static unsigned int TextureFromFile(const char *path, const std::string &directory);
 
 class Model {
 public:
     Model() = default;
 
-    explicit Model(std::string path) {
+    Model(std::string path, bool gamma = false) : gammaCorrection(gamma) {
         this->loadModel(path.c_str());
     }
 
@@ -47,193 +45,212 @@ public:
             mesh.Draw(shader);
     }
 
-    static bool validModel(const string &path) {
+    static bool validModel(const std::string &path) {
         Assimp::Importer importer;
         const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-            cout << "Validate error assimp: " << importer.GetErrorString() << endl;
+            std::cout << "Validate error assimp: " << importer.GetErrorString() << std::endl;
             return false;
         }
         return true;
     }
 
-    vector<Texture> textures_loaded;
-    vector<Mesh> meshes;
+    std::vector<Texture> textures_loaded;
+    std::vector<Mesh> meshes;
+    std::string directory;
+    bool gammaCorrection;
 private:
-    // Model Data
-
-    string directory;
-
-    void loadModel(const string &path) {
+    void loadModel(std::string const &path) {
+        // Чтение файла с помощью Assimp
         Assimp::Importer importer;
-        const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+        const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs |
+                                                       aiProcess_CalcTangentSpace);
 
-        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-            cout << "ERROR::ASSIMP::" << importer.GetErrorString() << endl;
+        // Проверка на ошибки
+        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // если НЕ 0
+        {
+            std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
             return;
         }
 
+        // Получение пути к файлу
         directory = path.substr(0, path.find_last_of('/'));
 
+        // Рекурсивная обработка корневого узла Assimp
         processNode(scene->mRootNode, scene);
-
     }
 
+    // Рекурсивно обрабатываем каждый отдельный меш, расположенный в узле,
+    // и повторяем этот процесс для дочерних узлов (если такие есть)
     void processNode(aiNode *node, const aiScene *scene) {
-        // process all the node's meshes (if any)
-        for (int i = 0; i < node->mNumMeshes; i++) {
+        // Обрабатываем каждый меш текущего узла
+        for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+            // Узел содержит только индексы объектов в сцене.
             aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
             meshes.push_back(processMesh(mesh, scene));
         }
 
-        // Then do the same for each of its children
-        for (int i = 0; i < node->mNumChildren; i++) {
+        // Обрабатываем дочерние узлы (если они есть.
+        for (unsigned int i = 0; i < node->mNumChildren; i++) {
             processNode(node->mChildren[i], scene);
         }
     }
 
     Mesh processMesh(aiMesh *mesh, const aiScene *scene) {
-        // Data
-        vector<Vertex> vertices;
-        vector<unsigned int> indecies;
-        vector<Texture> textures;
+        // Данные для заполнения
+        std::vector<Vertex> vertices;
+        std::vector<unsigned int> indices;
+        std::vector<Texture> textures;
 
-        // Vertex
-        for (int i = 0; i < mesh->mNumVertices; i++) {
-            // Position
+        // Цикл по всем вершинам меша
+        for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
             Vertex vertex;
-            Vec3 vector3;
+            Vec3 vector; // Объявляем временный вектор,
+            // т.к. assimp использует свой векторный класс, который не преобразуется напрямую в тип Vec3,
+            // поэтому сначала мы передаем данные в этот промежуточный вектор типа Vec3
 
-            vector3.x = mesh->mVertices[i].x;
-            vector3.y = mesh->mVertices[i].y;
-            vector3.z = mesh->mVertices[i].z;
+            // Координаты
+            vector.x = mesh->mVertices[i].x;
+            vector.y = mesh->mVertices[i].y;
+            vector.z = mesh->mVertices[i].z;
+            vertex.Position = vector;
 
-            vertex.Position = vector3;
+            // Нормали
+            vector.x = mesh->mNormals[i].x;
+            vector.y = mesh->mNormals[i].y;
+            vector.z = mesh->mNormals[i].z;
+            vertex.Normal = vector;
 
-            // Normals
-            if (mesh->HasNormals()) {
-                vector3.x = mesh->mNormals[i].x;
-                vector3.y = mesh->mNormals[i].y;
-                vector3.z = mesh->mNormals[i].z;
-
-                vertex.Normal = vector3;
-            }
-
-            // Texture Coordinate
+            // если меш содержит текстурные координаты
             if (mesh->mTextureCoords[0]) {
-                Vec2 vector2;
+                Vec2 vec;
 
-                vector2.x = mesh->mTextureCoords[0][i].x;
-                vector2.y = mesh->mTextureCoords[0][i].y;
-
-                vertex.TexCoords = vector2;
+                // мы не будем использовать модели в которых вершина может содержать несколько текстурных координат,
+                // поэтому мы всегда берем первый набор (0)
+                vec.x = mesh->mTextureCoords[0][i].x;
+                vec.y = mesh->mTextureCoords[0][i].y;
+                vertex.TexCoords = vec;
             } else
-                vertex.TexCoords = Vec2(0.0f);
+                vertex.TexCoords = Vec2(0.0f, 0.0f);
 
+            // Касательный вектор
+            vector.x = mesh->mTangents[i].x;
+            vector.y = mesh->mTangents[i].y;
+            vector.z = mesh->mTangents[i].z;
+            vertex.Tangent = vector;
+
+            // Вектор бинормали
+            vector.x = mesh->mBitangents[i].x;
+            vector.y = mesh->mBitangents[i].y;
+            vector.z = mesh->mBitangents[i].z;
+            vertex.Bitangent = vector;
             vertices.push_back(vertex);
         }
 
-        // Indices
-        for (int i = 0; i < mesh->mNumFaces; i++) {
+        // (грань - это треугольник меша) получаем индексы вершин
+        for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
             aiFace face = mesh->mFaces[i];
 
-            for (int j = 0; j < face.mNumIndices; j++)
-                indecies.push_back(face.mIndices[j]);
+            // все индексы граней
+            for (unsigned int j = 0; j < face.mNumIndices; j++)
+                indices.push_back(face.mIndices[j]);
         }
 
-        // Texture
+        // Обрабатываем материалы
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-        // Diffuse Map
-        vector<Texture> diffuseMaps = loadMaterialTexture(material, aiTextureType_DIFFUSE, "texture_diffuse");
+        // Каждая диффузная текстура будет называться 'texture_diffuseN',
+        // где N - это порядковый номер [1..MAX_SAMPLER_NUMBER].
+
+        // Диффузные карты
+        std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-        // Specular Map
-        vector<Texture> specularMaps = loadMaterialTexture(material, aiTextureType_SPECULAR, "texture_specular");
+        // Карты отражения
+        std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
-        vector<Texture> normalMaps = loadMaterialTexture(material, aiTextureType_NORMALS, "texture_normal");
+        // Карты нормалей
+        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
-        vector<Texture> heightMaps = loadMaterialTexture(material, aiTextureType_HEIGHT, "texture_height");
+        // Карты высот
+        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
-        return Mesh(vertices, indecies, textures);
+        return Mesh(vertices, indices, textures);
     }
 
-    vector<Texture> loadMaterialTexture(aiMaterial *mat, aiTextureType type, string typeName) {
-        vector<Texture> textures;
-
-        for (int i = 0; i < mat->GetTextureCount(type); i++) {
+    std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
+        std::vector<Texture> textures;
+        for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
             aiString str;
             mat->GetTexture(type, i, &str);
+
             bool skip = false;
-            for (int j = 0; j < textures_loaded.size(); j++) {
-                if (strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0) {
+            for (unsigned int j = 0; j < textures_loaded.size(); j++) {
+                if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0) {
                     textures.push_back(textures_loaded[j]);
-                    skip = true;
+                    skip = true; // текстура с тем же путем к файлу уже загружена, переходим к следующей (оптимизация)
                     break;
                 }
             }
-
             if (!skip) {
                 Texture texture;
-                texture.id = TextureFromFile(str.C_Str(), directory);
-                texture.path = str.C_Str();
+                texture.id = TextureFromFile(str.C_Str(), this->directory);
                 texture.type = typeName;
+                texture.path = str.C_Str();
                 textures.push_back(texture);
                 textures_loaded.push_back(texture);
             }
         }
-
         return textures;
     }
 
 };
 
-static unsigned int TextureFromFile(const char *path, const string &directory) {
-    string fileName = string(path);
+static unsigned int TextureFromFile(const char *path, const std::string &directory) {
+    std::string filename = std::string(path);
     if (!directory.empty())
-        fileName = directory + '/' + fileName;
-
+        filename = directory + '/' + filename;
 
     unsigned int textureID;
     glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
 
-    /* Filter Options */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load(fileName.c_str(), &width, &height, &nrChannels, 0);
-
-    if (data) {
+    int width, height, nrComponents;
+    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    if (data)
+    {
         GLenum format;
-        if (nrChannels == 1)
+        if (nrComponents == 1)
             format = GL_RED;
-        if (nrChannels == 3) // jpg file
+        else if (nrComponents == 3)
             format = GL_RGB;
-        if (nrChannels == 4) // png file
+        else if (nrComponents == 4)
             format = GL_RGBA;
 
+        glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        std::cout << "Failed to load texture\n";
-        std::cout << "Path:" << fileName << std::endl;
-        return FAIL_LOAD_TEXTURE;
-    }
 
-    stbi_image_free(data);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
 
     return textureID;
 }
 
-static unsigned int loadCubeMap(vector<std::string> faces) {
+static unsigned int loadCubeMap(std::vector<std::string> faces) {
     unsigned int textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
