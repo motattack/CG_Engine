@@ -58,6 +58,7 @@ public:
 
             shader.setMat4("projection", camera.GetProjectionMatrix());
             shader.setMat4("view", camera.GetViewMatrix());
+            shader.unBind();
         }
     }
 

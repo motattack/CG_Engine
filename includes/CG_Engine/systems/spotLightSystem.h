@@ -25,6 +25,7 @@ public:
             shader.bind();
             light.light.position = transform.Position;
             light.light.render(shader, 0);
+            shader.unBind();
         }
     }
 

@@ -18,23 +18,23 @@ public:
             auto &transform = Manager.getComponent<Transform>(entity);
             auto &keyMotion = Manager.getComponent<KeyMotion>(entity);
 
-            if (keyMotion.axis == Action_Type::WASD) {
-                WASDControl(transform, keyMotion.speed, deltatime);
-                continue;
-            }
+//            if (keyMotion.axis == Action_Type::WASD) {
+//                WASDControl(transform, keyMotion.speed, deltatime);
+//                continue;
+//            }
             if (keyMotion.axis == Action_Type::WASDQE) {
                 WASDQEControl(transform, keyMotion.speed, deltatime);
                 continue;
             }
-            if (keyMotion.axis == Action_Type::ARROWS) {
-                ARROWSControl(transform, keyMotion.speed, deltatime);
-                std::cout << "arrows";
-                continue;
-            }
-            if (keyMotion.axis == Action_Type::NUMERIC_ARROWS) {
-                NUMControl(transform, keyMotion.speed, deltatime);
-                continue;
-            }
+//            if (keyMotion.axis == Action_Type::ARROWS) {
+//                ARROWSControl(transform, keyMotion.speed, deltatime);
+//                std::cout << "arrows";
+//                continue;
+//            }
+//            if (keyMotion.axis == Action_Type::NUMERIC_ARROWS) {
+//                NUMControl(transform, keyMotion.speed, deltatime);
+//                continue;
+//            }
         }
     }
 
@@ -79,28 +79,38 @@ public:
 
     void WASDQEControl(Transform &transform, float speed, float deltatime) {
         auto &event = Input::Event();
+
+
         // X-AXIS
-        if (event.IsKeyPressed(sf::Keyboard::D)) {
+        if (event.IsKeyPressed(sf::Keyboard::W)) {
             transform.Position.x += speed * deltatime;
         }
-        if (event.IsKeyPressed(sf::Keyboard::A)) {
+        if (event.IsKeyPressed(sf::Keyboard::S)) {
             transform.Position.x -= speed * deltatime;
         }
 
-        // Y-AXIS
-        if (event.IsKeyPressed(sf::Keyboard::W)) {
-            transform.Position.y += speed * deltatime;
+        // z-AXIS
+        if (event.IsKeyPressed(sf::Keyboard::D)) {
+            transform.Position.z += speed * deltatime;
         }
-        if (event.IsKeyPressed(sf::Keyboard::S)) {
-            transform.Position.y -= speed * deltatime;
+        if (event.IsKeyPressed(sf::Keyboard::A)) {
+            transform.Position.z -= speed * deltatime;
         }
 
-        // Z-AXIS
+        // X-AXIS
         if (event.IsKeyPressed(sf::Keyboard::Q)) {
             transform.Rotation.x += speed * deltatime;
         }
         if (event.IsKeyPressed(sf::Keyboard::E)) {
             transform.Rotation.x -= speed * deltatime;
+        }
+
+        //
+        if (event.IsKeyPressed(sf::Keyboard::Space)) {
+            transform.Position.y += speed * deltatime;
+        }
+        if (event.IsKeyPressed(sf::Keyboard::LShift)) {
+            transform.Position.y -= speed * deltatime;
         }
     }
 

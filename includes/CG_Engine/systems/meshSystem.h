@@ -35,6 +35,7 @@ public:
 
             transform.setModelUniform(shader);
             renderer.Mesh.Draw(shader);
+            shader.unBind();
         }
     }
 

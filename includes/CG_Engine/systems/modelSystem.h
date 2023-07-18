@@ -23,6 +23,7 @@ public:
             Manager.getComponent<Transform>(entity).setModelUniform(shader);
             Manager.getComponent<ModelRenderer>(entity).Renderer->Draw(shader);
         }
+        shader.unBind();
     }
 
 private:
