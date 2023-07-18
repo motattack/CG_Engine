@@ -22,6 +22,17 @@ public:
             auto &renderer = Manager.getComponent<MeshRenderer>(entity);
             auto &transform = Manager.getComponent<Transform>(entity);
 
+            unsigned int diffuseMap = Resource.Texture2D("bricks");
+            unsigned int normalMap = Resource.Texture2D("bricks2_disp");
+            unsigned int heightMap = Resource.Texture2D("bricks2_normal");
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, diffuseMap);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, normalMap);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, heightMap);
+
             transform.setModelUniform(shader);
             renderer.Mesh.Draw(shader);
         }

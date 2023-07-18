@@ -137,6 +137,10 @@ public:
         createProgram("SKYBOX", "sbox.vert", "sbox.frag");
         createProgram("LIGHT", "lCube.vert", "lCube.frag");
 
+        addTexture2D("bricks", loadTexture2D("res/textures/cube/bricks2.jpg"));
+        addTexture2D("bricks2_disp", loadTexture2D("res/textures/cube/bricks2_disp.jpg"));
+        addTexture2D("bricks2_normal", loadTexture2D("res/textures/cube/bricks2_normal.jpg"));
+
         // skybox cubeMap
         std::vector<std::string> face_paths;
         face_paths.emplace_back("res/textures/skybox/earth/right.jpg");
@@ -175,6 +179,11 @@ public:
             std::cout << "Trying to add same texture twice!" << std::endl;
         texture2ds.insert({name, texID});
     };
+
+    const GLuint Texture2D(std::string name) {
+        assert(texture2ds.find(name) != texture2ds.end() && "TexID out of range!");
+        return texture2ds.at(name);
+    }
 
     // Cubemap texture
     void loadCubeMap(std::string name, std::vector<std::string> faces) {

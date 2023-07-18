@@ -9,5 +9,6 @@
 #include <CG_Engine/systems/directionalLightSystem.h>
 #include <CG_Engine/systems/pointLightSystem.h>
 #include <CG_Engine/systems/spotLightSystem.h>
+//#include <CG_Engine/systems/spriteRendererSystem.h>
 
 #endif //CG_ENGINE_COMMON_ROOT_H

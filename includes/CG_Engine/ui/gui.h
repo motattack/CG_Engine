@@ -28,6 +28,7 @@
 #include "CG_Engine/components/pointLight.h"
 #include <CG_Engine/components/camera.h>
 #include <CG_Engine/components/keyMotion.h>
+#include <CG_Engine/components/spriteRenderer.h>
 #include <CG_Engine/base/entityManager.h>
 
 #include <CG_Engine/base/Entity.h>

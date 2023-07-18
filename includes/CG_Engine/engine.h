@@ -103,6 +103,7 @@ public:
         Manager.registerCompList<PointLighting>();
         Manager.registerCompList<MeshRenderer>();
         Manager.registerCompList<ModelRenderer>();
+//        Manager.registerCompList<SpriteRenderer>();
         Manager.registerCompList<DirectionalLight>();
         Manager.registerCompList<KeyMotion>();
 
@@ -112,6 +113,7 @@ public:
         Registrar<SpotLighting>("Point Light");
         Registrar<MeshRenderer>("MeshRenderer");
         Registrar<ModelRenderer>("ModelRenderer");
+//        Registrar<SpriteRenderer>("SpriteRenderer");
         Registrar<DirectionalLight>("Directional Light");
         Registrar<EntityName>("EntityName");
         Registrar<KeyMotion>("KeyMotion");
@@ -124,6 +126,7 @@ public:
 
         Manager.addSystem<MeshRendererSystem>();
         Manager.addSystem<ModelRendererSystem>();
+//        Manager.addSystem<SpriteRendererSystem>();
 
         // runtime systems will be added at runtime
         Manager.addSystem<CameraSystem>();
